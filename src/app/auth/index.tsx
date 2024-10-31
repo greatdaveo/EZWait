@@ -6,13 +6,14 @@ import { Ionicons } from '@expo/vector-icons'
 import PhoneInput from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
 import { launchImageLibrary } from 'react-native-image-picker'
+import { Calendar } from 'react-native-calendars'
 
 const onboardingSteps = [
   { step: 1, label: 'Step 1' },
   { step: 2, label: 'Step 2' },
-  { step: 3, label: 'Step 3' },
-  { step: 4, label: 'Step 4' },
-  { step: 5, label: 'Step 5' }
+  { step: 3, label: 'Step 3' }
+  // { step: 4, label: 'Step 4' },
+  // { step: 5, label: 'Step 5' }
 ]
 
 export default function AuthScreen({ title }: { title: string }) {
@@ -20,6 +21,7 @@ export default function AuthScreen({ title }: { title: string }) {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [serviceType, setServiceType] = useState('')
 
   // To navigate to the next step
   const handleNextStep = () => {
@@ -33,6 +35,8 @@ export default function AuthScreen({ title }: { title: string }) {
       setCurrentStep((prevStep) => prevStep - 1)
     }
   }
+
+  const handleImageUpload = async () => {}
 
   return (
     <View style={styles.authContainer}>
@@ -65,17 +69,20 @@ export default function AuthScreen({ title }: { title: string }) {
       )}
 
       <View style={styles.inputContainer}>
-        <Text style={styles.authTitle}>{title}</Text>
-        {title === 'Personal Information' && <TextInput placeholder="Full Name" style={styles.input} />}
-        <TextInput placeholder="Email" style={styles.input} />
-        <View style={styles.passwordContainer}>
-          <TextInput placeholder="Password" style={styles.passwordInput} secureTextEntry={!passwordVisible} />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-            <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
-          </TouchableOpacity>
-        </View>
+        {currentStep === 1 && <Text style={styles.authTitle}>{title}</Text>}
+
+        {title === 'Personal Information' && currentStep === 1 && <TextInput placeholder="Full Name" style={styles.input} />}
+        {currentStep === 1 && <TextInput placeholder="Email" style={styles.input} />}
+        {currentStep === 1 && (
+          <View style={styles.passwordContainer}>
+            <TextInput placeholder="Password" style={styles.passwordInput} secureTextEntry={!passwordVisible} />
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+            </TouchableOpacity>
+          </View>
+        )}
         {title === 'Welcome Back' && <Text style={styles.forgotPasswordText}>Forgot Password?</Text>}
-        {title === 'Personal Information' && (
+        {title === 'Personal Information' && currentStep === 1 && (
           <View style={styles.passwordContainer}>
             <TextInput placeholder="Confirm Password" style={styles.passwordInput} secureTextEntry={!confirmPasswordVisible} />
 
@@ -84,7 +91,7 @@ export default function AuthScreen({ title }: { title: string }) {
             </TouchableOpacity>
           </View>
         )}
-        {title === 'Personal Information' && (
+        {title === 'Personal Information' && currentStep === 1 && (
           <PhoneInput
             defaultCode="GB"
             layout="first"
@@ -95,18 +102,52 @@ export default function AuthScreen({ title }: { title: string }) {
           />
         )}
 
-        {title === 'Personal Information' && (
+        {title === 'Personal Information' && currentStep === 1 && (
           <View style={styles.addressContainer}>
             <Ionicons name="location" size={20} color="grey" style={styles.addressIcon} />
             <TextInput placeholder="Address" style={styles.addressInput} secureTextEntry={!confirmPasswordVisible} />
           </View>
         )}
 
+        {/* For Step 2: To Upload Picture */}
+        {currentStep === 2 && (
+          <View style={styles.imageUploadContainer}>
+            <Text style={styles.formTitle}>Upload Your Picture</Text>
+            <>
+              <TouchableOpacity onPress={handleImageUpload} style={styles.chooseFileButton}>
+                <Ionicons name="add-circle" size={20} color="gray" style={styles.uploadIcon} />
+                <Text style={styles.chooseFileText}>Choose File</Text>
+              </TouchableOpacity>
+            </>
+
+            {/* To display Profile Image if Selected */}
+            {profileImage && <Image source={{ uri: profileImage }} style={styles.profileImage} />}
+          </View>
+        )}
+
+        {/* For Step3: For Preference & Availability */}
+        {currentStep === 3 && (
+          <View style={styles.preferencesContainer}>
+            <Text style={styles.formTitle}>Select Your Service Type</Text>
+            <TextInput placeholder="Service Type" value={serviceType} onChangeText={setServiceType} style={styles.input} />
+
+            <Text>Availability</Text>
+
+            <Calendar
+              onDayPress={(day) => {
+                console.log('Selected Day', day)
+              }}
+            />
+          </View>
+        )}
+
         {/* Only show this when it is to Register */}
         {title === 'Personal Information' && currentStep < onboardingSteps.length ? (
-          <TouchableOpacity style={styles.nextButton} onPress={handleNextStep}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.nextButton} onPress={handleNextStep}>
+              <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+          </>
         ) : (
           <View>
             {title === 'Personal Information' && <LinkButton href="/register" text="Register" />}
@@ -115,18 +156,6 @@ export default function AuthScreen({ title }: { title: string }) {
           </View>
         )}
       </View>
-
-      {currentStep === 2 && (
-        <View style={styles.imageUploadContainer}>
-          <Text>Upload Your Picture</Text>
-
-          <TouchableOpacity>
-            {profileImage ? <Image source={{ uri: profileImage }} style={styles.profileImage} /> : <Ionicons name="person" size={100} color="gray" />}
-          </TouchableOpacity>
-
-          <Text>Upload Profile Picture</Text>
-        </View>
-      )}
 
       <View>
         {title === 'Welcome Back' && (
@@ -270,8 +299,8 @@ const styles = StyleSheet.create({
     borderColor: appTheme.primary,
     paddingVertical: 12,
     borderRadius: 10,
-    alignItems: 'center'
-    // marginTop: 20,
+    alignItems: 'center',
+    position: 'relative'
   },
   nextButtonText: {
     color: appTheme.primary,
@@ -295,7 +324,51 @@ const styles = StyleSheet.create({
   },
 
   // For Step 2
-  imageUploadContainer: {},
+  imageUploadContainer: {
+    position: 'absolute',
+    top: -10,
+    alignSelf: 'center'
+  },
 
-  profileImage: {}
+  formTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+
+  chooseFileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'gray',
+    borderStyle: 'dotted',
+    marginTop: 15
+  },
+
+  chooseFileText: {
+    fontSize: 16,
+    color: 'gray',
+    marginLeft: 5
+  },
+
+  uploadIcon: {
+    marginRight: 5
+  },
+
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginVertical: 10
+  },
+
+  // For Step 3
+  preferencesContainer: {
+    marginVertical: 20,
+    marginTop: -100
+  }
 })
