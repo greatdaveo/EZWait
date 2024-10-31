@@ -1,12 +1,13 @@
-import { Link } from 'expo-router'
+import { Link, useNavigation } from 'expo-router'
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Button } from 'react-native'
 import LinkButton from 'src/components/LinkButton'
 import { Ionicons } from '@expo/vector-icons'
 import PhoneInput from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
 import { launchImageLibrary } from 'react-native-image-picker'
 import { Calendar } from 'react-native-calendars'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const onboardingSteps = [
   { step: 1, label: 'Step 1' },
@@ -38,8 +39,14 @@ export default function AuthScreen({ title }: { title: string }) {
 
   const handleImageUpload = async () => {}
 
+  //   const navigation = useNavigation()
+
   return (
     <View style={styles.authContainer}>
+      {/* <View>
+        <Button title="Go Back" onPress={() => navigation.goBack()} />
+      </View> */}
+
       {/* Top Bar with Back Icon and Title */}
       {title === 'Personal Information' && (
         <View style={styles.topBar}>
@@ -204,7 +211,8 @@ const styles = StyleSheet.create({
   authContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    backgroundColor: appTheme.secondary
   },
 
   authTitle: {
@@ -316,7 +324,8 @@ const styles = StyleSheet.create({
   },
 
   belowTextCover: {
-    textAlign: 'center'
+    textAlign: 'center',
+    marginTop: -100
   },
 
   belowText: {

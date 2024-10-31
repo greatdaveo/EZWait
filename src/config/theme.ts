@@ -9,6 +9,7 @@ export const appTheme = {
   secondary: '#fff',
   secondary2: '#ddd',
   semi: '#E1D3E5',
+  themeBlack: '#000',
 
   // primaryBColor: '#8513A4',
   // primaryHColor: '#fff',

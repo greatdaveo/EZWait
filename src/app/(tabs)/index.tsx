@@ -1,15 +1,15 @@
-import { Stack } from 'expo-router'
 import LinkButton from 'src/components/LinkButton'
 import ScreenLayout from 'src/components/ScreenLayout'
 import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
+import { Link } from 'expo-router'
 
 export default function HomeScreen() {
   return (
     <ScreenLayout testID="home-screen-layout">
       <View style={styles.Content}>
-        <ImageBackground source={require('../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
+        <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
           <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
             <View style={styles.overlay}>
               <Text style={styles.title}>Book in seconds with EZWait</Text>
@@ -18,24 +18,7 @@ export default function HomeScreen() {
           </LinearGradient>
 
           <View style={styles.buttonContainer}>
-            {/* <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
-              ]}
-              onPress={() => {}}>
-              {({ pressed }) => <Text style={[styles.buttonText, pressed && styles.buttonTextPressed]}>Login</Text>}
-            </Pressable>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.button,
-                { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
-              ]}
-              onPress={() => {}}>
-              {({ pressed }) => <Text style={[styles.buttonText, pressed && styles.buttonTextPressed]}>Register</Text>}
-            </Pressable> */}
-
+            {/* <Link href="/auth/login"> Get Started</Link> */}
             <LinkButton href="/auth/login" text="Get Started" />
           </View>
         </ImageBackground>
