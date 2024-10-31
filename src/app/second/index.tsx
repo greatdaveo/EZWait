@@ -1,41 +1,46 @@
-import styled from 'styled-components/native'
 import { Stack } from 'expo-router'
 import LinkButton from 'src/components/LinkButton'
 import ScreenLayout from 'src/components/ScreenLayout'
+import { View, Text, StyleSheet } from 'react-native'
+import { appTheme } from 'src/config/theme'
 
 export default function SecondScreen() {
   return (
     <ScreenLayout testID="second-screen-layout">
-      <S.Content testID="second-screen-content">
+      <View style={styles.content} testID="second-screen-content">
         <Stack.Screen options={{ title: 'Second Screen' }} />
 
-        <S.Title testID="second-screen-title">🥈</S.Title>
-        <S.Text testID="second-screen-text">Go to app/second/index.tsx to edit</S.Text>
+        <Text style={styles.title} testID="second-screen-title">
+          🥈
+        </Text>
+        <Text style={styles.text} testID="second-screen-text">
+          Go to app/second/index.tsx to edit
+        </Text>
 
         <LinkButton href="/" text="Go To Home Screen" />
-      </S.Content>
+      </View>
     </ScreenLayout>
   )
 }
 
-const S = {
-  Content: styled.View`
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  `,
-  Title: styled.Text`
-    color: ${(p) => p.theme.primary};
-    font-family: helvetica;
-    font-weight: 900;
-    font-size: ${(p) => p.theme.size(200, 'px')};
-    margin-bottom: ${(p) => p.theme.size(10, 'px')};
-  `,
-  Text: styled.Text`
-    color: ${(p) => p.theme.primary};
-    font-family: helvetica;
-    font-weight: 600;
-    font-size: ${(p) => p.theme.size(15, 'px')};
-    margin-bottom: ${(p) => p.theme.size(15, 'px')};
-  `
-}
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  title: {
+    color: appTheme.primary,
+    fontFamily: 'helvetica',
+    fontWeight: '900',
+    fontSize: 40, // Replace with your desired size
+    marginBottom: 10 // Replace with your desired margin
+  },
+  text: {
+    color: appTheme.primary,
+    fontFamily: 'helvetica',
+    fontWeight: '600',
+    fontSize: 15, // Replace with your desired size
+    marginBottom: 15 // Replace with your desired margin
+  }
+})

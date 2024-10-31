@@ -1,41 +1,100 @@
-import styled from 'styled-components/native'
 import { Stack } from 'expo-router'
 import LinkButton from 'src/components/LinkButton'
 import ScreenLayout from 'src/components/ScreenLayout'
+import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
+import { appTheme } from 'src/config/theme'
 
 export default function HomeScreen() {
   return (
     <ScreenLayout testID="home-screen-layout">
-      <S.Content testID="home-screen-content">
-        <Stack.Screen options={{ title: 'Home Screen' }} />
+      <View style={styles.Content}>
+        <ImageBackground source={require('../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
+          <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
+            <View style={styles.overlay}>
+              <Text style={styles.title}>Book in seconds with EZWait</Text>
+              <Text style={styles.subtitle}>Schedule easily within a second. Reserve and manage your appointments</Text>
+            </View>
+          </LinearGradient>
 
-        <S.Title testID="home-screen-title">🏠</S.Title>
-        <S.Text testID="home-screen-text">Go to app/index.tsx to edit</S.Text>
+          <View style={styles.buttonContainer}>
+            {/* <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
+              ]}
+              onPress={() => {}}>
+              {({ pressed }) => <Text style={[styles.buttonText, pressed && styles.buttonTextPressed]}>Login</Text>}
+            </Pressable>
 
-        <LinkButton href="/second" text="Go To Second Screen" />
-      </S.Content>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
+              ]}
+              onPress={() => {}}>
+              {({ pressed }) => <Text style={[styles.buttonText, pressed && styles.buttonTextPressed]}>Register</Text>}
+            </Pressable> */}
+
+            <LinkButton href="/auth/login" text="Get Started" />
+          </View>
+        </ImageBackground>
+      </View>
     </ScreenLayout>
   )
 }
 
-const S = {
-  Content: styled.View`
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-  `,
-  Title: styled.Text`
-    color: ${(p) => p.theme.primary};
-    font-family: helvetica;
-    font-weight: 900;
-    font-size: ${(p) => p.theme.size(200, 'px')};
-    margin-bottom: ${(p) => p.theme.size(10, 'px')};
-  `,
-  Text: styled.Text`
-    color: ${(p) => p.theme.primary};
-    font-family: helvetica;
-    font-weight: 700;
-    font-size: ${(p) => p.theme.size(15, 'px')};
-    margin-bottom: ${(p) => p.theme.size(15, 'px')};
-  `
-}
+const styles = StyleSheet.create({
+  Content: {
+    flex: 1
+    // backgroundColor: '#fff'
+  },
+
+  backgroundImage: {
+    flex: 1,
+    // resizeMode: 'cover',
+    width: '100%',
+    height: '90%',
+    // aspectRatio: 20 / 30,
+    justifyContent: 'space-between'
+    // gap: 230
+    // justifyContent: 'center'
+  },
+
+  gradient: {
+    ...StyleSheet.absoluteFillObject
+  },
+
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20
+  },
+
+  title: {
+    color: appTheme.secondary,
+    fontSize: 42,
+    paddingHorizontal: 30,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 20
+  },
+
+  subtitle: {
+    color: appTheme.secondary2,
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+
+  buttonContainer: {
+    gap: 15,
+    textAlign: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+    marginTop: 700
+  }
+})

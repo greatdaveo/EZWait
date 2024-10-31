@@ -4,24 +4,25 @@ import { Slot } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import styled, { ThemeProvider, type DefaultTheme } from 'styled-components/native'
 import { appTheme, navTheme } from 'src/config/theme'
+import { SafeAreaView, StyleSheet } from 'react-native'
 
 export default function AppLayout() {
   return (
     <ThemeProvider theme={appTheme as DefaultTheme}>
       <StatusBar style="light" />
-      <S.AppWrapper>
+      <SafeAreaView style={s.AppWrapper}>
         <NavProvider value={navTheme}>
           <Slot screenOptions={{ headerShown: false }} />
         </NavProvider>
-      </S.AppWrapper>
+      </SafeAreaView>
     </ThemeProvider>
   )
 }
 
-const S = {
-  AppWrapper: styled.SafeAreaView`
-    flex: 1;
-    flex-direction: column;
-    background-color: ${appTheme.background};
-  `
-}
+const s = StyleSheet.create({
+  AppWrapper: {
+    flex: 1,
+    // flexDirection: 'column',
+    backgroundColor: appTheme.secondary
+  }
+})

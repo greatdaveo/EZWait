@@ -1,6 +1,7 @@
-import styled from 'styled-components/native'
 import { Link } from 'expo-router'
 import { openURL } from 'expo-linking'
+import { Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native'
+import { appTheme } from 'src/config/theme'
 
 interface Props {
   href: string
@@ -9,33 +10,67 @@ interface Props {
 
 export default function LinkButton({ href, text }: Props) {
   return href.substring(0, 1) === '/' ? (
-    <S.InternalLink testID="link-button" href={href}>
-      <S.LinkText testID="link-button-text">{text}</S.LinkText>
-    </S.InternalLink>
+    <Pressable
+      style={({ pressed }) => [
+        styles.button,
+        { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
+      ]}>
+      {({ pressed }) => (
+        <Link testID="link-button" href={href} style={styles.internalLink}>
+          <Text testID="link-button-text" style={[styles.buttonText, pressed && styles.buttonTextPressed]}>
+            {text}
+          </Text>
+        </Link>
+      )}
+    </Pressable>
   ) : (
-    <S.ExternalLink testID="link-button" onPress={() => openURL(href)}>
-      <S.LinkText testID="link-button-text">{text}</S.LinkText>
-    </S.ExternalLink>
+    <TouchableOpacity testID="link-button" onPress={() => openURL(href)} style={styles.externalLink}>
+      <Text testID="link-button-text" style={styles.linkText}>
+        {text}
+      </Text>
+    </TouchableOpacity>
   )
 }
 
-const S = {
-  ExternalLink: styled.TouchableOpacity`
-    padding: ${(p) => p.theme.size(10, 'px')} ${(p) => p.theme.size(20, 'px')};
-    border-color: ${(p) => p.theme.highlight};
-    border-width: ${(p) => p.theme.size(1, 'px')};
-    border-radius: ${(p) => p.theme.size(5, 'px')};
-    background-color: transparent;
-  `,
-  InternalLink: styled(Link)`
-    padding: ${(p) => p.theme.size(10, 'px')} ${(p) => p.theme.size(20, 'px')};
-    border-color: ${(p) => p.theme.highlight};
-    border-width: ${(p) => p.theme.size(1, 'px')};
-    border-radius: ${(p) => p.theme.size(5, 'px')};
-    background-color: transparent;
-  `,
-  LinkText: styled.Text`
-    color: ${(p) => p.theme.highlight};
-    font-weight: 600;
-  `
-}
+const styles = StyleSheet.create({
+  externalLink: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderColor: appTheme.primary,
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: 'transparent'
+  },
+  internalLink: {
+    gap: 15,
+    textAlign: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 20
+    // marginTop: 600
+  },
+
+  button: {
+    padding: 20,
+    borderRadius: 10,
+    borderWidth: 2
+  },
+
+  buttonText: {
+    fontSize: 20,
+    color: appTheme.secondary,
+    textAlign: 'center',
+    fontWeight: '600'
+  },
+
+  buttonTextPressed: {
+    color: appTheme.primary
+  },
+
+  linkText: {
+    fontSize: 20,
+    color: appTheme.secondary,
+    textAlign: 'center',
+    fontWeight: '600'
+  }
+})

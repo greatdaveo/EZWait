@@ -5,10 +5,13 @@ import { dimensions, height, width } from 'src/utils/dimensions'
  * -
  */
 export const appTheme = {
-  background: '#222',
-  primary: '#FFF',
-  secondary: '#CCC',
-  highlight: '#FF2353',
+  primary: '#8513A4',
+  secondary: '#fff',
+  secondary2: '#ddd',
+  semi: '#E1D3E5',
+
+  // primaryBColor: '#8513A4',
+  // primaryHColor: '#fff',
   size: dimensions,
   windowHeight: `${height}px`,
   windowWidth: `${width}px`
@@ -21,10 +24,10 @@ export const appTheme = {
 export const navTheme = {
   dark: false,
   colors: {
-    background: appTheme.background,
+    background: appTheme.primary,
     border: appTheme.secondary,
-    card: appTheme.background,
-    notification: appTheme.highlight,
+    card: appTheme.primary,
+    notification: appTheme.primary,
     primary: appTheme.primary,
     text: appTheme.primary
   }
