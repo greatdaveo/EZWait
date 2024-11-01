@@ -15,9 +15,14 @@ export default function Login({ title }: { title: string }) {
       <View style={styles.inputContainer}>
         <Text style={styles.authTitle}>Welcome Back</Text>
 
-        <TextInput placeholder="Email" style={styles.input} />
+        <TextInput placeholder="Email" placeholderTextColor={appTheme.themeGray} style={styles.input} />
         <View style={styles.passwordContainer}>
-          <TextInput placeholder="Password" style={styles.passwordInput} secureTextEntry={!passwordVisible} />
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor={appTheme.themeGray}
+            style={styles.passwordInput}
+            secureTextEntry={!passwordVisible}
+          />
           <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
             <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
           </TouchableOpacity>

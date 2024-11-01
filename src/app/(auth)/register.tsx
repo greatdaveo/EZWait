@@ -6,7 +6,20 @@ import { appTheme } from 'src/config/theme'
 import { Calendar } from 'react-native-calendars'
 import { launchImageLibrary } from 'react-native-image-picker'
 import LinkButton from 'src/components/LinkButton'
-import { Link } from 'expo-router'
+import { Link, router, useNavigation } from 'expo-router'
+import { doc, setDoc } from 'firebase/firestore'
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+import { db } from 'src/firebase/firebaseConfig'
+
+interface UserData {
+  name: string
+  email: string
+  phone: string
+  address?: string
+  password: string
+  confirmPassword: string
+  profileImage?: string
+}
 
 const onboardingSteps = [
   { step: 1, label: 'Step 1' },
@@ -16,16 +29,37 @@ const onboardingSteps = [
   // { step: 5, label: 'Step 5' }
 ]
 
-export default function Register({ title }: { title: string }) {
+const Register: React.FC = () => {
+  const [userData, setUserData] = useState<UserData>({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    password: '',
+    confirmPassword: '',
+    profileImage: ''
+  })
+  // const [email, setEmail] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
-  const [profileImage, setProfileImage] = useState<string | null>(null)
+  // const [profileImage, setProfileImage] = useState<string | null>(null)
   const [serviceType, setServiceType] = useState('')
+  const [errors, setErrors] = useState<{ [key in keyof UserData]?: string }>({})
+  const navigate = useNavigation()
+
+  const handleBlur = (field: keyof UserData) => {
+    if (!userData[field]) {
+      setErrors((prev) => ({ ...prev, [field]: `${field} is required` }))
+    } else {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
 
   // To navigate to the next step
   const handleNextStep = () => {
     if (currentStep < onboardingSteps.length) {
+      registerUserData()
       setCurrentStep((prevStep) => prevStep + 1)
     }
   }
@@ -37,6 +71,39 @@ export default function Register({ title }: { title: string }) {
   }
 
   const handleImageUpload = async () => {}
+
+  const handleInputChange = (field: keyof UserData, value: string) => {
+    setUserData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const registerUserData = async () => {
+    const { name, email, password, confirmPassword, address, profileImage } = userData
+
+    if (password !== confirmPassword) {
+      alert('Passwords do not match')
+      return
+    }
+
+    try {
+      const auth = getAuth()
+      const userCredentials = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredentials.user
+
+      await setDoc(doc(db, 'users', user.uid), {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        address: userData.address,
+        profileImage: userData.profileImage
+      })
+
+      alert('User saved successfully!')
+    } catch (error: any) {
+      console.log('Error saving user: ', error)
+      alert('Error Saving User Data')
+      // alert(error)
+    }
+  }
 
   //   const navigation = useNavigation()
 
@@ -70,21 +137,59 @@ export default function Register({ title }: { title: string }) {
       <View style={styles.inputContainer}>
         {currentStep === 1 && (
           <>
-            <TextInput placeholder="Email" style={styles.input} />
+            <TextInput
+              placeholder="Full Name"
+              value={userData.name}
+              onChangeText={(value) => handleInputChange('name', value)}
+              placeholderTextColor={appTheme.themeGray}
+              onBlur={() => handleBlur('name')}
+              style={styles.input}
+            />
+            {errors.name && <Text style={{ color: 'red' }}>{errors.name}</Text>}
+
+            <TextInput
+              placeholder="Email"
+              value={userData.email}
+              onChangeText={(value) => handleInputChange('email', value)}
+              placeholderTextColor={appTheme.themeGray}
+              onBlur={() => handleBlur('email')}
+              style={styles.input}
+            />
+            {errors.email && <Text style={{ color: 'red' }}>{errors.email}</Text>}
+
             <View style={styles.passwordContainer}>
-              <TextInput placeholder="Password" style={styles.passwordInput} secureTextEntry={!passwordVisible} />
+              <TextInput
+                placeholder="Password"
+                value={userData.password}
+                onChangeText={(value) => handleInputChange('password', value)}
+                placeholderTextColor={appTheme.themeGray}
+                style={styles.passwordInput}
+                onBlur={() => handleBlur('password')}
+                secureTextEntry={!passwordVisible}
+              />
+
               <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
                 <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
               </TouchableOpacity>
             </View>
+            {errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
 
             <View style={styles.passwordContainer}>
-              <TextInput placeholder="Confirm Password" style={styles.passwordInput} secureTextEntry={!confirmPasswordVisible} />
+              <TextInput
+                placeholder="Confirm Password"
+                value={userData.confirmPassword}
+                onChangeText={(value) => handleInputChange('confirmPassword', value)}
+                placeholderTextColor={appTheme.themeGray}
+                onBlur={() => handleBlur('confirmPassword')}
+                style={styles.passwordInput}
+                secureTextEntry={!confirmPasswordVisible}
+              />
 
               <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
                 <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
               </TouchableOpacity>
             </View>
+            {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>}
 
             <PhoneInput
               defaultCode="GB"
@@ -93,11 +198,20 @@ export default function Register({ title }: { title: string }) {
               textContainerStyle={styles.phoneTextInput}
               textInputStyle={styles.phoneTextInputInner}
               placeholder="Phone Number"
+              value={userData.phone}
+              onChangeText={(value) => handleInputChange('phone', value)}
             />
 
             <View style={styles.addressContainer}>
               <Ionicons name="location" size={20} color="grey" style={styles.addressIcon} />
-              <TextInput placeholder="Address" style={styles.addressInput} secureTextEntry={!confirmPasswordVisible} />
+              <TextInput
+                placeholder="Address"
+                value={userData.address}
+                onChangeText={(value) => handleInputChange('address', value)}
+                placeholderTextColor={appTheme.themeGray}
+                style={styles.addressInput}
+                secureTextEntry={!confirmPasswordVisible}
+              />
             </View>
           </>
         )}
@@ -143,7 +257,7 @@ export default function Register({ title }: { title: string }) {
           </>
         ) : (
           <>
-            <LinkButton href="/register" text="Register" />
+            <LinkButton href="/DashboardScreen" text="Register" />
           </>
         )}
 
@@ -157,6 +271,8 @@ export default function Register({ title }: { title: string }) {
     </View>
   )
 }
+
+export default Register
 
 const styles = StyleSheet.create({
   authContainer: {

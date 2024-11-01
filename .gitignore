@@ -12,6 +12,7 @@ npm-debug.*
 web-build/
 build-*.tar.gz
 coverage
+.env
 
 # macOS
 .DS_Store

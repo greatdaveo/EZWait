@@ -10,6 +10,7 @@ export const appTheme = {
   secondary2: '#ddd',
   semi: '#E1D3E5',
   themeBlack: '#000',
+  themeGray: '#a9a9a9',
 
   // primaryBColor: '#8513A4',
   // primaryHColor: '#fff',
