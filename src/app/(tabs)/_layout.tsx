@@ -9,31 +9,27 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: appTheme.primary,
         tabBarInactiveTintColor: appTheme.primary,
-        headerStyle: {
-          backgroundColor: '#25292e'
-        },
-        headerShadowVisible: false,
-        headerTintColor: 'green',
-        tabBarStyle: {
-          // backgroundColor: '#25292e'
-        }
+        headerShown: false
+        // headerStyle: {
+        //   backgroundColor: '#25292e'
+        // },
+        // headerShadowVisible: false,
+        // headerTintColor: 'green',
+        // tabBarStyle: {
+        //   // backgroundColor: '#25292e'
+        // }
       }}>
+        
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
+          headerTitle: 'Home Page',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={appTheme.primary} size={24} />
         }}
       />
-      <Tabs.Screen
-        name="auth"
-        options={{
-          title: 'Auth',
-          headerShown: true,
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} color={appTheme.primary} size={24} />
-        }}
-      />
+
       <Tabs.Screen
         name="DashboardScreen"
         options={{
@@ -42,6 +38,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} color={appTheme.primary} size={24} />
         }}
       />
+
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'Calendar',
+          headerTitle: 'Calendar Page',
+          // tabBarLabel: 'Auth',
+          headerShown: true,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
+        }}
+      />
+
       <Tabs.Screen
         name="SettingsScreen"
         options={{

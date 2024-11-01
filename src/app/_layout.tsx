@@ -1,31 +1,27 @@
 import 'expo-dev-client'
-import { ThemeProvider as NavProvider } from '@react-navigation/native'
 import { Slot, Stack, Tabs } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import styled, { ThemeProvider, type DefaultTheme } from 'styled-components/native'
 import { appTheme, navTheme } from 'src/config/theme'
-import { Button, SafeAreaView, StyleSheet } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Button, SafeAreaView, StyleSheet, View } from 'react-native'
+import { useState } from 'react'
 
 export default function AppLayout() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+
   return (
-    <SafeAreaView style={s.AppWrapper}>
-      <StatusBar style="dark" />
-      <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
+      {isLoggedIn ? (
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="auth/register" options={{ headerShown: false }} /> */}
+      ) : (
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+      )}
 
-        <Stack.Screen
-          name="+not-found"
-          options={{
-            title: 'Page Not Found'
-          }}
-        />
-
-        {/* <Stack.Screen name="auth/index" options={{ title: 'Auth' }} /> */}
-      </Stack>
-    </SafeAreaView>
+      <Stack.Screen
+        name="+not-found"
+        options={{
+          title: 'Page Not Found'
+        }}
+      />
+    </Stack>
   )
 }
 
