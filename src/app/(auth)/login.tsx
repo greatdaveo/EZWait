@@ -1,12 +1,39 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
-import { Link } from 'expo-router'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { Link, router, useNavigation } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import LinkButton from 'src/components/LinkButton'
+import { fetchSignInMethodsForEmail, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
+// import { auth } from 'src/firebase/firebaseConfig'
 
-export default function Login({ title }: { title: string }) {
+interface UserData {
+  email: string
+  password: string
+}
+
+const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  // const navigation = useNavigation()
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const auth = getAuth()
+      const userExist = await fetchSignInMethodsForEmail(auth, email)
+      console.log(userExist)
+      const userCredentials = await signInWithEmailAndPassword(auth, email, password)
+      console.log('Logged in users: ', userCredentials.user)
+      router.push('/DashboardScreen')
+      // navigation.navigate('DashboardScreen')
+      return userCredentials.user
+    } catch (error: any) {
+      console.log('Unable to login: ', error)
+      alert('Unable to login')
+    }
+  }
 
   return (
     <View style={styles.authContainer}>
@@ -15,10 +42,18 @@ export default function Login({ title }: { title: string }) {
       <View style={styles.inputContainer}>
         <Text style={styles.authTitle}>Welcome Back</Text>
 
-        <TextInput placeholder="Email" placeholderTextColor={appTheme.themeGray} style={styles.input} />
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          placeholderTextColor={appTheme.themeGray}
+          style={styles.input}
+          autoCapitalize="none"
+        />
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Password"
+            onChangeText={setPassword}
             placeholderTextColor={appTheme.themeGray}
             style={styles.passwordInput}
             secureTextEntry={!passwordVisible}
@@ -28,9 +63,11 @@ export default function Login({ title }: { title: string }) {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        <TouchableOpacity onPress={() => router.push('resetPassword')}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-        <LinkButton href="/login" text="Login" />
+        <LinkButton href={'/DashboardScreen'} text="Login" onPress={handleLogin} />
       </View>
 
       <View>
@@ -44,6 +81,8 @@ export default function Login({ title }: { title: string }) {
     </View>
   )
 }
+
+export default Login
 
 const styles = StyleSheet.create({
   authContainer: {

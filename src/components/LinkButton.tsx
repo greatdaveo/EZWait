@@ -6,9 +6,10 @@ import { appTheme } from 'src/config/theme'
 interface Props {
   href: string
   text: string
+  onPress: any
 }
 
-export default function LinkButton({ href, text }: Props) {
+export default function LinkButton({ href, text, onPress }: Props) {
   return href.substring(0, 1) === '/' ? (
     <Pressable
       style={({ pressed }) => [
@@ -16,7 +17,7 @@ export default function LinkButton({ href, text }: Props) {
         { borderColor: pressed ? appTheme.primary : appTheme.secondary, backgroundColor: pressed ? appTheme.semi : appTheme.primary }
       ]}>
       {({ pressed }) => (
-        <Link testID="link-button" href={href} style={styles.internalLink}>
+        <Link testID="link-button" href={href} onPress={onPress} style={styles.internalLink}>
           <Text testID="link-button-text" style={[styles.buttonText, pressed && styles.buttonTextPressed]}>
             {text}
           </Text>

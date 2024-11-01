@@ -39,6 +39,7 @@ const Register: React.FC = () => {
     confirmPassword: '',
     profileImage: ''
   })
+
   // const [email, setEmail] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
@@ -101,7 +102,6 @@ const Register: React.FC = () => {
     } catch (error: any) {
       console.log('Error saving user: ', error)
       alert('Error Saving User Data')
-      // alert(error)
     }
   }
 
@@ -256,7 +256,7 @@ const Register: React.FC = () => {
           </>
         ) : (
           <>
-            <LinkButton href="/DashboardScreen" text="Register" />
+            <LinkButton href="/DashboardScreen" text="Register" onPress={registerUserData} />
           </>
         )}
 
