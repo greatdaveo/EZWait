@@ -210,7 +210,6 @@ const Register: React.FC = () => {
                 onChangeText={(value) => handleInputChange('address', value)}
                 placeholderTextColor={appTheme.themeGray}
                 style={styles.addressInput}
-                secureTextEntry={!confirmPasswordVisible}
               />
             </View>
           </>
