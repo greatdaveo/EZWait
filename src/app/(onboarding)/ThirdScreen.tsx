@@ -3,10 +3,12 @@ import ScreenLayout from 'src/components/ScreenLayout'
 import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
-import { Link } from 'expo-router'
+import { Link, router, useNavigation } from 'expo-router'
 import { Image } from 'react-native'
 
 export default function ThirdScreen() {
+  const onPress = () => {}
+
   return (
     <ScreenLayout testID="home-screen-layout">
       <View style={styles.Content}>
@@ -21,7 +23,7 @@ export default function ThirdScreen() {
           </LinearGradient>
 
           <View style={styles.buttonContainer}>
-            <LinkButton href="/(auth)/login" text="Get Started" />
+            <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
           </View>
         </ImageBackground>
       </View>

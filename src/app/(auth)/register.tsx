@@ -23,8 +23,8 @@ interface UserData {
 
 const onboardingSteps = [
   { step: 1, label: 'Step 1' },
-  { step: 2, label: 'Step 2' },
-  { step: 3, label: 'Step 3' }
+  { step: 2, label: 'Step 2' }
+  // { step: 3, label: 'Step 3' }
   // { step: 4, label: 'Step 4' },
   // { step: 5, label: 'Step 5' }
 ]
@@ -227,22 +227,6 @@ const Register: React.FC = () => {
 
             {/* To display Profile Image if Selected */}
             {/* {profileImage && <Image source={{ uri: profileImage }} style={styles.profileImage} />} */}
-          </View>
-        )}
-
-        {/* For Step3: For Preference & Availability */}
-        {currentStep === 3 && (
-          <View style={styles.preferencesContainer}>
-            <Text style={styles.formTitle}>Select Your Service Type</Text>
-            <TextInput placeholder="Service Type" value={serviceType} onChangeText={setServiceType} style={styles.input} />
-
-            <Text style={styles.availabilityText}>Availability</Text>
-
-            <Calendar
-              onDayPress={(day) => {
-                console.log('Selected Day', day)
-              }}
-            />
           </View>
         )}
       </View>

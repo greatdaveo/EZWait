@@ -19,34 +19,36 @@ export default function TabLayout() {
         //   // backgroundColor: '#25292e'
         // }
       }}>
-        
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          headerTitle: 'Home Page',
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={appTheme.primary} size={24} />
-        }}
-      />
-
       <Tabs.Screen
         name="DashboardScreen"
         options={{
           title: 'Dashboard',
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person' : 'person-outline'} color={appTheme.primary} size={24} />
+          headerTitle: 'Dashboard',
+          headerShown: true,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'person-sharp' : 'person-outline'} color={appTheme.primary} size={24} />
         }}
       />
 
       <Tabs.Screen
-        name="calendar"
+        name="ScheduleScreen"
         options={{
-          title: 'Calendar',
-          headerTitle: 'Calendar Page',
+          title: 'Schedule',
+          headerTitle: 'Schedule',
           // tabBarLabel: 'Auth',
           headerShown: true,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
+        }}
+      />
+
+      <Tabs.Screen
+        name="HistoryScreen"
+        options={{
+          title: 'History',
+          headerTitle: 'History',
+          headerShown: true,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'notifications' : 'notifications-outline'} color={appTheme.primary} size={24} />
+          )
         }}
       />
 

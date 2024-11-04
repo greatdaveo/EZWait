@@ -7,11 +7,6 @@ import LinkButton from 'src/components/LinkButton'
 import { fetchSignInMethodsForEmail, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
 // import { auth } from 'src/firebase/firebaseConfig'
 
-interface UserData {
-  email: string
-  password: string
-}
-
 const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [email, setEmail] = useState('')
@@ -26,8 +21,7 @@ const Login: React.FC = () => {
       console.log(userExist)
       const userCredentials = await signInWithEmailAndPassword(auth, email, password)
       console.log('Logged in users: ', userCredentials.user)
-      router.push('/DashboardScreen')
-      // navigation.navigate('DashboardScreen')
+      router.push('/(tabs)/DashboardScreen')
       return userCredentials.user
     } catch (error: any) {
       console.log('Unable to login: ', error)
@@ -67,13 +61,13 @@ const Login: React.FC = () => {
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <LinkButton href={'/DashboardScreen'} text="Login" onPress={handleLogin} />
+        <LinkButton href={'/(tabs)/DashboardScreen'} text="Login" onPress={handleLogin} />
       </View>
 
       <View>
         <Text style={styles.belowTextCover}>
           Don't have an account?{' '}
-          <Link href={'/(auth)/register'} style={styles.belowText}>
+          <Link href="/(auth)/register" style={styles.belowText}>
             Sign Up
           </Link>
         </Text>
