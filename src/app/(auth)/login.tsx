@@ -1,32 +1,63 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Button, Pressable, ActivityIndicator } from 'react-native'
 import { Link, router, useNavigation } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import LinkButton from 'src/components/LinkButton'
-import { fetchSignInMethodsForEmail, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth'
-// import { auth } from 'src/firebase/firebaseConfig'
+import { fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
 const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   // const navigation = useNavigation()
 
-  const handleLogin = async (email: string, password: string) => {
+  const validEMail = (email: any) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const handleLogin = async () => {
+    if (!validEMail(email)) {
+      Alert.alert('Please enter a valid email')
+      return
+    }
+
     try {
       const auth = getAuth()
-      const userExist = await fetchSignInMethodsForEmail(auth, email)
-      console.log(userExist)
+
       const userCredentials = await signInWithEmailAndPassword(auth, email, password)
-      console.log('Logged in users: ', userCredentials.user)
-      router.push('/(tabs)/DashboardScreen')
-      return userCredentials.user
+      setIsLoading(true)
+      if (userCredentials) {
+        // console.log('Logged in users: ', userCredentials.user)
+        router.push('/(tabs)/DashboardScreen')
+        setIsLoading(false)
+      } else {
+        setIsLoading(false)
+        Alert.alert('User does not exist, kindly sign up')
+        return
+      }
     } catch (error: any) {
-      console.log('Unable to login: ', error)
-      alert('Unable to login')
+      setIsLoading(false)
+      console.log('Unable to login: ', error.code)
+      setError(error.message)
+      if (error.code === 'auth/wrong-password') {
+        Alert.alert('Incorrect Password', 'The password you entered is incorrect.')
+      } else if (error.code === 'auth/user-not-found') {
+        Alert.alert('User Not Found', 'No account found with this email address.')
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('Invalid Email', 'Please enter a valid email address.')
+      } else {
+        Alert.alert('Login Error', error.message)
+      }
     }
+  }
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color={appTheme.primary} />
   }
 
   return (
@@ -39,19 +70,27 @@ const Login: React.FC = () => {
         <TextInput
           placeholder="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => {
+            setEmail(text)
+            setError('')
+          }}
           placeholderTextColor={appTheme.themeGray}
           style={styles.input}
           autoCapitalize="none"
         />
+
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Password"
-            onChangeText={setPassword}
+            onChangeText={(text) => {
+              setPassword(text)
+              setError('')
+            }}
             placeholderTextColor={appTheme.themeGray}
             style={styles.passwordInput}
             secureTextEntry={!passwordVisible}
           />
+
           <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
             <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
           </TouchableOpacity>
@@ -61,7 +100,9 @@ const Login: React.FC = () => {
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <LinkButton href={'/(tabs)/DashboardScreen'} text="Login" onPress={handleLogin} />
+        <TouchableOpacity style={styles.buttonCover}>
+          <Button title="Login" onPress={handleLogin} color={appTheme.secondary} />
+        </TouchableOpacity>
       </View>
 
       <View>
@@ -133,6 +174,17 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     margin: 10,
     marginBottom: 35
+  },
+
+  buttonCover: {
+    gap: 15,
+    textAlign: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: appTheme.primary,
+    color: appTheme.secondary,
+    padding: 15,
+    borderRadius: 10
   },
 
   belowTextCover: {

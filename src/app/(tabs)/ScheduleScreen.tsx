@@ -10,6 +10,7 @@ import { getAuth } from 'firebase/auth'
 // import { db } from 'src/firebase/firebaseConfig'
 
 // Global Variable
+const db = getFirestore()
 const auth = getAuth()
 const user = auth.currentUser
 
@@ -17,8 +18,6 @@ export default function ScheduleScreen() {
   const [date, setDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
-
-  const db = getFirestore()
 
   const onDayPress = (day: any) => {
     // console.log(day.dateString)
@@ -36,10 +35,11 @@ export default function ScheduleScreen() {
       return
     }
 
+    // console.log('User: ', user)
     // const auth = getAuth()
     // const user = auth.currentUser
 
-    if (!user) {
+    if (!user?.email) {
       Alert.alert('Error", "User not authenticated')
       return
     }
@@ -66,7 +66,7 @@ export default function ScheduleScreen() {
       <View style={styles.headContainer}>
         <View>
           <Text style={styles.text}>Good morning,</Text>
-          <Text style={styles.subtext}>David Olowomeye</Text>
+          <Text style={styles.subtext}>{user?.displayName}</Text>
         </View>
         <Image
           source={{ uri: auth.currentUser?.photoURL || 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }}
