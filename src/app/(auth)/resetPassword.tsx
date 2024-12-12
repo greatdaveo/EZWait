@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons'
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
 import React, { useState } from 'react'
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { appTheme } from 'src/config/theme'
 
 const ResetPassword = () => {
@@ -9,9 +10,14 @@ const ResetPassword = () => {
   const resetPassword = async () => {
     try {
       const auth = getAuth()
-      await sendPasswordResetEmail(auth, email)
-      console.log('Password reset email sent to: ', email)
-      Alert.alert('Password reset email sent. Check your inbox')
+      if (email.length < 1) {
+        Alert.alert('Please enter your email')
+        return
+      } else {
+        await sendPasswordResetEmail(auth, email)
+        console.log('Password reset email sent to: ', email)
+        Alert.alert('Password reset email sent. Check your inbox')
+      }
     } catch (error: any) {
       console.error('Error sending password reset email:', error)
       alert('Unable to reset password')
@@ -21,7 +27,7 @@ const ResetPassword = () => {
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.title}>Reset Password</Text>
+      {/* <Text style={styles.title}>Reset Password</Text> */}
       <Text style={styles.instructions}>Enter your email address to receive a reset link.</Text>
 
       <TextInput

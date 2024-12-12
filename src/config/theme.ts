@@ -5,7 +5,7 @@ import { dimensions, height, width } from 'src/utils/dimensions'
  * -
  */
 export const appTheme = {
-  primary: '#8513A4',
+  primary: '#9747FF',
   secondary: '#fff',
   secondary2: '#ddd',
   semi: '#E1D3E5',

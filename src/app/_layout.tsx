@@ -5,7 +5,7 @@ import { Button, SafeAreaView, StyleSheet, View } from 'react-native'
 import { useState } from 'react'
 
 export default function AppLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true)
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

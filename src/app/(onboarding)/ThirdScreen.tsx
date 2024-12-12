@@ -1,6 +1,6 @@
 import LinkButton from 'src/components/LinkButton'
 import ScreenLayout from 'src/components/ScreenLayout'
-import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
 import { Link, router, useNavigation } from 'expo-router'
@@ -10,24 +10,24 @@ export default function ThirdScreen() {
   const onPress = () => {}
 
   return (
-    <ScreenLayout testID="home-screen-layout">
-      <View style={styles.Content}>
-        <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
-          <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
-            <View style={styles.overlay}>
-              <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
+    // <ScreenLayout testID="home-screen-layout">
+    <View style={styles.Content}>
+      <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
+        <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
+          <View style={styles.overlay}>
+            <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
 
-              <Text style={styles.title}>EZWait Got You.</Text>
-              <Text style={styles.subtitle}>No more waiting time at the barber's shop</Text>
-            </View>
-          </LinearGradient>
-
-          <View style={styles.buttonContainer}>
-            <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
+            <Text style={styles.title}>EZWait Got You.</Text>
+            <Text style={styles.subtitle}>No more waiting time at the barber's shop</Text>
           </View>
-        </ImageBackground>
-      </View>
-    </ScreenLayout>
+        </LinearGradient>
+
+        <View style={styles.buttonContainer}>
+          <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
+        </View>
+      </ImageBackground>
+    </View>
+    //  </ScreenLayout>
   )
 }
 

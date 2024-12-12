@@ -15,7 +15,7 @@ export default function HistoryScreen() {
   const [loading, setLoading] = useState(true)
 
   const fetchBookings = async () => {
-    console.log(user?.email)
+    // console.log(user?.email)
 
     if (!user?.email) {
       console.log('No user is signed in')
@@ -23,7 +23,7 @@ export default function HistoryScreen() {
     }
 
     const querySnapshot = await getDocs(collection(db, 'user', user?.uid, 'schedule'))
-    console.log(querySnapshot)
+    // console.log(querySnapshot)
 
     querySnapshot.forEach((doc) => {
       // console.log(doc.data())
