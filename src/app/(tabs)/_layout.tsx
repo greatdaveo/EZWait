@@ -9,7 +9,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: appTheme.primary,
         tabBarInactiveTintColor: appTheme.primary,
-        headerShown: false,
+        headerShown: false
         // headerStyle: {
         //   backgroundColor: '#25292e'
         // }
@@ -34,10 +34,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="BookingScreen"
         options={{
-          title: 'Schedule',
-          headerTitle: 'Schedule',
+          title: 'Bookings',
+          headerTitle: 'Booking dashboard',
           // tabBarLabel: 'Auth',
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
@@ -65,11 +65,13 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="SettingsScreen"
+        name="ProfileScreen"
         options={{
-          title: 'Settings',
+          title: 'Profile',
           headerShown: false,
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'settings' : 'settings-outline'} color={appTheme.primary} size={24} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'person-circle-sharp' : 'person-circle-outline'} color={appTheme.primary} size={focused ? 32 : 32} />
+          )
         }}
       />
     </Tabs>

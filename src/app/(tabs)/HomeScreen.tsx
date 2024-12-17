@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import React, { useState } from 'react'
-import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import { appTheme } from 'src/config/theme'
 import DropDownPicker from 'react-native-dropdown-picker'
 import LinkButton from 'src/components/LinkButton'
@@ -30,83 +30,109 @@ const DashboardScreen = () => {
       time: '6:00pm - 6:40pm',
       service: 'Low cut and dye',
       img: require('../../assets/images/Frame3.png')
+    },
+
+    {
+      name: 'Benson Wonuola',
+      date: '20/11/24',
+      time: '6:00pm - 6:40pm',
+      service: 'Low cut and dye',
+      img: require('../../assets/images/Frame3.png')
+    },
+
+    {
+      name: 'Daniel Mayowa',
+      date: '20/11/24',
+      time: '4:30pm - 5:00pm',
+      service: 'Beard trimming',
+      img: require('../../assets/images/Frame1.png')
+    },
+
+    {
+      name: 'Benson Wonuola',
+      date: '20/11/24',
+      time: '6:00pm - 6:40pm',
+      service: 'Low cut and dye',
+      img: require('../../assets/images/Frame3.png')
     }
   ]
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerCover}>
-        <View style={styles.imgCover}>
-          <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.headerCover}>
+          <View style={styles.imgCover}>
+            <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
 
-          <View>
-            <Text style={styles.nameText}>Hi, Mayo 👍</Text>
-            <Text style={styles.subtext}>Good morning</Text>
+            <View>
+              <Text style={styles.nameText}>Hi, Mayo 👍</Text>
+              <Text style={styles.subtext}>Good morning</Text>
+            </View>
+          </View>
+
+          <View style={styles.alarmCover}>
+            <View style={styles.alarm}>
+              <Ionicons name="notifications-sharp" color={appTheme.themeBlack} size={28} />
+            </View>
+
+            <View style={styles.alarmTextCover}>
+              <Text style={styles.alarmText}>2</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.alarmCover}>
-          <View style={styles.alarm}>
-            <Ionicons name="notifications-sharp" color={appTheme.themeBlack} size={28} />
+        <View style={styles.headerImg}>
+          <View style={styles.headerImgCover}>
+            <Text style={styles.headerImgText}>Get ready for your next appointments with your clients</Text>
+
+            <TouchableOpacity style={styles.viewAllButton}>
+              <Text style={styles.viewAllText}>View all</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.alarmTextCover}>
-            <Text style={styles.alarmText}>2</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.headerImg}>
-        <View style={styles.headerImgCover}>
-          <Text style={styles.headerImgText}>Get ready for your next appointments with your clients</Text>
-
-          <TouchableOpacity style={styles.viewAllButton}>
-            <Text style={styles.viewAllText}>View all</Text>
-          </TouchableOpacity>
+          <Image source={require('../../assets/images/HomeImg.png')} style={styles.headerImgRight} resizeMode="cover" />
         </View>
 
-        <Image source={require('../../assets/images/HomeImg.png')} style={styles.headerImgRight} resizeMode="cover" />
-      </View>
+        <View style={styles.appointmentsCover}>
+          <Text style={styles.sectionTitle}>Pending Appointments</Text>
 
-      <View style={styles.appointmentsCover}>
-        <Text style={styles.sectionTitle}>Pending Appointments</Text>
+          {data.map((appointment, i) => (
+            <View style={styles.eachAppointmentCover} key={i}>
+              <View style={styles.eachAppointment}>
+                <Image source={appointment.img} style={styles.customerImg} />
 
-        {data.map((appointment, i) => (
-          <View style={styles.eachAppointmentCover} key={i}>
-            <View style={styles.eachAppointment}>
-              <Image source={appointment.img} style={styles.customerImg} />
+                <View style={styles.detailsCover}>
+                  <Text style={styles.nameText}>{appointment.name}</Text>
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="calendar-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.date}</Text>
+                  </View>
 
-              <View style={styles.detailsCover}>
-                <Text style={styles.nameText}>{appointment.name}</Text>
-                <View style={styles.appointmentDetailsCover}>
-                  <Ionicons name="calendar-outline" color={appTheme.themeBlack} size={24} />
-                  <Text>{appointment.date}</Text>
-                </View>
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.time}</Text>
+                  </View>
 
-                <View style={styles.appointmentDetailsCover}>
-                  <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
-                  <Text>{appointment.time}</Text>
-                </View>
-
-                <View style={styles.appointmentDetailsCover}>
-                  <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
-                  <Text>{appointment.service}</Text>
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.service}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
 
-            <View style={styles.btnCover}>
-              <TouchableOpacity style={styles.acceptBtn}>
-                <Text style={styles.btnText}>Accept</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.declineBtn}>
-                <Text style={styles.btnText}>Decline</Text>
-              </TouchableOpacity>
+              <View style={styles.btnCover}>
+                <TouchableOpacity style={styles.acceptBtn}>
+                  <Text style={styles.btnText}>Accept</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.declineBtn}>
+                  <Text style={styles.btnText}>Decline</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+        </View>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
