@@ -240,7 +240,7 @@ const Register: React.FC = () => {
           </>
         ) : (
           <>
-            <LinkButton href="/HomeScreen" text="Register" onPress={registerUserData} />
+            <LinkButton href="/StylistHomeScreen" text="Register" onPress={registerUserData} />
           </>
         )}
 

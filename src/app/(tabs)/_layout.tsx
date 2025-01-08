@@ -1,9 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
-import { SafeAreaView, StyleSheet } from 'react-native'
+import { useState } from 'react'
+import { SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native'
 import { appTheme } from 'src/config/theme'
 
 export default function TabLayout() {
+  const [userRole, setUserRole] = useState('stylist')
+
   return (
     <Tabs
       screenOptions={{
@@ -20,14 +23,30 @@ export default function TabLayout() {
         // }
       }}>
       <Tabs.Screen
-        name="HomeScreen"
+        name="StylistHomeScreen"
         options={{
           title: 'Home',
           headerTitle: 'Home',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
-          )
+          ),
+
+          tabBarButton: (props) => (userRole === 'stylist' ? <TouchableOpacity {...props} /> : null)
+        }}
+      />
+
+      <Tabs.Screen
+        name="CustomerHomeScreen"
+        options={{
+          title: 'Home',
+          headerTitle: 'Home',
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
+          ),
+
+          tabBarButton: (props) => (userRole === 'customer' ? <TouchableOpacity /> : null)
         }}
       />
 

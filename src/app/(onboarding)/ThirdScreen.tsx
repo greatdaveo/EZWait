@@ -22,13 +22,13 @@ export default function ThirdScreen() {
           </View>
         </LinearGradient>
 
-        {/* <View style={styles.buttonContainer}>
-          <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
-        </View> */}
-
         <View style={styles.buttonContainer}>
-          <LinkButton href="/screens/UserHomeScreen" text="Get Started" onPress={onPress} />
+          <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
         </View>
+
+        {/* <View style={styles.buttonContainer}>
+          <LinkButton href="/screens/UserHomeScreen" text="Get Started" onPress={onPress} />
+        </View> */}
       </ImageBackground>
     </View>
     //  </ScreenLayout>
