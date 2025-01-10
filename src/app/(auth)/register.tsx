@@ -1,55 +1,57 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import PhoneInput from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
-import { Calendar } from 'react-native-calendars'
-import { launchImageLibrary } from 'react-native-image-picker'
-import LinkButton from 'src/components/LinkButton'
 import { Link, router, useNavigation } from 'expo-router'
-import { doc, setDoc } from 'firebase/firestore'
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { db } from 'src/firebase/firebaseConfig'
+import DropDownPicker from 'react-native-dropdown-picker'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/redux/store'
+import { RESET_AUTH, registerUserSlice } from 'src/redux/auth/authSlice'
 
-interface UserData {
-  name: string
+interface FormData {
+  id?: number | null
+  fullName: string
   email: string
   phone: string
-  address?: string
+  role: string | null
+  address?: string | undefined
   password: string
   confirmPassword: string
   profileImage?: string
 }
 
-const onboardingSteps = [
-  { step: 1, label: 'Step 1' },
-  { step: 2, label: 'Step 2' }
-  // { step: 3, label: 'Step 3' }
-  // { step: 4, label: 'Step 4' },
-  // { step: 5, label: 'Step 5' }
-]
+const initialState: FormData = {
+  id: null,
+  fullName: '',
+  email: '',
+  phone: '',
+  role: null,
+  address: '',
+  password: '',
+  confirmPassword: '',
+  profileImage: ''
+}
 
 const Register: React.FC = () => {
-  const [userData, setUserData] = useState<UserData>({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    password: '',
-    confirmPassword: '',
-    profileImage: ''
-  })
+  const [userData, setUserData] = useState<FormData>(initialState)
 
-  // const [email, setEmail] = useState('')
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
-  // const [profileImage, setProfileImage] = useState<string | null>(null)
-  const [serviceType, setServiceType] = useState('')
-  const [errors, setErrors] = useState<{ [key in keyof UserData]?: string }>({})
+  const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({})
+
+  const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigation()
 
-  const handleBlur = (field: keyof UserData) => {
+  const [open, setOpen] = useState(false)
+  const [dropdownItems, setDropdownItems] = useState([
+    { label: 'Customer', value: 'customer' },
+    { label: 'Stylist', value: 'stylist' }
+  ])
+
+  const handleBlur = (field: keyof FormData) => {
     if (!userData[field]) {
       setErrors((prev) => ({ ...prev, [field]: `${field} is required` }))
     } else {
@@ -57,192 +59,147 @@ const Register: React.FC = () => {
     }
   }
 
-  // To navigate to the next step
-  const handleNextStep = () => {
-    if (currentStep < onboardingSteps.length) {
-      registerUserData()
-      setCurrentStep((prevStep) => prevStep + 1)
-    }
-  }
-
-  const handlePreviousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1)
-    }
-  }
-
-  const handleImageUpload = async () => {}
-
-  const handleInputChange = (field: keyof UserData, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setUserData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const registerUserData = async () => {
-    const { name, email, password, confirmPassword, address, profileImage } = userData
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match')
-      return
+  useEffect(() => {
+    if (isSuccess && isLoggedIn) {
+      Alert.alert('Registration Successful.')
+      router.navigate('/')
     }
 
-    try {
-      const auth = getAuth()
-      const userCredentials = await createUserWithEmailAndPassword(auth, email, password)
-      const user = userCredentials.user
+    dispatch(RESET_AUTH())
+  }, [isSuccess, isLoggedIn, dispatch])
 
-      await setDoc(doc(db, 'users', user.uid), {
-        name: userData.name,
-        email: userData.email,
-        phone: userData.phone,
-        address: userData.address,
-        profileImage: userData.profileImage
-      })
-
-      alert('User saved successfully!')
-    } catch (error: any) {
-      console.log('Error saving user: ', error)
-      alert('Error Saving User Data')
+  const handleRegister = async () => {
+    if (userData.password !== userData.confirmPassword) {
+      return Alert.alert('Passwords do not match')
     }
+
+    const formData = {
+      ...userData,
+      address: userData.address ?? null
+    }
+
+    console.log(userData)
+
+    await dispatch(registerUserSlice(formData))
   }
-
-  //   const navigation = useNavigation()
 
   return (
     <View style={styles.authContainer}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={handlePreviousStep}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-
         <View style={styles.titleCover}>
-          <Text style={styles.title}>Register</Text>
+          <Text style={styles.title}>Welcome</Text>
         </View>
       </View>
 
-      <View style={styles.stepsContainer}>
-        {onboardingSteps.map((step, i) => (
-          <Ionicons
-            key={i}
-            name={step.step <= currentStep ? 'ellipse' : 'ellipse-outline'}
-            size={20}
-            color={step.step <= currentStep ? appTheme.primary : 'gray'}
-            style={styles.stepIcon}
-          />
-        ))}
-      </View>
-
-      {/* <Text style={styles.authTitle}>{title}</Text> */}
-      {/* <Text style={styles.authTitle}>Personal Information</Text> */}
-
       <View style={styles.inputContainer}>
-        {currentStep === 1 && (
-          <>
+        {/* {currentStep === 1 && ( */}
+        <>
+          <TextInput
+            placeholder="Full Name"
+            value={userData.fullName}
+            onChangeText={(value) => handleInputChange('fullName', value)}
+            placeholderTextColor={appTheme.themeGray}
+            onBlur={() => handleBlur('fullName')}
+            style={styles.input}
+          />
+          {errors.fullName && <Text style={{ color: 'red' }}>{errors.fullName}</Text>}
+
+          <TextInput
+            placeholder="Email"
+            value={userData.email}
+            onChangeText={(value) => handleInputChange('email', value)}
+            placeholderTextColor={appTheme.themeGray}
+            onBlur={() => handleBlur('email')}
+            style={styles.input}
+          />
+          {errors.email && <Text style={{ color: 'red' }}>{errors.email}</Text>}
+
+          <DropDownPicker
+            open={open}
+            value={userData.role}
+            items={dropdownItems}
+            setOpen={setOpen}
+            placeholder="Select a role"
+            // setValue={(callback) => handleInputChange('role', callback(userData.role))}
+            setValue={(callback) => {
+              const value = callback(userData.role)
+              handleInputChange('role', value)
+            }}
+            setItems={setDropdownItems}
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={styles.dropdownText}
+            labelStyle={styles.dropdownLabel}
+            // onChangeValue={(value) => handleInputChange('role', value)}
+          />
+
+          <PhoneInput
+            defaultCode="GB"
+            layout="first"
+            containerStyle={styles.phoneInputContainer}
+            textContainerStyle={styles.phoneTextInput}
+            textInputStyle={styles.phoneTextInputInner}
+            placeholder="Phone Number"
+            value={userData.phone}
+            onChangeText={(value) => handleInputChange('phone', value)}
+          />
+
+          <View style={styles.addressContainer}>
+            <Ionicons name="location" size={20} color="grey" style={styles.addressIcon} />
             <TextInput
-              placeholder="Full Name"
-              value={userData.name}
-              onChangeText={(value) => handleInputChange('name', value)}
+              placeholder="Address"
+              value={userData.address}
+              onChangeText={(value) => handleInputChange('address', value)}
               placeholderTextColor={appTheme.themeGray}
-              onBlur={() => handleBlur('name')}
-              style={styles.input}
+              style={styles.addressInput}
             />
-            {errors.name && <Text style={{ color: 'red' }}>{errors.name}</Text>}
-
-            <TextInput
-              placeholder="Email"
-              value={userData.email}
-              onChangeText={(value) => handleInputChange('email', value)}
-              placeholderTextColor={appTheme.themeGray}
-              onBlur={() => handleBlur('email')}
-              style={styles.input}
-            />
-            {errors.email && <Text style={{ color: 'red' }}>{errors.email}</Text>}
-
-            <View style={styles.passwordContainer}>
-              <TextInput
-                placeholder="Password"
-                value={userData.password}
-                onChangeText={(value) => handleInputChange('password', value)}
-                placeholderTextColor={appTheme.themeGray}
-                style={styles.passwordInput}
-                onBlur={() => handleBlur('password')}
-                secureTextEntry={!passwordVisible}
-              />
-
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-                <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
-              </TouchableOpacity>
-            </View>
-            {errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
-
-            <View style={styles.passwordContainer}>
-              <TextInput
-                placeholder="Confirm Password"
-                value={userData.confirmPassword}
-                onChangeText={(value) => handleInputChange('confirmPassword', value)}
-                placeholderTextColor={appTheme.themeGray}
-                onBlur={() => handleBlur('confirmPassword')}
-                style={styles.passwordInput}
-                secureTextEntry={!confirmPasswordVisible}
-              />
-
-              <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
-                <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
-              </TouchableOpacity>
-            </View>
-            {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>}
-
-            <PhoneInput
-              defaultCode="GB"
-              layout="first"
-              containerStyle={styles.phoneInputContainer}
-              textContainerStyle={styles.phoneTextInput}
-              textInputStyle={styles.phoneTextInputInner}
-              placeholder="Phone Number"
-              value={userData.phone}
-              onChangeText={(value) => handleInputChange('phone', value)}
-            />
-
-            <View style={styles.addressContainer}>
-              <Ionicons name="location" size={20} color="grey" style={styles.addressIcon} />
-              <TextInput
-                placeholder="Address"
-                value={userData.address}
-                onChangeText={(value) => handleInputChange('address', value)}
-                placeholderTextColor={appTheme.themeGray}
-                style={styles.addressInput}
-              />
-            </View>
-          </>
-        )}
-        {/* For Step 2: To Upload Picture */}
-        {currentStep === 2 && (
-          <View style={styles.imageUploadContainer}>
-            <View>
-              <Text style={styles.formTitle}>Upload Your Picture</Text>
-              <TouchableOpacity onPress={handleImageUpload} style={styles.chooseFileButton}>
-                <Ionicons name="add-circle" size={20} color="gray" style={styles.uploadIcon} />
-                <Text style={styles.chooseFileText}>Choose File</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* To display Profile Image if Selected */}
-            {/* {profileImage && <Image source={{ uri: profileImage }} style={styles.profileImage} />} */}
           </View>
-        )}
-      </View>
 
-      <View>
-        {currentStep < onboardingSteps.length ? (
-          <>
-            <TouchableOpacity style={styles.nextButton} onPress={handleNextStep}>
-              <Text style={styles.nextButtonText}>Next</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Password"
+              value={userData.password}
+              onChangeText={(value) => handleInputChange('password', value)}
+              placeholderTextColor={appTheme.themeGray}
+              style={styles.passwordInput}
+              onBlur={() => handleBlur('password')}
+              secureTextEntry={!passwordVisible}
+            />
+
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
             </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <LinkButton href="/StylistHomeScreen" text="Register" onPress={registerUserData} />
-          </>
-        )}
+          </View>
+          {errors.password && <Text style={{ color: 'red' }}>{errors.password}</Text>}
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Confirm Password"
+              value={userData.confirmPassword}
+              onChangeText={(value) => handleInputChange('confirmPassword', value)}
+              placeholderTextColor={appTheme.themeGray}
+              onBlur={() => handleBlur('confirmPassword')}
+              style={styles.passwordInput}
+              secureTextEntry={!confirmPasswordVisible}
+            />
+
+            <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+            </TouchableOpacity>
+          </View>
+          {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>}
+        </>
+
+        <>
+          {/* <LinkButton href="/StylistHomeScreen" text="Register" onPress={handleRegister} /> */}
+          <TouchableOpacity style={styles.btnCover} onPress={handleRegister}>
+            <Text style={styles.btnText}>Register</Text>
+          </TouchableOpacity>
+        </>
 
         <Text style={styles.belowTextCover}>
           Already have an account?{' '}
@@ -264,7 +221,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: appTheme.secondary,
     // backgroundColor: 'red',
-    paddingTop: 60
+    paddingTop: 100
   },
 
   topBar: {
@@ -316,6 +273,38 @@ const styles = StyleSheet.create({
     marginVertical: 8
   },
 
+  // Dropdown
+
+  dropdown: {
+    // height: 50,
+    borderRadius: 8,
+    borderColor: 'white',
+    backgroundColor: '#f2f2f2',
+    marginBottom: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 20
+  },
+
+  dropdownContainer: {
+    borderColor: '#f2f2f2',
+    // backgroundColor: '#f2f2f2',
+    paddingVertical: 2,
+    paddingHorizontal: 10
+  },
+
+  dropdownText: {
+    fontSize: 18,
+    color: '#aaa'
+  },
+
+  dropdownLabel: {
+    // fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333'
+  },
+
+  // :::::::::::::::
+
   passwordInput: {
     flex: 1,
     padding: 24,
@@ -356,8 +345,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     borderRadius: 8,
     paddingLeft: 10,
-    marginVertical: 8,
-    marginBottom: 50
+    marginVertical: 8
+    // marginBottom: 50
   },
 
   addressInput: {
@@ -467,5 +456,22 @@ const styles = StyleSheet.create({
   availabilityText: {
     fontSize: 16,
     marginVertical: 10
+  },
+
+  btnCover: {
+    backgroundColor: appTheme.primary,
+    alignItems: 'center',
+    // paddingVertical: 20,
+    padding: 20,
+    borderRadius: 10,
+    marginTop: 10,
+    marginBottom: 20
+  },
+
+  btnText: {
+    fontSize: 20,
+    color: appTheme.secondary,
+    textAlign: 'center',
+    fontWeight: '600'
   }
 })

@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: 'transparent'
   },
+  
   internalLink: {
     gap: 15,
     textAlign: 'center',

@@ -2,12 +2,12 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import authService from './authService'
 
 export interface UserData {
-  id: string | null
+  id?: number | null
   fullName: string | null
   email: string | null
   role: string | null
   phone: string | null
-  address: string | null
+  address?: string | null
   password: string | null
   confirmPassword: string | null
 }
@@ -73,9 +73,6 @@ const authSlice = createSlice({
       state.isLoading = false
       state.message = ''
     }
-    // startLoading(state) {
-    //   state.isLoading = true
-    // },
   },
   extraReducers: (builder) => {
     builder
@@ -87,12 +84,16 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isLoggedIn = true
         state.user = action.payload
+        console.log('registerSlice fulfilled:', action.payload)
       })
       .addCase(registerUserSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
-        state.message = action.payload as string
+        // state.message = action.payload as string
+        state.message = (action.payload as string) ? (action.payload as string) : 'An error occurred during registration.'
+
         state.user = null
+        console.log('registerSlice error:', action.payload)
       })
 
       // For the User Login

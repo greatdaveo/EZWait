@@ -2,8 +2,8 @@ import axios from 'axios'
 import { Backend_Url } from '@env'
 import { LoginData, UserData } from './authSlice'
 
-const Backend_url = Backend_Url
-export const API_URL = `${Backend_Url}/api/v1/user/register`
+export const API_URL = `${Backend_Url}/api/v1/user`
+console.log(API_URL)
 
 // For registration
 const registerService = async (userData: UserData) => {
@@ -11,6 +11,7 @@ const registerService = async (userData: UserData) => {
     withCredentials: true
   })
 
+  console.log('response: ', response.data)
   return response.data
 }
 

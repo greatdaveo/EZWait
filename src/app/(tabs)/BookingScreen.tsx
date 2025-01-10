@@ -9,9 +9,9 @@ import { Calendar, CalendarList } from 'react-native-calendars'
 import moment from 'moment'
 
 // Global Variable
-const db = getFirestore()
-const auth = getAuth()
-const user = auth.currentUser
+// const db = getFirestore()
+// const auth = getAuth()
+// const user = auth.currentUser
 
 export default function ScheduleScreen() {
   const data = [
