@@ -1,11 +1,19 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import { useState } from 'react'
-import { SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native'
+import { TouchableOpacity } from 'react-native'
+import { useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
+import { RootState } from 'src/redux/store'
 
 export default function TabLayout() {
-  const [userRole, setUserRole] = useState('stylist')
+  const { user } = useSelector((state: RootState) => state.auth)
+  const [userRole, setUserRole] = useState<string>(user?.data?.role)
+  // console.log(user?.data?.role)
+  // console.log(userRole)
+  const ConditionalTouchableOpacity = ({ condition, children, ...props }: TouchableOpacityProps & { condition: boolean }) => {
+    return condition ? <TouchableOpacity {...props}>{children}</TouchableOpacity> : null
+  }
 
   return (
     <Tabs
@@ -23,30 +31,26 @@ export default function TabLayout() {
         // }
       }}>
       <Tabs.Screen
-        name="StylistHomeScreen"
+        name="CustomerHomeScreen"
         options={{
           title: 'Home',
-          headerTitle: 'Home',
+          href: userRole === 'stylist' ? null : '',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
-          ),
-
-          tabBarButton: (props) => (userRole === 'stylist' ? <TouchableOpacity {...props} /> : null)
+          )
         }}
       />
 
       <Tabs.Screen
-        name="CustomerHomeScreen"
+        name="StylistHomeScreen"
         options={{
           title: 'Home',
-          headerTitle: 'Home',
+          href: userRole === 'customer' ? null : '',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
-          ),
-
-          tabBarButton: (props) => (userRole === 'customer' ? <TouchableOpacity /> : null)
+          )
         }}
       />
 
@@ -60,7 +64,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
-
       <Tabs.Screen
         name="SearchScreen"
         options={{
@@ -70,7 +73,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'search-sharp' : 'search-outline'} color={appTheme.primary} size={24} />
         }}
       />
-
       <Tabs.Screen
         name="HistoryScreen"
         options={{
@@ -82,7 +84,6 @@ export default function TabLayout() {
           )
         }}
       />
-
       <Tabs.Screen
         name="ProfileScreen"
         options={{

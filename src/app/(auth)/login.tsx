@@ -25,7 +25,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const { isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const [userRole, setUserRole] = useState<string>(user?.data?.role)
 
   const dispatch = useDispatch<AppDispatch>()
 
@@ -39,7 +40,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
       Alert.alert('Login Successful.')
-      router.navigate('/(tabs)/BookingScreen')
+      router.navigate(userRole === 'stylist' ? '/(tabs)/StylistHomeScreen' : '/(tabs)/CustomerHomeScreen')
     }
 
     if (isError) {
