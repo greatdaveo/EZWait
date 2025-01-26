@@ -1,17 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Button, Pressable, ActivityIndicator } from 'react-native'
 import { Link, router, useNavigation } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import LinkButton from 'src/components/LinkButton'
 import { fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { useDispatch, useSelector } from 'react-redux'
+import { RESET_AUTH, loginUserSlice } from 'src/redux/auth/authSlice'
+import { AppDispatch, RootState } from 'src/redux/store'
+
+// interface FormData {
+//   name: string
+//   email: string
+// }
+
+// const initialState: FormData = {
+//   name: '',
+//   email: ''
+// }
 
 const Login: React.FC = () => {
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const { isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
+  const dispatch = useDispatch<AppDispatch>()
 
   // const navigation = useNavigation()
 
@@ -20,40 +36,27 @@ const Login: React.FC = () => {
     return emailRegex.test(email)
   }
 
+  useEffect(() => {
+    if (isSuccess && isLoggedIn) {
+      Alert.alert('Login Successful.')
+      router.navigate('/(tabs)/BookingScreen')
+    }
+
+    if (isError) {
+      Alert.alert('Invalid Email or Password')
+    }
+
+    dispatch(RESET_AUTH())
+  }, [isSuccess, isLoggedIn, isError, dispatch])
+
   const handleLogin = async () => {
     if (!validEMail(email)) {
       Alert.alert('Please enter a valid email')
       return
     }
 
-    try {
-      const auth = getAuth()
-
-      const userCredentials = await signInWithEmailAndPassword(auth, email, password)
-      setIsLoading(true)
-      if (userCredentials) {
-        // console.log('Logged in users: ', userCredentials.user)
-        router.push('/(tabs)/DashboardScreen')
-        setIsLoading(false)
-      } else {
-        setIsLoading(false)
-        Alert.alert('User does not exist, kindly sign up')
-        return
-      }
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log('Unable to login: ', error.code)
-      setError(error.message)
-      if (error.code === 'auth/wrong-password') {
-        Alert.alert('Incorrect Password', 'The password you entered is incorrect.')
-      } else if (error.code === 'auth/user-not-found') {
-        Alert.alert('User Not Found', 'No account found with this email address.')
-      } else if (error.code === 'auth/invalid-email') {
-        Alert.alert('Invalid Email', 'Please enter a valid email address.')
-      } else {
-        Alert.alert('Login Error', error.message)
-      }
-    }
+    const payload = { email, password }
+    await dispatch(loginUserSlice(payload))
   }
 
   if (isLoading) {

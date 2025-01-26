@@ -36,10 +36,10 @@ const initialState: AuthState = {
 
 export const registerUserSlice = createAsyncThunk('auth/register', async (userData: UserData, thunkAPI) => {
   try {
-    // console.log('userData', userData)
+    // console.log('Register Slice userData', userData)
     return await authService.registerService(userData)
   } catch (error: string | any) {
-    console.log(error)
+    console.log('Registration Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -47,8 +47,10 @@ export const registerUserSlice = createAsyncThunk('auth/register', async (userDa
 
 export const loginUserSlice = createAsyncThunk('auth/login', async (userData: LoginData, thunkAPI) => {
   try {
+    // console.log('Login Slice userData', userData)
     return await authService.loginService(userData)
   } catch (error: string | any) {
+    console.log('Login Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
