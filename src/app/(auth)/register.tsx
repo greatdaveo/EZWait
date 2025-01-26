@@ -10,27 +10,25 @@ import { AppDispatch, RootState } from 'src/redux/store'
 import { RESET_AUTH, registerUserSlice } from 'src/redux/auth/authSlice'
 
 interface FormData {
-  id?: number | null
-  fullName: string
+  name: string
   email: string
-  phone: string
+  number: string
   role: string | null
-  address?: string | undefined
+  location?: string | undefined
   password: string
-  confirmPassword: string
-  profileImage?: string
+  confirm_password: string
+  // profileImage?: string
 }
 
 const initialState: FormData = {
-  id: null,
-  fullName: '',
+  name: '',
   email: '',
-  phone: '',
+  number: '',
   role: null,
-  address: '',
+  location: '',
   password: '',
-  confirmPassword: '',
-  profileImage: ''
+  confirm_password: ''
+  // profileImage: ''
 }
 
 const Register: React.FC = () => {
@@ -66,25 +64,36 @@ const Register: React.FC = () => {
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
       Alert.alert('Registration Successful.')
-      router.navigate('/')
+      router.navigate('/(auth)/login')
     }
 
     dispatch(RESET_AUTH())
   }, [isSuccess, isLoggedIn, dispatch])
 
   const handleRegister = async () => {
-    if (userData.password !== userData.confirmPassword) {
-      return Alert.alert('Passwords do not match')
+    const { name, email, number, role, password, confirm_password, location } = userData
+
+    // if (!name || !email || !number || !role || !password || !confirm_password) {
+    //   return Alert.alert('All fields are required.')
+    // }
+
+    if (password !== confirm_password) {
+      return Alert.alert('Passwords do not match.')
     }
 
-    const formData = {
-      ...userData,
-      address: userData.address ?? null
+    const payload = {
+      name,
+      email,
+      number,
+      role,
+      location: location || null,
+      password,
+      confirm_password
     }
 
-    console.log(userData)
+    // console.log(userData)
 
-    await dispatch(registerUserSlice(formData))
+    await dispatch(registerUserSlice(payload))
   }
 
   return (
@@ -100,13 +109,13 @@ const Register: React.FC = () => {
         <>
           <TextInput
             placeholder="Full Name"
-            value={userData.fullName}
-            onChangeText={(value) => handleInputChange('fullName', value)}
+            value={userData.name}
+            onChangeText={(value) => handleInputChange('name', value)}
             placeholderTextColor={appTheme.themeGray}
-            onBlur={() => handleBlur('fullName')}
+            onBlur={() => handleBlur('name')}
             style={styles.input}
           />
-          {errors.fullName && <Text style={{ color: 'red' }}>{errors.fullName}</Text>}
+          {errors.name && <Text style={{ color: 'red' }}>{errors.name} </Text>}
 
           <TextInput
             placeholder="Email"
@@ -144,18 +153,18 @@ const Register: React.FC = () => {
             textContainerStyle={styles.phoneTextInput}
             textInputStyle={styles.phoneTextInputInner}
             placeholder="Phone Number"
-            value={userData.phone}
-            onChangeText={(value) => handleInputChange('phone', value)}
+            value={userData.number}
+            onChangeText={(value) => handleInputChange('number', value)}
           />
 
-          <View style={styles.addressContainer}>
-            <Ionicons name="location" size={20} color="grey" style={styles.addressIcon} />
+          <View style={styles.locationContainer}>
+            <Ionicons name="location" size={20} color="grey" style={styles.locationIcon} />
             <TextInput
-              placeholder="Address"
-              value={userData.address}
-              onChangeText={(value) => handleInputChange('address', value)}
+              placeholder="Location"
+              value={userData.location}
+              onChangeText={(value) => handleInputChange('location', value)}
               placeholderTextColor={appTheme.themeGray}
-              style={styles.addressInput}
+              style={styles.locationInput}
             />
           </View>
 
@@ -179,10 +188,10 @@ const Register: React.FC = () => {
           <View style={styles.passwordContainer}>
             <TextInput
               placeholder="Confirm Password"
-              value={userData.confirmPassword}
-              onChangeText={(value) => handleInputChange('confirmPassword', value)}
+              value={userData.confirm_password}
+              onChangeText={(value) => handleInputChange('confirm_password', value)}
               placeholderTextColor={appTheme.themeGray}
-              onBlur={() => handleBlur('confirmPassword')}
+              onBlur={() => handleBlur('confirm_password')}
               style={styles.passwordInput}
               secureTextEntry={!confirmPasswordVisible}
             />
@@ -191,7 +200,7 @@ const Register: React.FC = () => {
               <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
             </TouchableOpacity>
           </View>
-          {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword}</Text>}
+          {errors.confirm_password && <Text style={{ color: 'red' }}>{errors.confirm_password}</Text>}
         </>
 
         <>
@@ -339,7 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
 
-  addressContainer: {
+  locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f2f2f2',
@@ -349,13 +358,13 @@ const styles = StyleSheet.create({
     // marginBottom: 50
   },
 
-  addressInput: {
+  locationInput: {
     flex: 1,
     padding: 24,
     fontSize: 18
   },
 
-  addressIcon: {
+  locationIcon: {
     marginRight: -10,
     marginLeft: 20
   },

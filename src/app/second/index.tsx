@@ -17,7 +17,7 @@ export default function SecondScreen() {
           Go to app/second/index.tsx to edit
         </Text>
 
-        <LinkButton href="/" text="Go To Home Screen" />
+        {/* <LinkButton href="/" text="Go To Home Screen" /> */}
       </View>
     </ScreenLayout>
   )

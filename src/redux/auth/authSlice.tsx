@@ -2,14 +2,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import authService from './authService'
 
 export interface UserData {
-  id?: number | null
-  fullName: string | null
+  name: string | null
   email: string | null
   role: string | null
-  phone: string | null
-  address?: string | null
+  number: string | null
+  location?: string | null
   password: string | null
-  confirmPassword: string | null
+  confirm_password: string | null
 }
 
 export interface LoginData {
@@ -37,9 +36,11 @@ const initialState: AuthState = {
 
 export const registerUserSlice = createAsyncThunk('auth/register', async (userData: UserData, thunkAPI) => {
   try {
+    // console.log('userData', userData)
     return await authService.registerService(userData)
   } catch (error: string | any) {
-    const message = (error.message && error.response.data && error.message.data.message) || error.message || error.toString()
+    console.log(error)
+    const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
 })
@@ -48,7 +49,7 @@ export const loginUserSlice = createAsyncThunk('auth/login', async (userData: Lo
   try {
     return await authService.loginService(userData)
   } catch (error: string | any) {
-    const message = (error.message && error.response.data && error.message.data.message) || error.message || error.toString()
+    const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
 })
@@ -57,8 +58,7 @@ export const logoutUserSlice = createAsyncThunk('auth/logout', async (_, thunkAP
   try {
     return await authService.logoutService()
   } catch (error: string | any) {
-    const message = (error.message && error.response.data && error.message.data.message) || error.message || error.toString()
-
+    const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
 })
@@ -84,16 +84,18 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isLoggedIn = true
         state.user = action.payload
+        console.log('registerSlice success user:', state.user)
+
         console.log('registerSlice fulfilled:', action.payload)
       })
       .addCase(registerUserSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
-        // state.message = action.payload as string
-        state.message = (action.payload as string) ? (action.payload as string) : 'An error occurred during registration.'
+        state.message = action.payload as string
+        // state.message = (action.payload as string) ? (action.payload as string) : 'An error occurred during registration.'
 
         state.user = null
-        console.log('registerSlice error:', action.payload)
+        // console.log('registerSlice error:', state)
       })
 
       // For the User Login
