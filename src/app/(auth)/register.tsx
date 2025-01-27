@@ -8,6 +8,8 @@ import DropDownPicker from 'react-native-dropdown-picker'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { RESET_AUTH, registerUserSlice } from 'src/redux/auth/authSlice'
+import * as Location from 'expo-location'
+import axios from 'axios'
 
 interface FormData {
   name: string
@@ -37,6 +39,7 @@ const Register: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
   const [errors, setErrors] = useState<{ [key in keyof FormData]?: string }>({})
+  const [loading, setLoading] = useState(false)
 
   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
 
@@ -61,7 +64,38 @@ const Register: React.FC = () => {
     setUserData((prev) => ({ ...prev, [field]: value }))
   }
 
+  // const fetchLocation = async () => {
+  //   try {
+  //     setLoading(true)
+  //     const {} = await Location.requestForegroundPermissionsAsync()
+  //     if (status != 'granted') {
+  //       Alert.alert('Permission Denied', 'Location access is required.')
+  //       return
+  //     }
+
+  //     const location = await Location.getCurrentPositionAsync({})
+  //     const { latitude, longitude } = location.coords
+
+  //     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+  //       params: {
+  //         latlng: `${latitude},${longitude}`,
+  //         key: 'MY_API_KEY'
+  //       }
+  //     })
+
+  //     const address = response.data.results[0]?.formatted_address || 'Unknown'
+  //     handleInputChange('location', address)
+  //   } catch (error) {
+  //     Alert.alert('Error', 'Unable to fetch location.')
+  //     console.error(error)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+
   useEffect(() => {
+    // fetchLocation()
+
     if (isSuccess && isLoggedIn) {
       Alert.alert('Registration Successful.')
       router.navigate('/(auth)/login')
@@ -165,6 +199,7 @@ const Register: React.FC = () => {
               onChangeText={(value) => handleInputChange('location', value)}
               placeholderTextColor={appTheme.themeGray}
               style={styles.locationInput}
+              editable={!loading}
             />
           </View>
 

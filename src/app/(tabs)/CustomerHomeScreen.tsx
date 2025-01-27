@@ -1,7 +1,37 @@
 import { Ionicons } from '@expo/vector-icons'
-import React from 'react'
+import React, { useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
+import { RootState } from 'src/redux/store'
+
+export const UserTopContent = () => {
+  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const [userName, setUserName] = useState<string>(user?.data?.name)
+
+  return (
+    <View style={styles.headerCover}>
+      <View style={styles.imgCover}>
+        <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
+
+        <View>
+          <Text style={styles.nameText}>Hi, {userName.trim().split(' ')[0]} 👋</Text>
+          <Text style={styles.subtext}>Good morning</Text>
+        </View>
+      </View>
+
+      <View style={styles.alarmCover}>
+        <View style={styles.alarm}>
+          <Ionicons name="notifications-sharp" color={appTheme.themeBlack} size={28} />
+        </View>
+
+        <View style={styles.alarmTextCover}>
+          <Text style={styles.alarmText}>2</Text>
+        </View>
+      </View>
+    </View>
+  )
+}
 
 const UserHomeScreen = () => {
   const data = [
@@ -53,29 +83,11 @@ const UserHomeScreen = () => {
       img: require('../../assets/images/Frame3.png')
     }
   ]
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
-        <View style={styles.headerCover}>
-          <View style={styles.imgCover}>
-            <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
-
-            <View>
-              <Text style={styles.nameText}>Hi, David 👍</Text>
-              <Text style={styles.subtext}>Good morning</Text>
-            </View>
-          </View>
-
-          <View style={styles.alarmCover}>
-            <View style={styles.alarm}>
-              <Ionicons name="notifications-sharp" color={appTheme.themeBlack} size={28} />
-            </View>
-
-            <View style={styles.alarmTextCover}>
-              <Text style={styles.alarmText}>2</Text>
-            </View>
-          </View>
-        </View>
+        <UserTopContent />
 
         <View style={styles.headerImg}>
           <View style={styles.headerImgCover}>

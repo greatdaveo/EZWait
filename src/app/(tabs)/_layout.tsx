@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native'
 import { useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
@@ -11,9 +11,6 @@ export default function TabLayout() {
   const [userRole, setUserRole] = useState<string>(user?.data?.role)
   // console.log(user?.data?.role)
   // console.log(userRole)
-  const ConditionalTouchableOpacity = ({ condition, children, ...props }: TouchableOpacityProps & { condition: boolean }) => {
-    return condition ? <TouchableOpacity {...props}>{children}</TouchableOpacity> : null
-  }
 
   return (
     <Tabs
@@ -34,7 +31,7 @@ export default function TabLayout() {
         name="CustomerHomeScreen"
         options={{
           title: 'Home',
-          href: userRole === 'stylist' ? null : '',
+          href: userRole === 'stylist' ? null : undefined,
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
@@ -46,7 +43,7 @@ export default function TabLayout() {
         name="StylistHomeScreen"
         options={{
           title: 'Home',
-          href: userRole === 'customer' ? null : '',
+          href: userRole === 'customer' ? null : undefined,
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'home' : 'home-outline'} color={focused ? appTheme.primary : appTheme.primary} size={24} />
@@ -58,12 +55,26 @@ export default function TabLayout() {
         name="BookingScreen"
         options={{
           title: 'Bookings',
+          href: userRole === 'customer' ? null : undefined,
           headerTitle: 'Booking dashboard',
           // tabBarLabel: 'Auth',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
+
+      <Tabs.Screen
+        name="ScheduleScreen"
+        options={{
+          title: 'Schedule',
+          href: userRole === 'stylist' ? null : undefined,
+          headerTitle: 'Schedule Bookings',
+          // tabBarLabel: 'Auth',
+          headerShown: true,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
+        }}
+      />
+
       <Tabs.Screen
         name="SearchScreen"
         options={{

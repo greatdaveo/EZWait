@@ -9,16 +9,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RESET_AUTH, loginUserSlice } from 'src/redux/auth/authSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 
-// interface FormData {
-//   name: string
-//   email: string
-// }
-
-// const initialState: FormData = {
-//   name: '',
-//   email: ''
-// }
-
 const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
   const [email, setEmail] = useState<string>('')
@@ -44,11 +34,11 @@ const Login: React.FC = () => {
     }
 
     if (isError) {
-      Alert.alert('Invalid Email or Password')
+      Alert.alert('Incorrect Email or Password')
     }
 
     dispatch(RESET_AUTH())
-  }, [isSuccess, isLoggedIn, isError, dispatch])
+  }, [isSuccess, isLoggedIn, isError, dispatch, userRole])
 
   const handleLogin = async () => {
     if (!validEMail(email)) {
