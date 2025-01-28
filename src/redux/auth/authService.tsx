@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { Backend_Url } from '@env'
 import { LoginData, UserData } from './authSlice'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const API_URL = `${Backend_Url}/api/v1/user`
 console.log(API_URL)
@@ -11,14 +12,19 @@ const registerService = async (userData: UserData) => {
     withCredentials: true
   })
 
-  console.log('response: ', response.data)
   return response.data
 }
 
 // For Login
 const loginService = async (userData: LoginData) => {
-  const response = await axios.post(API_URL + '/login', userData)
-  return response.data
+  const response = await axios.post(API_URL + '/login', userData, {
+    withCredentials: true
+  })
+  // console.log('Login Data: ', response.data)
+  const { data, token } = response.data
+  await AsyncStorage.setItem('token', token)
+  // console.log(data)
+  return data
 }
 
 // To logout

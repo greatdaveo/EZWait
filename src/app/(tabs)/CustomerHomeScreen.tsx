@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
-import { RootState } from 'src/redux/store'
+import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
+import { AppDispatch, RootState } from 'src/redux/store'
 
 export const UserTopContent = () => {
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
-  const [userName, setUserName] = useState<string>(user?.data?.name)
+  const [userName, setUserName] = useState<string>(user?.name)
 
   return (
     <View style={styles.headerCover}>
@@ -15,7 +16,7 @@ export const UserTopContent = () => {
         <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
 
         <View>
-          <Text style={styles.nameText}>Hi, {userName.trim().split(' ')[0]} 👋</Text>
+          <Text style={styles.nameText}>Hi, {userName?.trim().split(' ')[0]} 👋</Text>
           <Text style={styles.subtext}>Good morning</Text>
         </View>
       </View>
@@ -84,6 +85,19 @@ const UserHomeScreen = () => {
     }
   ]
 
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth)
+  const { bookings, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
+  const dispatch = useDispatch<AppDispatch>()
+
+  console.log(bookings)
+
+  // console.log(bookings)
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(getAllBookingsSlice())
+    }
+  }, [isLoggedIn, dispatch])
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -147,22 +161,17 @@ const UserHomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {data.map((appointment, i) => (
+          {bookings?.data?.map((stylist: any, i: number) => (
             <View style={styles.eachAppointmentCover} key={i}>
               <View style={styles.eachAppointment}>
-                <Image source={appointment.img} style={styles.customerImg} />
+                <Image source={stylist.img} style={styles.customerImg} />
 
                 <View style={styles.detailsCover}>
-                  <Text style={styles.nameText}>{appointment.name}</Text>
-                  {/* 
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
-                    <Text style={styles.appointmentText}>{appointment.time}</Text>
-                  </View> */}
+                  <Text style={styles.nameText}>{stylist.name}</Text>
 
                   <View style={styles.appointmentDetailsCover}>
                     <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
-                    <Text style={styles.appointmentText}>{appointment.service}</Text>
+                    <Text style={styles.appointmentText}>{stylist.services}</Text>
                   </View>
 
                   <View style={styles.ratingsIcons}>
@@ -174,7 +183,45 @@ const UserHomeScreen = () => {
                   </View>
 
                   <View style={styles.appointmentDetailsCover}>
-                    <Text style={styles.appointmentText}>{appointment.ratings}</Text>
+                    <Text style={styles.appointmentText}>{stylist.ratings}-star rating</Text>
+                  </View>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.btnCover}>
+                <Text style={styles.btnText}>See Profile</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          {data.map((stylist, i) => (
+            <View style={styles.eachAppointmentCover} key={i}>
+              <View style={styles.eachAppointment}>
+                <Image source={stylist.img} style={styles.customerImg} />
+
+                <View style={styles.detailsCover}>
+                  <Text style={styles.nameText}>{stylist.name}</Text>
+                  {/* 
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
+                    <Text style={styles.appointmentText}>{appointment.time}</Text>
+                  </View> */}
+
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
+                    <Text style={styles.appointmentText}>{stylist.service}</Text>
+                  </View>
+
+                  <View style={styles.ratingsIcons}>
+                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                  </View>
+
+                  <View style={styles.appointmentDetailsCover}>
+                    <Text style={styles.appointmentText}>{stylist.ratings}</Text>
                   </View>
                 </View>
               </View>

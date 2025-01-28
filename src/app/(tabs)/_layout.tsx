@@ -8,7 +8,7 @@ import { RootState } from 'src/redux/store'
 
 export default function TabLayout() {
   const { user } = useSelector((state: RootState) => state.auth)
-  const [userRole, setUserRole] = useState<string>(user?.data?.role)
+  const [userRole, setUserRole] = useState<string>(user?.role)
   // console.log(user?.data?.role)
   // console.log(userRole)
 

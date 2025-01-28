@@ -8,6 +8,7 @@ import { fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword } from 
 import { useDispatch, useSelector } from 'react-redux'
 import { RESET_AUTH, loginUserSlice } from 'src/redux/auth/authSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
@@ -17,6 +18,14 @@ const Login: React.FC = () => {
   const [error, setError] = useState('')
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
   const [userRole, setUserRole] = useState<string>(user?.data?.role)
+
+  // const saveToken = async (token: string) => {
+  //   try {
+  //     await AsyncStorage.setItem('authToken', token)
+  //   } catch (error) {
+  //     console.log('Error saving token', error)
+  //   }
+  // }
 
   const dispatch = useDispatch<AppDispatch>()
 

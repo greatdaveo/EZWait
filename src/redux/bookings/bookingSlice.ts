@@ -12,6 +12,7 @@ export interface BookingData {
 
 interface BookingState {
   booking: any
+  bookings: any
   isSuccess: boolean
   isLoggedIn: boolean
   isLoading: boolean
@@ -21,12 +22,23 @@ interface BookingState {
 
 const initialState: BookingState = {
   booking: null,
+  bookings: [],
   isLoggedIn: false,
   isError: false,
   isSuccess: false,
   isLoading: false,
   message: ''
 }
+
+export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', async (_, thunkAPI) => {
+  try {
+    return await bookingService.getAllBookings()
+  } catch (error: string | any) {
+    console.log('Get Booking Slice Error', error)
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
 
 export const makeBookingSlice = createAsyncThunk('bookings/make-bookings', async (formData: BookingData, thunkAPI) => {
   try {
@@ -72,6 +84,24 @@ const bookingSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      .addCase(getAllBookingsSlice.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getAllBookingsSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isLoggedIn = true
+        state.isError = false
+        state.bookings = action.payload
+        // console.log('Fulfilled bookings fetched:', action.payload)
+      })
+      .addCase(getAllBookingsSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        // Alert.alert('Bookings Scheduled Fail! ❌')
+      })
+
       .addCase(makeBookingSlice.pending, (state) => {
         state.isLoading = true
       })
