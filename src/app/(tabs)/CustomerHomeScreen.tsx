@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
+import { useNavigation, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,6 +9,7 @@ import { AppDispatch, RootState } from 'src/redux/store'
 
 export const UserTopContent = () => {
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
   const [userName, setUserName] = useState<string>(user?.name)
 
   return (
@@ -87,11 +89,18 @@ const UserHomeScreen = () => {
 
   const { isLoggedIn } = useSelector((state: RootState) => state.auth)
   const { bookings, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
+  const { stylistProfile } = useSelector((state: RootState) => state.profile)
+
   const dispatch = useDispatch<AppDispatch>()
+  const navigation = useNavigation()
+  const router = useRouter()
 
-  console.log(bookings)
+  // console.log(bookings?.data)
 
-  // console.log(bookings)
+  const viewStylistProfile = () => {
+    console.log('stylistProfile: ', stylistProfile)
+  }
+
   useEffect(() => {
     if (isLoggedIn) {
       dispatch(getAllBookingsSlice())
@@ -188,7 +197,7 @@ const UserHomeScreen = () => {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.btnCover}>
+              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.id}`)}>
                 <Text style={styles.btnText}>See Profile</Text>
               </TouchableOpacity>
             </View>
