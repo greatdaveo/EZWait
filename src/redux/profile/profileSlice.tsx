@@ -53,7 +53,7 @@ const profileSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.stylistProfile = action.payload
-        console.log('Fulfilled Stylist fetched:', action.payload)
+        // console.log('Fulfilled Stylist fetched:', action.payload)
       })
       .addCase(getStylistProfileSlice.rejected, (state, action) => {
         state.isLoading = false

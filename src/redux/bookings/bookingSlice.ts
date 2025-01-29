@@ -3,8 +3,8 @@ import { bookingService } from './bookingService'
 import { Alert } from 'react-native'
 
 export interface BookingData {
-  //   user_id: number | null
-  //   stylist_id: number | null
+  user_id: number | null
+  stylist_id: number | null
   booking_time: string | null
   booking_day: string | null
   booking_status: string | null
@@ -42,6 +42,7 @@ export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', as
 
 export const makeBookingSlice = createAsyncThunk('bookings/make-bookings', async (formData: BookingData, thunkAPI) => {
   try {
+    console.log('makeBookingSlice Data: ', formData)
     return await bookingService.makeBooking(formData)
   } catch (error: string | any) {
     console.log('Make Booking Slice Error', error)

@@ -8,6 +8,7 @@ import { UserTopContent } from './CustomerHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { makeBookingSlice } from 'src/redux/bookings/bookingSlice'
+import { useLocalSearchParams } from 'expo-router'
 
 const BookingDetail: React.FC<{ icon: any; label: string }> = ({ icon, label }) => (
   <View style={styles.bookingDetails}>
@@ -17,12 +18,16 @@ const BookingDetail: React.FC<{ icon: any; label: string }> = ({ icon, label }) 
 )
 
 interface FormData {
+  // user_id: number | null
+  // stylist_id: number | null
   booking_time: string
   booking_day: string
   booking_status: string
 }
 
 const initialState: FormData = {
+  // user_id: null,
+  // stylist_id: null,
   booking_time: '',
   booking_day: '',
   booking_status: ''
@@ -34,10 +39,14 @@ const ScheduleScreen: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState('')
   const [bookingData, setBookingData] = useState<FormData>(initialState)
 
+  const { user } = useSelector((state: RootState) => state.auth)
+  const { stylist_id } = useLocalSearchParams() as { stylist_id: string }
+
+  // console.log('user: ', user, 'Stylist: ', stylist_id)
+
   const dispatch = useDispatch<AppDispatch>()
 
   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
-  //   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
 
   const onDayPress = (day: any) => {
     // console.log(day.dateString)
@@ -63,6 +72,8 @@ const ScheduleScreen: React.FC = () => {
     }
 
     const payload = {
+      user_id: user.id,
+      stylist_id: Number(stylist_id),
       booking_time,
       booking_day: selectedDate,
       booking_status: 'pending'

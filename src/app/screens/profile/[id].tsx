@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useNavigation } from 'expo-router'
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
 import React, { useEffect } from 'react'
 import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,7 +10,11 @@ const StylistProfileScreen: React.FC = () => {
   const navigation = useNavigation()
   const dispatch = useDispatch<AppDispatch>()
   const { stylistProfile, isLoading } = useSelector((state: RootState) => state.profile)
-  console.log(stylistProfile)
+  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
+  const router = useRouter()
+
+  // console.log('stylistProfile: ', stylistProfile)
 
   useEffect(() => {
     dispatch(getStylistProfileSlice(id))
@@ -38,7 +42,10 @@ const StylistProfileScreen: React.FC = () => {
     )
   }
 
-  const { user, stylist }: any = stylistProfile?.data
+  const { data }: any = stylistProfile
+  // console.log('Stylist user id: ', data?.user?.id)
+  // console.log('Stylist user id: ', data?.stylist?.stylist_id)
+  // console.log('Customer user id: ', user?.id)
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -47,30 +54,38 @@ const StylistProfileScreen: React.FC = () => {
       {/* Personal Details Section */}
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Personal Details</Text>
-        <Text style={styles.detail}>Name: {user?.name}</Text>
-        <Text style={styles.detail}>Email: {user?.email}</Text>
-        <Text style={styles.detail}>Phone: {user?.number}</Text>
-        <Text style={styles.detail}>Location: {user?.location}</Text>
-        <Text style={styles.detail}>Joined: {new Date(user?.created_at).toLocaleDateString()}</Text>
+        <Text style={styles.detail}>Name: {data?.user?.name}</Text>
+        <Text style={styles.detail}>Email: {data?.user?.email}</Text>
+        <Text style={styles.detail}>Phone: {data?.user?.number}</Text>
+        <Text style={styles.detail}>Location: {data?.user?.location}</Text>
+        <Text style={styles.detail}>Joined: {new Date(data?.user?.created_at).toLocaleDateString()}</Text>
       </View>
 
       {/* Stylist Details Section */}
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Stylist Details</Text>
-        <Text style={styles.detail}>Services: {stylist?.services}</Text>
-        <Text style={styles.detail}>Availability: {stylist?.availability}</Text>
-        <Text style={styles.detail}>Ratings: {stylist?.ratings}</Text>
+        <Text style={styles.detail}>Services: {data?.stylist?.services}</Text>
+        <Text style={styles.detail}>Availability: {data?.stylist?.availability}</Text>
+        <Text style={styles.detail}>Ratings: {data?.stylist?.ratings}</Text>
       </View>
 
       {/* Statistics Section */}
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Statistics</Text>
-        <Text style={styles.detail}>Total Bookings: {stylist?.no_of_customer_bookings}</Text>
-        <Text style={styles.detail}>Current Customers: {stylist?.no_of_current_customers}</Text>
+        <Text style={styles.detail}>Total Bookings: {data?.stylist?.no_of_customer_bookings}</Text>
+        <Text style={styles.detail}>Current Customers: {data?.stylist?.no_of_current_customers}</Text>
       </View>
 
       <Button title="Go Back" onPress={() => navigation.goBack()} />
-      <Button title="Make Booking" onPress={() => navigation.goBack()} />
+      <Button
+        title="Make Booking"
+        onPress={() =>
+          router.push({
+            pathname: '(tabs)/ScheduleScreen',
+            params: { stylist_id: data?.stylist?.stylist_id }
+          })
+        }
+      />
     </ScrollView>
   )
 }
