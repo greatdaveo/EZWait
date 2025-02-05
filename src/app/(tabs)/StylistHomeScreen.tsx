@@ -1,12 +1,15 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import { appTheme } from 'src/config/theme'
 import DropDownPicker from 'react-native-dropdown-picker'
 import LinkButton from 'src/components/LinkButton'
 import { router } from 'expo-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/redux/store'
+import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
 
-const DashboardScreen = () => {
+const DashboardScreen: React.FC = () => {
   const data = [
     {
       name: 'Daniel Mayowa',
@@ -57,6 +60,20 @@ const DashboardScreen = () => {
     }
   ]
 
+  const dispatch = useDispatch<AppDispatch>()
+  const { stylistProfile }: any = useSelector((state: RootState) => state.profile)
+  const { bookings, isLoading } = useSelector((state: RootState) => state.bookings)
+
+  const [stylistName, setStylistName] = useState<{ [key: number]: string }>({})
+
+  useEffect(() => {
+    console.log(bookings)
+
+    if (stylistProfile?.stylist?.id) {
+      dispatch(getAllBookingsSlice())
+    }
+  }, [dispatch])
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -95,6 +112,41 @@ const DashboardScreen = () => {
 
         <View style={styles.appointmentsCover}>
           <Text style={styles.sectionTitle}>Pending Appointments</Text>
+
+          {bookings.data.map((appointment: any, i: number) => (
+            <View style={styles.eachAppointmentCover} key={i}>
+              <View style={styles.eachAppointment}>
+                <Image source={appointment?.img} style={styles.customerImg} />
+
+                <View style={styles.detailsCover}>
+                  <Text style={styles.nameText}>{appointment.name}</Text>
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="calendar-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.date}</Text>
+                  </View>
+
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.booking_time}</Text>
+                  </View>
+
+                  <View style={styles.appointmentDetailsCover}>
+                    <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
+                    <Text>{appointment.services}</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={styles.btnCover}>
+                <TouchableOpacity style={styles.acceptBtn}>
+                  <Text style={styles.btnText}>Accept</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.declineBtn}>
+                  <Text style={styles.btnText}>Decline</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
 
           {data.map((appointment, i) => (
             <View style={styles.eachAppointmentCover} key={i}>

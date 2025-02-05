@@ -4,10 +4,18 @@ import { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import { Switch } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/redux/store'
+import { logoutUserSlice } from 'src/redux/auth/authSlice'
+import { useRouter } from 'expo-router'
 
 export default function ProfileScreen() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isReminderOn, setIsReminderOn] = useState(false)
+  const { isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth)
+
+  const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
   const handlePreviousStep = () => {
     if (currentStep > 1) {
@@ -20,7 +28,13 @@ export default function ProfileScreen() {
   }
 
   const handleLogout = () => {
-    console.log('Logout')
+    // console.log('Logout')
+
+    if (isLoggedIn) {
+      dispatch(logoutUserSlice())
+    }
+
+    router.push('/(onboarding)/ThirdScreen')
   }
 
   return (

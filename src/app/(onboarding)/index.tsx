@@ -12,8 +12,8 @@ export default function OnboardingScreen() {
 
   return (
     <Swiper loop={false} horizontal={true} showsPagination={true} activeDotColor={appTheme.primary} style={styles.wrapper}>
-      <FirstScreen />
-      <SecondScreen />
+      {/* <FirstScreen /> */}
+      {/* <SecondScreen /> */}
       <ThirdScreen />
     </Swiper>
   )

@@ -42,10 +42,10 @@ export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', as
 
 export const makeBookingSlice = createAsyncThunk('bookings/make-bookings', async (formData: BookingData, thunkAPI) => {
   try {
-    console.log('makeBookingSlice Data: ', formData)
+    // console.log('makeBookingSlice Data: ', formData)
     return await bookingService.makeBooking(formData)
   } catch (error: string | any) {
-    console.log('Make Booking Slice Error', error)
+    // console.log('Make Booking Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -94,7 +94,7 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.bookings = action.payload
-        // console.log('Fulfilled bookings fetched:', action.payload)
+        console.log('Fulfilled bookings fetched:', action.payload)
       })
       .addCase(getAllBookingsSlice.rejected, (state, action) => {
         state.isLoading = false

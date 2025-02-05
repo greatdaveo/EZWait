@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import authService from './authService'
+import { Alert } from 'react-native'
 
 export interface UserData {
   name: string | null
@@ -129,7 +130,7 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isLoggedIn = false
         state.user = null
-        // console.log(action.payload);
+        Alert.alert('Logout Successful', 'We hope to see you soon!')
       })
 
       .addCase(logoutUserSlice.rejected, (state, action) => {

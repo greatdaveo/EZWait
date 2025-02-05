@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
 import { Link, router, useNavigation } from 'expo-router'
 import { Image } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 
 export default function ThirdScreen() {
   const onPress = () => {}
@@ -12,24 +13,25 @@ export default function ThirdScreen() {
   return (
     // <ScreenLayout testID="home-screen-layout">
     <View style={styles.Content}>
-      <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
-        <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
+      <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
+        <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
           <View style={styles.overlay}>
-            <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
+            <View style={styles.titleCover}>
+              <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
+              <Text style={styles.title}>Ezwait</Text>
+            </View>
 
-            <Text style={styles.title}>EZWait Got You.</Text>
-            <Text style={styles.subtitle}>No more waiting time at the barber's shop</Text>
+            <Text style={styles.subtitle}>Book top barbers easily and stay sharp. Your perfect cut is a tap away!</Text>
+
+            <TouchableOpacity style={styles.buttonContainer}>
+              <Link href="/(auth)/login" style={styles.btnText}>
+                Get Started
+              </Link>
+              <Ionicons name="arrow-forward" color={'white'} size={20} />
+            </TouchableOpacity>
           </View>
-        </LinearGradient>
-
-        <View style={styles.buttonContainer}>
-          <LinkButton href="/(auth)/login" text="Get Started" onPress={onPress} />
-        </View>
-
-        {/* <View style={styles.buttonContainer}>
-          <LinkButton href="/screens/UserHomeScreen" text="Get Started" onPress={onPress} />
-        </View> */}
-      </ImageBackground>
+        </ImageBackground>
+      </LinearGradient>
     </View>
     //  </ScreenLayout>
   )
@@ -43,46 +45,70 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     width: '100%',
-    height: '90%',
-    justifyContent: 'space-between'
+    height: '100%',
+    justifyContent: 'flex-end'
   },
 
   gradient: {
     ...StyleSheet.absoluteFillObject
   },
 
-  logo: {},
-
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    gap: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+
+  titleCover: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  logo: {
+    width: 40,
+    height: 35,
+    resizeMode: 'contain',
+    marginRight: 4
   },
 
   title: {
     color: appTheme.secondary,
-    fontSize: 42,
-    paddingHorizontal: 30,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 20
+    fontSize: 40,
+    fontWeight: '500',
+    textAlign: 'center'
+    // marginBottom: 10
   },
 
   subtitle: {
     color: appTheme.secondary2,
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    maxWidth: '60%'
   },
 
   buttonContainer: {
-    gap: 15,
-    textAlign: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
-    paddingHorizontal: 20,
-    marginTop: 700
+    backgroundColor: appTheme.primary,
+    width: 'auto',
+    margin: 'auto',
+    padding: 15,
+    marginTop: 30,
+    marginBottom: 100,
+    borderRadius: 10,
+    gap: 10
+  },
+
+  btnText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18
+    // marginRight: 5
   }
 })
