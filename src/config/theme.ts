@@ -8,7 +8,7 @@ export const appTheme = {
   primary: '#9747FF',
   secondary: '#fff',
   secondary2: '#ddd',
-  semi: '#E1D3E5',
+  semi: '#F4EDFF',
   themeBlack: '#000',
   themeGray: '#a9a9a9',
 

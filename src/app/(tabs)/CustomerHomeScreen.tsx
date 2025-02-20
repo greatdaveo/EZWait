@@ -15,22 +15,18 @@ export const UserTopContent = () => {
   return (
     <View style={styles.headerCover}>
       <View style={styles.imgCover}>
-        <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
+        {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
+        <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
 
-        <View>
-          <Text style={styles.nameText}>Hi, {userName?.trim().split(' ')[0]} 👋</Text>
-          <Text style={styles.subtext}>Good morning</Text>
+        <View style={styles.greetingsCover}>
+          <Text style={styles.subtext}>Good Afternoon, 👋 </Text>
+          <Text style={styles.nameText}>{userName}</Text>
         </View>
       </View>
 
-      <View style={styles.alarmCover}>
-        <View style={styles.alarm}>
-          <Ionicons name="notifications-sharp" color={appTheme.themeBlack} size={28} />
-        </View>
-
-        <View style={styles.alarmTextCover}>
-          <Text style={styles.alarmText}>2</Text>
-        </View>
+      <View style={styles.iconCover}>
+        <Ionicons name="search-outline" size={30} color={'#757575'} />
+        <Image source={require('../../assets/images/notification/notification1.png')} style={styles.alarmIcon} />
       </View>
     </View>
   )
@@ -126,37 +122,37 @@ const UserHomeScreen = () => {
 
         <View style={styles.servicesContainer}>
           <View style={styles.servicesHeader}>
-            <Text style={styles.servicesHeaderText}>Service</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllServicesText}>See All</Text>
+            <Text style={styles.servicesHeaderText}>Categories</Text>
+            <TouchableOpacity style={styles.seeAll}>
+              <Text style={styles.seeAllServicesText}>See all</Text>
             </TouchableOpacity>
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.servicesCover}>
               <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/Barbing.jpeg')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Hair cuts</Text>
+                <Image source={require('../../assets/images/stylists/image (4).png')} style={styles.stylistImg} />
+                <Text style={styles.stylistServiceText}>Fade</Text>
               </View>
 
               <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/MakeUp.jpeg')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Make up</Text>
+                <Image source={require('../../assets/images/stylists/image (5).png')} style={styles.stylistImg} />
+                <Text style={styles.stylistServiceText}>Beard Trim</Text>
               </View>
 
               <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/Shaving.jpeg')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Shaving</Text>
+                <Image source={require('../../assets/images/stylists/image (6).png')} style={styles.stylistImg} />
+                <Text style={styles.stylistServiceText}>Kids Cut</Text>
               </View>
 
               <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/Braiding.jpeg')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Braiding</Text>
+                <Image source={require('../../assets/images/stylists/image (7).png')} style={styles.stylistImg} />
+                <Text style={styles.stylistServiceText}>Package Deals</Text>
               </View>
 
               <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/Haircuts.jpeg')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Nails</Text>
+                <Image source={require('../../assets/images/stylists/image (8).png')} style={styles.stylistImg} />
+                <Text style={styles.stylistServiceText}>Buzz Cut</Text>
               </View>
             </View>
           </ScrollView>
@@ -164,41 +160,41 @@ const UserHomeScreen = () => {
 
         <View style={styles.appointmentsCover}>
           <View style={styles.servicesHeader}>
-            <Text style={styles.servicesHeaderText}>Top rated stylist</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllServicesText}>See All</Text>
+            <Text style={styles.servicesHeaderText}>Available Barbers</Text>
+
+            <TouchableOpacity style={styles.seeAll}>
+              <Text style={styles.seeAllServicesText}>See all</Text>
             </TouchableOpacity>
           </View>
 
           {bookings?.data?.map((stylist: any, i: number) => (
             <View style={styles.eachAppointmentCover} key={i}>
               <View style={styles.eachAppointment}>
-                <Image source={stylist.img} style={styles.customerImg} />
+                {/* <Image source={stylist.img} style={styles.customerImg} /> */}
+
+                <Image source={require('../../assets/images/stylists/image (9).png')} style={styles.stylistImg} />
 
                 <View style={styles.detailsCover}>
                   <Text style={styles.nameText}>{stylist.name}</Text>
 
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
-                    <Text style={styles.appointmentText}>{stylist.services}</Text>
-                  </View>
-
                   <View style={styles.ratingsIcons}>
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star-outline" color="black" size={18} />
+                    <Text style={styles.ratingsText}>{stylist.ratings}</Text>
                   </View>
 
                   <View style={styles.appointmentDetailsCover}>
-                    <Text style={styles.appointmentText}>{stylist.ratings}-star rating</Text>
+                    <Ionicons name="location-sharp" color={'#F0433F'} size={24} />
+                    <Text style={styles.appointmentText}>{stylist.location}</Text>
                   </View>
                 </View>
               </View>
 
               <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.id}`)}>
-                <Text style={styles.btnText}>See Profile</Text>
+                <Text style={styles.btnText}>Book Now</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -206,37 +202,29 @@ const UserHomeScreen = () => {
           {data.map((stylist, i) => (
             <View style={styles.eachAppointmentCover} key={i}>
               <View style={styles.eachAppointment}>
-                <Image source={stylist.img} style={styles.customerImg} />
+                <Image source={stylist.img} style={styles.stylistImg} width={24} height={24} />
 
                 <View style={styles.detailsCover}>
                   <Text style={styles.nameText}>{stylist.name}</Text>
-                  {/* 
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="time-outline" color={appTheme.themeBlack} size={24} />
-                    <Text style={styles.appointmentText}>{appointment.time}</Text>
-                  </View> */}
-
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="cut-outline" color={appTheme.themeBlack} size={24} />
-                    <Text style={styles.appointmentText}>{stylist.service}</Text>
-                  </View>
 
                   <View style={styles.ratingsIcons}>
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
-                    <Ionicons name="star-outline" color="#f0a437" size={20} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star" color="#f0a437" size={18} />
+                    <Ionicons name="star-outline" color="black" size={18} />
+                    <Text style={styles.ratingsText}>4.5</Text>
                   </View>
 
                   <View style={styles.appointmentDetailsCover}>
-                    <Text style={styles.appointmentText}>{stylist.ratings}</Text>
+                    <Ionicons name="location-sharp" color={'#F0433F'} size={24} />
+                    <Text style={styles.appointmentText}>{stylist.service}</Text>
                   </View>
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.btnCover}>
-                <Text style={styles.btnText}>See Profile</Text>
+              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.id}`)}>
+                <Text style={styles.btnText}>Book Now</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -270,37 +258,24 @@ const styles = StyleSheet.create({
   },
 
   img: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 50
   },
 
-  alarmCover: {
-    // position: 'absolute'
+  greetingsCover: {
+    gap: 5
   },
 
-  alarm: {
-    backgroundColor: appTheme.themeGray,
-    padding: 10,
-    borderRadius: 50,
-    position: 'relative'
+  iconCover: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
   },
 
-  alarmTextCover: {
-    position: 'absolute',
-    right: -12,
-    top: -10,
-    backgroundColor: '#F52933',
-    borderRadius: 100,
-    padding: 5,
-    paddingHorizontal: 10
-  },
-
-  alarmText: {
-    color: 'white',
-    fontWeight: 700,
-    fontSize: 16,
-    zIndex: 99
+  alarmIcon: {
+    width: 30,
+    height: 30
   },
 
   nameText: {
@@ -387,10 +362,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
+  seeAll: {
+    backgroundColor: appTheme.semi,
+    padding: 10,
+    borderRadius: 10
+  },
+
   seeAllServicesText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: appTheme.primary
+    // backgroundColor: appTheme.semi
   },
 
   servicesCover: {
@@ -405,14 +387,14 @@ const styles = StyleSheet.create({
   },
 
   stylistImg: {
-    width: 80,
-    height: 80,
-    borderRadius: 50
+    borderRadius: 50,
+    height: 100,
+    width: 100
   },
 
   stylistServiceText: {
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'medium'
     // textAlign: 'center'
   },
 
@@ -430,6 +412,7 @@ const styles = StyleSheet.create({
 
   eachAppointmentCover: {
     marginTop: 10,
+    marginBottom: 25,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
@@ -440,14 +423,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
 
-  customerImg: {
-    borderRadius: 10,
-    height: 100,
-    width: 100
-  },
-
   detailsCover: {
-    marginLeft: 10
+    marginLeft: 10,
+    gap: 10
   },
 
   appointmentDetailsCover: {
@@ -463,7 +441,14 @@ const styles = StyleSheet.create({
 
   ratingsIcons: {
     flexDirection: 'row',
+    alignItems: 'center',
+    // justifyContent: '',
     gap: 2
+  },
+
+  ratingsText: {
+    fontSize: 16,
+    marginLeft: 3
   },
 
   btnCover: {
@@ -476,7 +461,7 @@ const styles = StyleSheet.create({
   },
 
   btnText: {
-    // color: 'white',
+    color: appTheme.primary,
     fontWeight: 'bold'
     // fontSize: 15
   }

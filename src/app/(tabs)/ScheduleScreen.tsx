@@ -8,14 +8,18 @@ import { UserTopContent } from './CustomerHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { makeBookingSlice } from 'src/redux/bookings/bookingSlice'
-import { useLocalSearchParams } from 'expo-router'
+import { Link, useLocalSearchParams, useRouter } from 'expo-router'
+import RadioGroup from 'react-native-radio-buttons-group'
 
-const BookingDetail: React.FC<{ icon: any; label: string }> = ({ icon, label }) => (
-  <View style={styles.bookingDetails}>
-    <Ionicons name={icon} size={24} color={appTheme.primary} />
-    <Text style={styles.text}>{label}</Text>
-  </View>
-)
+const timeData = [
+  { id: '1', time: '9:00 AM - 10:00 AM' },
+  { id: '2', time: '10:30 AM - 11:30 AM' },
+  { id: '3', time: '12:00 PM - 1:00 PM' },
+  { id: '4', time: '2:00 PM - 3:00 PM' },
+  { id: '5', time: '5:00 PM - 6:00 PM' },
+  { id: '6', time: '6:30 PM - 7:30 PM' },
+  { id: '7', time: '8:00 PM - 9:00 PM' }
+]
 
 interface FormData {
   // user_id: number | null
@@ -36,8 +40,9 @@ const initialState: FormData = {
 const ScheduleScreen: React.FC = () => {
   const [date, setDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState('')
-  const [selectedTime, setSelectedTime] = useState('')
+  const [selectedTime, setSelectedTime] = useState(null)
   const [bookingData, setBookingData] = useState<FormData>(initialState)
+  const [nextState, setNextState] = useState<boolean>(false)
 
   const { user } = useSelector((state: RootState) => state.auth)
   const { stylist_id } = useLocalSearchParams() as { stylist_id: string }
@@ -45,6 +50,7 @@ const ScheduleScreen: React.FC = () => {
   // console.log('user: ', user, 'Stylist: ', stylist_id)
 
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
 
@@ -58,10 +64,18 @@ const ScheduleScreen: React.FC = () => {
 
     if (event.type === 'set' && time) {
       const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      setSelectedTime(formattedTime)
+      // setSelectedTime(formattedTime)
       setBookingData((prev) => ({ ...prev, booking_time: formattedTime }))
     }
   }
+
+  const [selectedId, setSelectedId] = useState(null)
+
+  const radioButtons = timeData.map((item) => ({
+    id: item.id,
+    value: item.time,
+    label: `🕒 ${item.time}` // Show time directly
+  }))
 
   const saveBooking = async () => {
     const { booking_time, booking_day, booking_status } = bookingData
@@ -84,181 +98,183 @@ const ScheduleScreen: React.FC = () => {
     await dispatch(makeBookingSlice(payload))
   }
 
+  const handlePreviousStep = () => {
+    router.back()
+  }
+
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <UserTopContent />
+    <ScrollView contentContainerStyle={styles.container}>
+      <>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={handlePreviousStep} style={styles.iconCover}>
+            <Ionicons name="chevron-back-outline" size={28} color={appTheme.primary} />
+          </TouchableOpacity>
 
-        <View>
-          <View style={styles.searchCover}>
-            <Ionicons name="search-outline" size={18} color={appTheme.themeGray} style={styles.searchIcon} />
-            <TextInput style={styles.input} placeholder="Search hair stylist by name" placeholderTextColor={appTheme.themeGray} />
-          </View>
-
-          <View style={styles.bookingDetailsCover}>
-            <BookingDetail icon="person-outline" label="Barber Abc" />
-            <BookingDetail icon="calendar-number-outline" label={selectedDate || '--'} />
-            <BookingDetail icon="time-outline" label={selectedTime || '--'} />
-          </View>
-
-          <View>
-            <View style={styles.preferencesContainer}>
-              <View style={styles.availabilityCover}>
-                <Text style={styles.availabilityText}>Calendar</Text>
-
-                <View style={styles.timeCover}>
-                  <Text>Select Time:</Text>
-                  <RNDateTimePicker
-                    mode="time"
-                    value={date}
-                    // display="spinner"
-                    // textColor="red"
-                    // accentColor={appTheme.primary}
-                    // themeVariant="light"
-                    onChange={handleTimeChange}
-                  />
-                </View>
-              </View>
-
-              <View style={styles.calendarCover}>
-                <Calendar onDayPress={(day) => onDayPress(day)} />
-              </View>
-            </View>
-
-            <TouchableOpacity onPress={saveBooking} style={styles.saveButton}>
-              <Ionicons name="add" color={appTheme.secondary} size={24} />
-            </TouchableOpacity>
+          <View style={styles.titleCover}>
+            <Text style={styles.title}>Book Your Appointment</Text>
           </View>
         </View>
-      </View>
+
+        <View style={styles.dateContainer}>
+          <Text style={styles.dateText}>Choose a Date</Text>
+          <Text style={styles.dateDesc}>Choose from available slots to secure your spot with your preferred barber.</Text>
+        </View>
+
+        <View style={styles.calendarCover}>
+          <Calendar onDayPress={(day) => onDayPress(day)} />
+        </View>
+
+        <View style={styles.buttonContainerCover}>
+          <TouchableOpacity style={styles.cancelBtn}>
+            <Link href="/(auth)/login" style={styles.cancelBtnText}>
+              Cancel
+            </Link>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.nextBtn} onPress={() => setNextState(true)}>
+            <Text style={styles.nextBtnText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </>
+
+      {nextState && (
+        <>
+          <View style={styles.topBar}>
+            <TouchableOpacity onPress={handlePreviousStep} style={styles.iconCover}>
+              <Ionicons name="chevron-back-outline" size={28} color={appTheme.primary} />
+            </TouchableOpacity>
+
+            <View style={styles.titleCover}>
+              <Text style={styles.title}>Book Your Appointment</Text>
+            </View>
+          </View>
+
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateText}>Available Time Slots</Text>
+            <Text style={styles.dateDesc}>Pick a time slot that fits your schedule. Availability is limited, so book now to secure your spot.</Text>
+          </View>
+
+          <View style={styles.calendarCover}>
+            <Text>Time Slots</Text>
+
+            <RadioGroup selectedId={selectedId} onPress={setSelectedId} radioButtons={radioButtons} />
+            {selectedId && <Text style={styles.selectedText}>Selected Time: {timeData.find((t) => t.id === selectedId)?.time}</Text>}
+          </View>
+
+          <View style={styles.buttonContainerCover}>
+            <TouchableOpacity style={styles.cancelBtn}>
+              <Link href="/(auth)/login" style={styles.cancelBtnText}>
+                Cancel
+              </Link>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.nextBtn} onPress={saveBooking}>
+              <Text style={styles.nextBtnText}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: 5,
-    padding: 15
+    marginTop: 50,
+    padding: 20
+    // backgroundColor: '#f7f7f7'
   },
 
-  headContainer: {
+  topBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-
-  bookingDetailsCover: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: 10,
-    borderRadius: 10,
-    padding: 10,
-    shadowColor: appTheme.primary,
-    backgroundColor: appTheme.secondary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 10
-  },
-
-  bookingDetails: {
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 5
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#EBEBEB',
+    paddingBottom: 30
   },
 
-  text: {
-    // fontSize: 24
-  },
-
-  subtext: {
-    fontWeight: '500',
-    fontSize: 18
-  },
-
-  img: {
-    width: 50,
-    height: 50,
+  iconCover: {
+    backgroundColor: '#F4EDFF',
+    padding: 5,
     borderRadius: 50
   },
 
-  searchCover: {
+  titleCover: {
+    flexDirection: 'row'
+  },
+
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginHorizontal: 50
+    // marginBottom: 4
+  },
+
+  // ::::::::::::::::::
+
+  dateContainer: {},
+
+  dateText: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 18
+  },
+
+  dateDesc: {
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 30,
+    width: '75%',
+    margin: 'auto'
+    // fontSize: 16
+  },
+
+  // :::::::::::::::
+
+  buttonContainerCover: {
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: 'white',
-    marginVertical: 10,
-    borderRadius: 10,
-
-    shadowColor: appTheme.primary,
-    backgroundColor: appTheme.secondary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 10
-  },
-
-  searchIcon: {
-    marginLeft: 15
-  },
-
-  input: {
-    padding: 2,
-    fontSize: 18,
-    marginVertical: 12
-  },
-
-  formTitle: {},
-
-  preferencesContainer: {
-    marginVertical: 20,
-    marginBottom: 10
-    // marginTop: -100
-  },
-
-  availabilityText: {
-    fontSize: 16,
-    marginVertical: 10
-  },
-
-  availabilityCover: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-
-  timeCover: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-
-  calendarCover: {
-    // borderWidth: 1,
-    // borderColor: appTheme.primary,
-    borderRadius: 10,
-    marginTop: 12,
-    shadowColor: appTheme.primary,
-    backgroundColor: appTheme.secondary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 10
-  },
-
-  saveButton: {
-    backgroundColor: appTheme.primary,
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 50,
+    justifyContent: 'space-between',
     marginTop: 40,
-    position: 'absolute',
-    right: 15,
-    bottom: -70,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4
-  }
+    gap: 20
+  },
+
+  cancelBtn: {
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#DEDEDE',
+    borderRadius: 10,
+    paddingHorizontal: 60
+  },
+
+  cancelBtnText: {
+    fontSize: 16,
+    fontWeight: 'medium'
+  },
+
+  nextBtn: {
+    backgroundColor: appTheme.primary,
+    padding: 20,
+    borderRadius: 10,
+    paddingHorizontal: 60
+  },
+
+  nextBtnText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'medium'
+  },
+
+  btnText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18
+    // marginRight: 5
+  },
+
+  calendarCover: {}
 })
 
 export default ScheduleScreen

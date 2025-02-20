@@ -70,7 +70,7 @@ export default function TabLayout() {
           href: userRole === 'stylist' ? null : undefined,
           headerTitle: 'Schedule Bookings',
           // tabBarLabel: 'Auth',
-          headerShown: true,
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
