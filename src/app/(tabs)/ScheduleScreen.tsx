@@ -83,9 +83,7 @@ const ScheduleScreen: React.FC = () => {
   }))
 
   const saveBooking = async () => {
-    router.push({
-      pathname: '/components/bookings/BookingsSummary'
-    })
+    router.push('/bookings')
 
     const { booking_time, booking_day, booking_status } = bookingData
 
