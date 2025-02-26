@@ -5,27 +5,30 @@ import { Button, SafeAreaView, StyleSheet, View } from 'react-native'
 import { useState } from 'react'
 import { Provider } from 'react-redux'
 import store from 'src/redux/store'
+import { PaperProvider } from 'react-native-paper'
 
 export default function AppLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true)
 
   return (
-    <Provider store={store}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        ) : (
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        )}
+    <PaperProvider>
+      <Provider store={store}>
+        <Stack screenOptions={{ headerShown: false }}>
+          {isLoggedIn ? (
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          ) : (
+            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          )}
 
-        <Stack.Screen
-          name="+not-found"
-          options={{
-            title: 'Page Not Found'
-          }}
-        />
-      </Stack>
-    </Provider>
+          <Stack.Screen
+            name="+not-found"
+            options={{
+              title: 'Page Not Found'
+            }}
+          />
+        </Stack>
+      </Provider>
+    </PaperProvider>
   )
 }
 

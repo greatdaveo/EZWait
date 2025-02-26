@@ -199,7 +199,7 @@ const UserHomeScreen = () => {
             </View>
           ))}
 
-          {data.map((stylist, i) => (
+          {data.map((stylist: any, i: number) => (
             <View style={styles.eachAppointmentCover} key={i}>
               <View style={styles.eachAppointment}>
                 <Image source={stylist.img} style={styles.stylistImg} width={24} height={24} />
@@ -223,7 +223,7 @@ const UserHomeScreen = () => {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.id}`)}>
+              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist?.id}`)}>
                 <Text style={styles.btnText}>Book Now</Text>
               </TouchableOpacity>
             </View>

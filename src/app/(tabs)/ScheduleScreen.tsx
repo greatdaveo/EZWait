@@ -8,8 +8,9 @@ import { UserTopContent } from './CustomerHomeScreen'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { makeBookingSlice } from 'src/redux/bookings/bookingSlice'
-import { Link, useLocalSearchParams, useRouter } from 'expo-router'
+import { Link, useLocalSearchParams, useNavigation, useRouter } from 'expo-router'
 import RadioGroup from 'react-native-radio-buttons-group'
+import CustomCalendar from 'src/components/calendar/CustomCalendar'
 
 const timeData = [
   { id: '1', time: '9:00 AM - 10:00 AM' },
@@ -43,6 +44,7 @@ const ScheduleScreen: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState(null)
   const [bookingData, setBookingData] = useState<FormData>(initialState)
   const [nextState, setNextState] = useState<boolean>(false)
+  const [pageIndex, setPageIndex] = useState(0)
 
   const { user } = useSelector((state: RootState) => state.auth)
   const { stylist_id } = useLocalSearchParams() as { stylist_id: string }
@@ -51,6 +53,7 @@ const ScheduleScreen: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const navigate = useNavigation()
 
   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
 
@@ -69,7 +72,9 @@ const ScheduleScreen: React.FC = () => {
     }
   }
 
-  const [selectedId, setSelectedId] = useState(null)
+  // For Radio Buttons
+
+  const [selectedId, setSelectedId] = useState('')
 
   const radioButtons = timeData.map((item) => ({
     id: item.id,
@@ -78,24 +83,28 @@ const ScheduleScreen: React.FC = () => {
   }))
 
   const saveBooking = async () => {
+    router.push({
+      pathname: '/components/bookings/BookingsSummary'
+    })
+
     const { booking_time, booking_day, booking_status } = bookingData
 
-    if (!selectedDate || !selectedTime) {
-      Alert.alert('Incomplete Fields', 'Please select both date and time for your booking.')
-      return
-    }
+    // if (!selectedDate || !selectedTime) {
+    //   Alert.alert('Incomplete Fields', 'Please select both date and time for your booking.')
+    //   return
+    // }
 
-    const payload = {
-      user_id: user.id,
-      stylist_id: Number(stylist_id),
-      booking_time,
-      booking_day: selectedDate,
-      booking_status: 'pending'
-    }
+    // const payload = {
+    //   user_id: user.id,
+    //   stylist_id: Number(stylist_id),
+    //   booking_time,
+    //   booking_day: selectedDate,
+    //   booking_status: 'pending'
+    // }
 
-    console.log('Booking Data: ', payload)
+    // console.log('Booking Data: ', payload)
 
-    await dispatch(makeBookingSlice(payload))
+    // await dispatch(makeBookingSlice(payload))
   }
 
   const handlePreviousStep = () => {
@@ -115,50 +124,62 @@ const ScheduleScreen: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.dateContainer}>
-          <Text style={styles.dateText}>Choose a Date</Text>
-          <Text style={styles.dateDesc}>Choose from available slots to secure your spot with your preferred barber.</Text>
-        </View>
+        {pageIndex === 0 && (
+          <View style={styles.contentCover}>
+            <View>
+              <View style={styles.dateContainer}>
+                <Text style={styles.dateText}>Choose a Date</Text>
+                <Text style={styles.dateDesc}>Choose from available slots to secure your spot with your preferred barber.</Text>
+              </View>
 
-        <View style={styles.calendarCover}>
-          <Calendar onDayPress={(day) => onDayPress(day)} />
-        </View>
+              <View style={styles.calendarCover}>
+                <Calendar onDayPress={(day) => onDayPress(day)} />
+                {/* <CustomCalendar /> */}
+              </View>
+            </View>
 
-        <View style={styles.buttonContainerCover}>
-          <TouchableOpacity style={styles.cancelBtn}>
-            <Link href="/(auth)/login" style={styles.cancelBtnText}>
-              Cancel
-            </Link>
-          </TouchableOpacity>
+            <View style={styles.buttonContainerCover}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
+                <Text style={styles.cancelBtnText}>Cancel</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity style={styles.nextBtn} onPress={() => setNextState(true)}>
-            <Text style={styles.nextBtnText}>Next</Text>
-          </TouchableOpacity>
-        </View>
-      </>
-
-      {nextState && (
-        <>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={handlePreviousStep} style={styles.iconCover}>
-              <Ionicons name="chevron-back-outline" size={28} color={appTheme.primary} />
-            </TouchableOpacity>
-
-            <View style={styles.titleCover}>
-              <Text style={styles.title}>Book Your Appointment</Text>
+              <TouchableOpacity style={styles.nextBtn} onPress={() => setPageIndex(1)}>
+                <Text style={styles.nextBtnText}>Next</Text>
+              </TouchableOpacity>
             </View>
           </View>
+        )}
+      </>
 
-          <View style={styles.dateContainer}>
-            <Text style={styles.dateText}>Available Time Slots</Text>
-            <Text style={styles.dateDesc}>Pick a time slot that fits your schedule. Availability is limited, so book now to secure your spot.</Text>
-          </View>
+      {pageIndex === 1 && (
+        <View style={styles.contentCover}>
+          <View>
+            <View style={styles.dateContainer}>
+              <Text style={styles.dateText}>Available Time Slots</Text>
+              <Text style={styles.dateDesc}>Pick a time slot that fits your schedule. Availability is limited, so book now to secure your spot.</Text>
+            </View>
 
-          <View style={styles.calendarCover}>
-            <Text>Time Slots</Text>
+            <View style={styles.timeCover}>
+              <Text style={styles.timeSlot}>Time Slots</Text>
 
-            <RadioGroup selectedId={selectedId} onPress={setSelectedId} radioButtons={radioButtons} />
-            {selectedId && <Text style={styles.selectedText}>Selected Time: {timeData.find((t) => t.id === selectedId)?.time}</Text>}
+              <RadioGroup
+                selectedId={selectedId}
+                onPress={setSelectedId}
+                // layout="column"
+                radioButtons={timeData.map((item, i) => ({
+                  id: item.id,
+                  value: item.id,
+                  label: (
+                    <View style={styles.radioItem}>
+                      <Text style={styles.timeText}> 🕒 {item.time}</Text>
+                      <View style={styles.radioButtonContainer} />
+                    </View>
+                  )
+                }))}
+              />
+
+              {selectedId && <Text style={styles.selectedTime}>Selected Time: {timeData.find((t) => t.id === selectedId)?.time}</Text>}
+            </View>
           </View>
 
           <View style={styles.buttonContainerCover}>
@@ -172,7 +193,7 @@ const ScheduleScreen: React.FC = () => {
               <Text style={styles.nextBtnText}>Confirm</Text>
             </TouchableOpacity>
           </View>
-        </>
+        </View>
       )}
     </ScrollView>
   )
@@ -181,8 +202,10 @@ const ScheduleScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    padding: 20
-    // backgroundColor: '#f7f7f7'
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    height: '100%'
+    // position: 'static'
   },
 
   topBar: {
@@ -214,7 +237,14 @@ const styles = StyleSheet.create({
 
   // ::::::::::::::::::
 
-  dateContainer: {},
+  contentCover: {
+    justifyContent: 'space-between',
+    gap: 180
+  },
+
+  dateContainer: {
+    marginTop: 20
+  },
 
   dateText: {
     fontWeight: 'bold',
@@ -226,19 +256,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 30,
-    width: '75%',
-    margin: 'auto'
-    // fontSize: 16
+    width: '80%',
+    margin: 'auto',
+    fontSize: 16
   },
 
   // :::::::::::::::
+
+  calendarCover: {
+    borderWidth: 2,
+    borderColor: '#F5F5F5',
+    marginTop: 30
+    // height: '100%'
+  },
+
+  timeCover: {
+    borderWidth: 2,
+    borderColor: '#F5F5F5',
+    marginTop: 30,
+    padding: 10,
+    paddingVertical: 30,
+    borderRadius: 10,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: -80
+  },
+
+  timeSlot: {
+    fontSize: 16,
+    marginBottom: 20
+  },
+
+  selectedTime: {},
 
   buttonContainerCover: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 40,
-    gap: 20
+    gap: 20,
+    bottom: 50
   },
 
   cancelBtn: {
@@ -274,7 +330,28 @@ const styles = StyleSheet.create({
     // marginRight: 5
   },
 
-  calendarCover: {}
+  // ::::::RADIO STYLES::::::
+  radioStyle: {
+    color: 'red'
+  },
+
+  radioItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%'
+    // gap: 100
+  },
+
+  timeText: {
+    fontSize: 16,
+    flex: 1,
+    marginLeft: 10
+  },
+
+  radioButtonContainer: {
+    marginLeft: 20
+  }
 })
 
 export default ScheduleScreen
