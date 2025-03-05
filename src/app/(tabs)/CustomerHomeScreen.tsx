@@ -1,34 +1,66 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation, useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
 import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 
-export const UserTopContent = () => {
+export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
+  // const [showSearch, setShowSearch] = useState(true)
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const router = useRouter()
 
   const [userName, setUserName] = useState<string>(user?.name)
 
+  const searchItem = (query: string) => {
+    setSearchQuery(query)
+    console.log('Searching for: ', query)
+  }
+
+  const viewNotification = () => {
+    router.push('/notification')
+  }
+
   return (
-    <View style={styles.headerCover}>
-      <View style={styles.imgCover}>
-        {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
-        <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
+    <>
+      {showSearch ? (
+        <View style={styles.searchHeaderCover}>
+          <View style={styles.searchCover}>
+            <TextInput placeholder="Search" placeholderTextColor={'#757575'} style={styles.search} onChangeText={() => searchItem('')} />
+            <Ionicons name="search-outline" size={24} color={'#757575'} style={styles.searchIcon} />
+          </View>
 
-        <View style={styles.greetingsCover}>
-          <Text style={styles.subtext}>Good Afternoon, 👋 </Text>
-          <Text style={styles.nameText}>{userName}</Text>
+          <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
+            <Ionicons name="close-outline" size={30} color={'#757575'} style={styles.cancelIcon} />
+          </TouchableOpacity>
         </View>
-      </View>
+      ) : (
+        <View style={styles.headerCover}>
+          <View style={styles.imgCover}>
+            {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
+            <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
 
-      <View style={styles.iconCover}>
-        <Ionicons name="search-outline" size={30} color={'#757575'} />
-        <Image source={require('../../assets/images/notification/notification1.png')} style={styles.alarmIcon} />
-      </View>
-    </View>
+            <View style={styles.greetingsCover}>
+              <Text style={styles.subtext}>Good Afternoon, 👋 </Text>
+              <Text style={styles.nameText}>{userName}</Text>
+            </View>
+          </View>
+
+          <View style={styles.iconCover}>
+            <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
+              <Ionicons name="search-outline" size={30} color={'#757575'} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={viewNotification}>
+              <Ionicons name="notifications-outline" size={30} color={'#757575'} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </>
   )
 }
 
@@ -87,6 +119,8 @@ const UserHomeScreen = () => {
   const { bookings, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
   const { stylistProfile } = useSelector((state: RootState) => state.profile)
 
+  const [showSearch, setShowSearch] = useState(false)
+
   const dispatch = useDispatch<AppDispatch>()
   const navigation = useNavigation()
   const router = useRouter()
@@ -105,9 +139,9 @@ const UserHomeScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <UserTopContent />
+      <UserTopContent showSearch={showSearch} setShowSearch={setShowSearch} />
 
+      <View style={showSearch ? { backgroundColor: '#e0e0e0' } : styles.container}>
         <View style={styles.headerImg}>
           <View style={styles.headerImgCover}>
             <Text style={styles.headerImgText}>Easily book your next appointments with your stylist</Text>
@@ -237,12 +271,49 @@ const UserHomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 40,
+    // marginTop: 40,
     padding: 5
   },
 
+  searchHeaderCover: {
+    flexDirection: 'row',
+    marginTop: 100
+    // backgroundColor: 'red'
+  },
+
+  searchCover: {
+    flex: 1,
+    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // gap: 10,
+    backgroundColor: '#FAF8FF',
+    borderRadius: 10,
+    marginBottom: 30
+  },
+
+  search: {
+    padding: 15,
+    fontSize: 18,
+    color: 'red'
+  },
+
+  searchIcon: {
+    position: 'absolute',
+    right: 15,
+    alignContent: 'center'
+  },
+
+  cancelIcon: {
+    alignContent: 'center',
+    padding: 10
+  },
+
+  // ::::::::::::::::
+
   headerCover: {
-    marginTop: 20,
+    marginTop: 70,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

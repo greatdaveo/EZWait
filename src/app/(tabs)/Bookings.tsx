@@ -1,14 +1,14 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
-const SearchScreen = () => {
+const Bookings = () => {
   return (
     <View>
-      <Text>hshs</Text>
+      <Text>Your Bookings</Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({})
 
-export default SearchScreen
+export default Bookings

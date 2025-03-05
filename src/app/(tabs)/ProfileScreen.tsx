@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, Button } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Button, TextInput } from 'react-native'
 import { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { logoutUserSlice } from 'src/redux/auth/authSlice'
 import { useRouter } from 'expo-router'
+import { ScrollView } from 'react-native'
+import { useRoute } from '@react-navigation/native'
 
 export default function ProfileScreen() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -27,7 +29,11 @@ export default function ProfileScreen() {
     console.log(`Navigating to ${page}`)
   }
 
-  const handleLogout = () => {
+  const editProfile = () => {
+    router.push('/profileInfo')
+  }
+
+  const handleUpdatedPassword = () => {
     // console.log('Logout')
 
     if (isLoggedIn) {
@@ -38,108 +44,114 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={handlePreviousStep}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.settings}>
-          <Ionicons name="settings-outline" color={appTheme.themeBlack} size={28} />
-        </TouchableOpacity>
+        <Text style={styles.title}>Profile</Text>
       </View>
 
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
           <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
-          <TouchableOpacity style={styles.cameraIcon}>
-            <Ionicons name="camera-outline" color={appTheme.themeBlack} size={28} />
+          <TouchableOpacity style={styles.plusIcon}>
+            <Ionicons name="add-circle" color={appTheme.primary} size={28} />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.profileName}>David Olowomeye</Text>
-        <Text style={styles.profileEmail}>davidolowo2@gmail.com</Text>
+        <View style={styles.profileNameCover}>
+          <View style={styles.profileNameContainer}>
+            <Text style={styles.profileName}>David Olowomeye</Text>
+            <Text style={styles.profileEmail}>davidolowo2@gmail.com</Text>
+          </View>
+
+          <TouchableOpacity style={styles.pencilIcon} onPress={editProfile}>
+            <Ionicons name="pencil-outline" color={appTheme.primary} size={24} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account settings</Text>
+        <Text style={styles.sectionTitle}>Notification Preferences</Text>
 
         <View>
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('EditProfile')}>
-            <Text style={styles.itemText}>Edit Profile</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('Security')}>
-            <Text style={styles.itemText}>Security</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('EmailNotification')}>
-            <Text style={styles.itemText}>Email Notification</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
-            <Text style={styles.itemText}>Turn on Reminder</Text>
-
             <Switch
               value={isReminderOn}
               onValueChange={() => setIsReminderOn((prevState) => !prevState)}
-              thumbColor={isReminderOn ? appTheme.primary : '#f4f3f4'}
-              trackColor={{ true: appTheme.semi, false: '#ddd' }}
+              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
             />
+
+            <Text style={styles.itemText}>Appointment Reminders</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
+            <Switch
+              value={isReminderOn}
+              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
+              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
+            />
+
+            <Text style={styles.itemText}>New Barber Availability</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
+            <Switch
+              value={isReminderOn}
+              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
+              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
+            />
+
+            <Text style={styles.itemText}>Promotions & Offers</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Help and Support</Text>
+        <Text style={styles.sectionTitle}>Security Settings</Text>
 
-        <View>
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('EditProfile')}>
-            <Text style={styles.itemText}>Set Time Availability</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('Security')}>
-            <Text style={styles.itemText}>Share the EZWait App</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('EmailNotification')}>
-            <Text style={styles.itemText}>Language Preferences</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => handleNavigate('TurnOnReminder')}>
-            <Text style={styles.itemText}>View Booking History</Text>
-            <Ionicons name="chevron-forward" size={20} color="#666" />
-          </TouchableOpacity>
+        <View style={styles.passwordCover}>
+          <Text style={styles.subSectionText}>Change Password</Text>
+          <TextInput placeholder="Current Password" placeholderTextColor="#BABABA" style={styles.textInput} />
+          <TextInput placeholder="New Password" placeholderTextColor="#BABABA" style={styles.textInput} />
+          <TextInput placeholder="Confirm Password" placeholderTextColor="#BABABA" style={styles.textInput} />
         </View>
+
+        <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedPassword}>
+          <Text style={styles.updateBtn}>Update Password</Text>
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.logoutButtonCover} onPress={handleLogout}>
-        <Text style={styles.logoutButton}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+      <View>
+        <Text style={styles.sectionTitle}>Delete Account</Text>
+        <Text style={styles.subSectionText}>Permanently delete your account and all associated data. This action cannon be undone.</Text>
+        <TouchableOpacity>
+          <Text style={styles.deleteBtn}>Delete account</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
+    flexGrow: 1,
     marginHorizontal: 20
   },
 
   topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomColor: appTheme.primary,
-    // borderBottomWidth: 2,
-    paddingTop: 60
-    // marginHorizontal: 20
+    paddingTop: 80,
+    borderBottomWidth: 2,
+    borderBottomColor: '#E3E3E3',
+    paddingBottom: 20
+  },
+
+  title: {
+    textAlign: 'center',
+    fontSize: 18
+    // fontWeight: 'bold'
   },
 
   settings: {
@@ -151,9 +163,16 @@ const styles = StyleSheet.create({
   // :::::::::::::::::
 
   profileSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 50,
     alignItems: 'center',
     marginTop: 20,
-    marginBottom: 30
+    marginBottom: 30,
+    paddingHorizontal: 5,
+    borderBottomWidth: 2,
+    borderBottomColor: '#E3E3E3',
+    paddingBottom: 30
   },
 
   profileImageContainer: {
@@ -161,24 +180,33 @@ const styles = StyleSheet.create({
   },
 
   img: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 10
   },
 
-  cameraIcon: {
+  plusIcon: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: 15,
+    right: 5,
     backgroundColor: appTheme.secondary,
     borderRadius: 15,
-    padding: 3,
+    padding: 1,
     elevation: 2
   },
 
+  profileNameCover: {
+    position: 'relative'
+  },
+
+  profileNameContainer: {
+    marginRight: 10,
+    marginLeft: -250
+  },
+
   profileName: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     color: appTheme.themeBlack,
     marginBottom: 5
@@ -186,14 +214,27 @@ const styles = StyleSheet.create({
 
   profileEmail: {
     fontSize: 16,
-    color: appTheme.themeGray,
+    color: '#757575',
     fontWeight: 500
+  },
+
+  pencilIcon: {
+    position: 'absolute',
+    right: 1,
+    top: -30,
+    borderWidth: 2,
+    borderRadius: 50,
+    borderColor: '#E3E3E3',
+    padding: 5
   },
 
   // ::::::::::::::::::::::::::
 
   section: {
-    marginBottom: 20
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#E3E3E3',
+    paddingBottom: 30
   },
 
   sectionTitle: {
@@ -211,9 +252,10 @@ const styles = StyleSheet.create({
 
   sectionItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    marginBottom: 8
+    marginBottom: 8,
+    gap: 10
     // paddingVertical: 15
   },
 
@@ -221,19 +263,42 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
 
-  logoutButtonCover: {
-    marginTop: 10
+  passwordCover: {
+    gap: 30
   },
 
-  logoutButton: {
+  subSectionText: {
+    fontSize: 16,
+    marginVertical: 15
+  },
+
+  textInput: {
+    padding: 20,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#959292',
+    fontSize: 16
+  },
+
+  updateBtnCover: {
+    marginTop: 35,
+    marginBottom: 25
+  },
+
+  updateBtn: {
     color: 'white',
     fontSize: 20,
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
     textAlign: 'center',
     backgroundColor: appTheme.primary,
-    paddingVertical: 15,
-    width: '45%',
-    margin: 'auto',
-    borderRadius: 20
+    paddingVertical: 18,
+    borderRadius: 10
+  },
+
+  deleteBtn: {
+    color: '#FF0000',
+    paddingVertical: 10,
+    paddingBottom: 30,
+    fontSize: 16
   }
 })

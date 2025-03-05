@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18
   },
+  
   cancelText: {
     color: '#333',
     fontWeight: 'bold',

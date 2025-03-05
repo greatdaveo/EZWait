@@ -67,7 +67,8 @@ export default function TabLayout() {
         name="ScheduleScreen"
         options={{
           title: 'Schedule',
-          href: userRole === 'stylist' ? null : undefined,
+          // href: userRole === 'stylist' ? null : undefined,
+          href: null,
           headerTitle: 'Schedule Bookings',
           // tabBarLabel: 'Auth',
           headerShown: false,
@@ -76,25 +77,18 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="SearchScreen"
+        name="Bookings"
         options={{
-          title: 'Search',
-          headerTitle: 'Search',
-          headerShown: true,
-          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'search-sharp' : 'search-outline'} color={appTheme.primary} size={24} />
+          title: 'Bookings',
+          href: userRole === 'stylist' ? null : undefined,
+          // href: null,
+          headerTitle: 'Schedule Bookings',
+          // tabBarLabel: 'Auth',
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
-      <Tabs.Screen
-        name="HistoryScreen"
-        options={{
-          title: 'History',
-          headerTitle: 'History',
-          headerShown: true,
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'notifications' : 'notifications-outline'} color={appTheme.primary} size={24} />
-          )
-        }}
-      />
+
       <Tabs.Screen
         name="ProfileScreen"
         options={{
