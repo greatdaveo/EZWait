@@ -5,6 +5,7 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
 import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
+import { getAllStylistProfileSlice } from 'src/redux/profile/profileSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 
 export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
@@ -28,8 +29,8 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
   return (
     <>
       {showSearch ? (
-        <View style={styles.searchHeaderCover}>
-          <View style={styles.searchCover}>
+        <View style={styles.searchBarContainer}>
+          <View style={styles.searchInputContainer}>
             <TextInput placeholder="Search" placeholderTextColor={'#757575'} style={styles.search} onChangeText={() => searchItem('')} />
             <Ionicons name="search-outline" size={24} color={'#757575'} style={styles.searchIcon} />
           </View>
@@ -39,7 +40,7 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
           </TouchableOpacity>
         </View>
       ) : (
-        <View style={styles.headerCover}>
+        <View style={styles.topBarContainer}>
           <View style={styles.imgCover}>
             {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
             <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
@@ -65,75 +66,17 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
 }
 
 const UserHomeScreen = () => {
-  const data = [
-    {
-      name: 'Daniel Mayowa',
-      time: '4:30pm - 5:00pm',
-      service: 'Beard trimming',
-      ratings: '5-star rating',
-      img: require('../../assets/images/Frame1.png')
-    },
-
-    {
-      name: 'Angel erl',
-      time: '5:10pm - 5:40pm',
-      service: 'Braids',
-      ratings: '5-star rating',
-      img: require('../../assets/images/Frame2.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      time: '6:00pm - 6:40pm',
-      ratings: '5-star rating',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      time: '6:00pm - 6:40pm',
-      ratings: '5-star rating',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    },
-
-    {
-      name: 'Daniel Mayowa',
-      time: '4:30pm - 5:00pm',
-      ratings: '5-star rating',
-      service: 'Beard trimming',
-      img: require('../../assets/images/Frame1.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      time: '6:00pm - 6:40pm',
-      ratings: '5-star rating',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    }
-  ]
-
   const { isLoggedIn } = useSelector((state: RootState) => state.auth)
-  const { bookings, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.bookings)
-  const { stylistProfile } = useSelector((state: RootState) => state.profile)
-
+  const { allStylists } = useSelector((state: RootState) => state.profile)
   const [showSearch, setShowSearch] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
-  const navigation = useNavigation()
   const router = useRouter()
-
-  // console.log(bookings?.data)
-
-  const viewStylistProfile = () => {
-    console.log('stylistProfile: ', stylistProfile)
-  }
 
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(getAllBookingsSlice())
+      // dispatch(getAllBookingsSlice())
+      dispatch(getAllStylistProfileSlice())
     }
   }, [isLoggedIn, dispatch])
 
@@ -141,7 +84,7 @@ const UserHomeScreen = () => {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <UserTopContent showSearch={showSearch} setShowSearch={setShowSearch} />
 
-      <View style={showSearch ? { backgroundColor: '#e0e0e0' } : styles.container}>
+      <View style={showSearch ? { backgroundColor: '#e0e0e0' } : styles.screenContainer}>
         <View style={styles.headerImg}>
           <View style={styles.headerImgCover}>
             <Text style={styles.headerImgText}>Easily book your next appointments with your stylist</Text>
@@ -201,22 +144,28 @@ const UserHomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {bookings?.data?.map((stylist: any, i: number) => (
-            <View style={styles.eachAppointmentCover} key={i}>
-              <View style={styles.eachAppointment}>
-                {/* <Image source={stylist.img} style={styles.customerImg} /> */}
-
-                <Image source={require('../../assets/images/stylists/image (9).png')} style={styles.stylistImg} />
+          {(allStylists?.data || []).map((stylist: any, i: number) => (
+            <View style={styles.stylistCardContainer} key={i}>
+              <View style={styles.stylistCard}>
+                <Image
+                  source={{
+                    uri: stylist.profile_picture
+                  }}
+                  style={styles.stylistImg}
+                />
 
                 <View style={styles.detailsCover}>
                   <Text style={styles.nameText}>{stylist.name}</Text>
 
                   <View style={styles.ratingsIcons}>
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star-outline" color="black" size={18} />
+                    {[...Array(5)].map((_, i) => (
+                      <Ionicons
+                        key={i}
+                        name={i < stylist.ratings ? 'star' : 'star-outline'}
+                        color={i < stylist.ratings ? '#f0a437' : 'black'}
+                        size={18}
+                      />
+                    ))}
                     <Text style={styles.ratingsText}>{stylist.ratings}</Text>
                   </View>
 
@@ -227,37 +176,7 @@ const UserHomeScreen = () => {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.id}`)}>
-                <Text style={styles.btnText}>Book Now</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          {data.map((stylist: any, i: number) => (
-            <View style={styles.eachAppointmentCover} key={i}>
-              <View style={styles.eachAppointment}>
-                <Image source={stylist.img} style={styles.stylistImg} width={24} height={24} />
-
-                <View style={styles.detailsCover}>
-                  <Text style={styles.nameText}>{stylist.name}</Text>
-
-                  <View style={styles.ratingsIcons}>
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star" color="#f0a437" size={18} />
-                    <Ionicons name="star-outline" color="black" size={18} />
-                    <Text style={styles.ratingsText}>4.5</Text>
-                  </View>
-
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="location-sharp" color={'#F0433F'} size={24} />
-                    <Text style={styles.appointmentText}>{stylist.service}</Text>
-                  </View>
-                </View>
-              </View>
-
-              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist?.id}`)}>
+              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.stylist_id}`)}>
                 <Text style={styles.btnText}>Book Now</Text>
               </TouchableOpacity>
             </View>
@@ -269,19 +188,19 @@ const UserHomeScreen = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screenContainer: {
     flex: 1,
     // marginTop: 40,
     padding: 5
   },
 
-  searchHeaderCover: {
+  searchBarContainer: {
     flexDirection: 'row',
     marginTop: 100
     // backgroundColor: 'red'
   },
 
-  searchCover: {
+  searchInputContainer: {
     flex: 1,
     position: 'relative',
     flexDirection: 'row',
@@ -312,7 +231,7 @@ const styles = StyleSheet.create({
 
   // ::::::::::::::::
 
-  headerCover: {
+  topBarContainer: {
     marginTop: 70,
     flexDirection: 'row',
     alignItems: 'center',
@@ -481,7 +400,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
 
-  eachAppointmentCover: {
+  stylistCardContainer: {
     marginTop: 10,
     marginBottom: 25,
     flexDirection: 'row',
@@ -489,7 +408,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
 
-  eachAppointment: {
+  stylistCard: {
     flexDirection: 'row',
     alignItems: 'center'
   },

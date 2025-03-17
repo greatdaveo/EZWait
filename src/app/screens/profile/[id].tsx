@@ -5,56 +5,15 @@ import { ActivityIndicator, Button, Image, ScrollView, StyleSheet, Text, Touchab
 import { useDispatch, useSelector } from 'react-redux'
 import { RESET_PROFILE, getStylistProfileSlice } from 'src/redux/profile/profileSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
-import StylistProfile from '../../../assets/images/stylists/StylistProfile.png'
 import { appTheme } from 'src/config/theme'
-import ServiceSvg from 'src/components/svg/ServiceSvg'
-// import ServiceSvg from '../../../assets/svg/✂️.svg'
-
-const availableServiceData = [
-  {
-    service: 'Classic Cut',
-    price: '$25'
-  },
-
-  {
-    service: 'Skin Fade',
-    price: '$30'
-  },
-
-  {
-    service: 'Bread Trim',
-    price: '$15'
-  },
-
-  {
-    service: 'Hot Towel Shave',
-    price: '$20'
-  }
-]
-
-const availableTimeData = [
-  {
-    day: 'Monday',
-    time: '9am - 10pm'
-  },
-  {
-    day: 'Tuesdays',
-    time: '9am - 10pm'
-  },
-  {
-    day: 'Wednesdays',
-    time: '9am - 10pm'
-  }
-]
 
 const StylistProfileScreen: React.FC = () => {
   const { id } = useLocalSearchParams() as { id: string }
   const navigation = useNavigation()
   const dispatch = useDispatch<AppDispatch>()
   const { stylistProfile, isLoading } = useSelector((state: RootState) => state.profile)
-  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
-  const [currentStep, setCurrentStep] = useState<number>(1)
-
+  const { user, isLoggedIn } = useSelector((state: RootState) => state.auth)
+  const [showAll, setShowAll] = useState(false)
   const router = useRouter()
 
   // console.log('stylistProfile: ', stylistProfile)
@@ -85,10 +44,11 @@ const StylistProfileScreen: React.FC = () => {
     )
   }
 
-  const { data }: any = stylistProfile
-  // console.log('Stylist user id: ', data?.user?.id)
-  // console.log('Stylist user id: ', data?.stylist?.stylist_id)
-  // console.log('Customer user id: ', user?.id)
+  const fixedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const { data, user: stylistUser }: any = stylistProfile
+  const { profile_picture, services, available_time_slots, sample_of_service_img, ratings, location } = data
+  const displayedServices = showAll ? services : services.slice(0, 2)
+  const displayedDays = showAll ? fixedDays : fixedDays.slice(0, 2)
 
   const handlePreviousStep = () => {
     router.back()
@@ -108,24 +68,25 @@ const StylistProfileScreen: React.FC = () => {
 
       <View style={styles.stylistProfileCover}>
         <View style={styles.profileImg}>
-          <Image source={require('../../../assets/images/stylists/StylistProfile.png')} style={styles.stylistProfile} />
-          <Text style={styles.available}>Available Now</Text>
+          <Image source={{ uri: profile_picture }} style={styles.stylistProfile} />
+
+          <Text style={[styles.available, data.active_status ? styles.availableText : styles.unavailableText]}>
+            {data.active_status ? 'Available Now' : 'Unavailable'}
+          </Text>
         </View>
         <View style={styles.stylistProfileDetails}>
-          <Text style={styles.stylistName}>Mike "The Fade Master"</Text>
+          <Text style={styles.stylistName}>{stylistUser.name}</Text>
 
           <View style={styles.ratingsIcons}>
-            <Ionicons name="star" color="#f0a437" size={18} />
-            <Ionicons name="star" color="#f0a437" size={18} />
-            <Ionicons name="star" color="#f0a437" size={18} />
-            <Ionicons name="star" color="#f0a437" size={18} />
-            <Ionicons name="star-outline" color="black" size={18} />
-            <Text style={styles.ratingsText}>4.5</Text>
+            {[...Array(5)].map((_, i) => (
+              <Ionicons key={i} name={i < ratings ? 'star' : 'star-outline'} color="#f0a437" size={18} />
+            ))}
+            <Text style={styles.ratingsText}>{ratings}</Text>
           </View>
 
           <View style={styles.locationCover}>
             <Ionicons name="location-sharp" color={'#F0433F'} size={18} />
-            <Text style={styles.locationText}>Downtown Barbershop</Text>
+            <Text style={styles.locationText}>{stylistUser.location}</Text>
           </View>
         </View>
       </View>
@@ -137,38 +98,35 @@ const StylistProfileScreen: React.FC = () => {
         </View>
 
         <View style={styles.ImgCover}>
-          <View style={styles.sampleContainer}>
-            <Image source={require('../../../assets/images/stylists/StylistWork1.png')} style={styles.workSampleImg} />
-            <Text style={styles.styleName}>Haircut + Bread Trim</Text>
-          </View>
-
-          <View style={styles.sampleContainer}>
-            <Image source={require('../../../assets/images/stylists/StylistWork2.png')} style={styles.workSampleImg} />
-            <Text style={styles.styleName}>Classic Cut</Text>
-          </View>
+          {sample_of_service_img.map((img: string, index: number) => (
+            <View key={index} style={styles.sampleContainer}>
+              <Image source={{ uri: img }} style={styles.workSampleImg} />
+              <Text style={styles.styleName}>Haircut + Bread Trim</Text>
+            </View>
+          ))}
         </View>
       </View>
 
       <View style={styles.availableServicesCover}>
         <View style={styles.availableServices}>
           <Text style={styles.availableServicesText}>Available Services</Text>
-          <TouchableOpacity style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+          <TouchableOpacity style={styles.seeAll} onPress={() => setShowAll(!showAll)}>
+            <Text style={styles.seeAllText}>{showAll ? 'Show Less' : 'See All'}</Text>
           </TouchableOpacity>
         </View>
 
-        {availableServiceData.map((data, i) => (
+        {displayedServices.map((service: { name: string; price: number }, i: number) => (
           <View style={styles.serviceDataCover} key={i}>
             <View style={styles.serviceDataCover2}>
               <Text style={styles.scissorsSvg}>✂️</Text>
-              <Text style={styles.service}>{data.service}</Text>
+              <Text style={styles.service}>{service.name}</Text>
             </View>
 
             <View style={styles.vectorContainer}>
-              <Text style={styles.vector}>....................................</Text>
+              <Text style={styles.vector}>..............................</Text>
             </View>
 
-            <Text style={styles.servicePrice}>{data.price}</Text>
+            <Text style={styles.servicePrice}>${service.price}</Text>
           </View>
         ))}
       </View>
@@ -176,20 +134,23 @@ const StylistProfileScreen: React.FC = () => {
       <View style={styles.availableServicesCover}>
         <View style={styles.availableServices}>
           <Text style={styles.availableServicesText}>Available Time Slots</Text>
-          <TouchableOpacity style={styles.seeAll}>
-            <Text style={styles.seeAllText}>See all</Text>
+          <TouchableOpacity style={styles.seeAll} onPress={() => setShowAll(!showAll)}>
+            <Text style={styles.seeAllText}>{showAll ? 'Show Less' : 'See All'}</Text>
           </TouchableOpacity>
         </View>
 
-        {availableTimeData.map((data, i) => (
-          <View style={styles.serviceDataCover} key={i}>
-            <View style={styles.serviceDataCover2}>
-              <Text style={styles.service}>{data.day}</Text>
-            </View>
+        {displayedDays.map((day, i) => {
+          const time = available_time_slots[i] || 'No slots available'
+          return (
+            <View style={styles.serviceDataCover} key={i}>
+              <View style={styles.serviceDataCover2}>
+                <Text style={styles.service}>{day}</Text>
+              </View>
 
-            <Text style={styles.servicePrice}>{data.time}</Text>
-          </View>
-        ))}
+              <Text style={styles.servicePrice}>{time}</Text>
+            </View>
+          )
+        })}
       </View>
 
       <View style={styles.availableServicesCover}>
@@ -197,7 +158,8 @@ const StylistProfileScreen: React.FC = () => {
           <Text style={styles.availableServicesText}>Customer Stats</Text>
         </View>
 
-        <Text style={styles.service}>Current Customers in Queue: 3</Text>
+        <Text style={styles.service}>Current Customers in Queue: {data.no_of_current_customers}</Text>
+        {/* <Text style={styles.service}>Total Bookings: {data.no_of_customer_bookings}</Text> */}
       </View>
 
       <TouchableOpacity style={styles.buttonContainer}>
@@ -234,12 +196,6 @@ const styles = StyleSheet.create({
     borderRadius: 50
   },
 
-  stylistProfile: {
-    width: 100,
-    height: 115,
-    borderRadius: '100%'
-  },
-
   stylistProfileCover: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -249,19 +205,37 @@ const styles = StyleSheet.create({
     padding: 20
   },
 
+  stylistProfile: {
+    width: 100,
+    height: 115,
+    borderRadius: '100%'
+  },
+
   profileImg: {
     position: 'relative'
   },
 
   available: {
-    color: '#1CC95A',
-    backgroundColor: '#EBFCED',
+    // color: '#1CC95A',
+    // backgroundColor: '#EBFCED',
     padding: 5,
+    // paddingVertical: 8,
     position: 'absolute',
-    bottom: 1,
-    left: 12,
+    bottom: 0,
+    left: 15,
     borderRadius: 5,
-    fontSize: 10
+    fontSize: 10,
+    fontWeight: 'bold'
+  },
+
+  availableText: {
+    color: '#1CC95A', // Green for available
+    backgroundColor: '#EBFCED'
+  },
+
+  unavailableText: {
+    color: '#D9534F', // Red for unavailable
+    backgroundColor: '#FADBD8'
   },
 
   stylistProfileDetails: {
