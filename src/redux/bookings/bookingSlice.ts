@@ -94,7 +94,7 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.bookings = action.payload
-        console.log('Fulfilled bookings fetched:', action.payload)
+        // console.log('Fulfilled bookings fetched:', action.payload)
       })
       .addCase(getAllBookingsSlice.rejected, (state, action) => {
         state.isLoading = false
