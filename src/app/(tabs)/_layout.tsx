@@ -90,12 +90,25 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="ProfileScreen"
+        name="CustomerProfileScreen"
         options={{
-          title: 'Profile',
+          title: 'Customer Profile Screen',
+          href: userRole === 'stylist' ? null : undefined,
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'person-circle-sharp' : 'person-circle-outline'} color={appTheme.primary} size={focused ? 32 : 32} />
+            <Ionicons name={focused ? 'person-sharp' : 'person-outline'} color={appTheme.primary} size={focused ? 32 : 32} />
+          )
+        }}
+      />
+
+      <Tabs.Screen
+        name="StylistProfileScreen"
+        options={{
+          title: 'Profile',
+          href: userRole === 'customer' ? null : undefined,
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'person-sharp' : 'person-outline'} color={appTheme.primary} size={focused ? 32 : 32} />
           )
         }}
       />
