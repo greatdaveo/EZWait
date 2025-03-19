@@ -1,18 +1,17 @@
-import React, { useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, Button, TextInput, Modal } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Button, TextInput, Modal, Alert } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-import { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import { Switch } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
-import { logoutUserSlice } from 'src/redux/auth/authSlice'
 import { useRouter } from 'expo-router'
 import { ScrollView } from 'react-native'
 import { useRoute } from '@react-navigation/native'
 import Checkbox from 'expo-checkbox'
 import { uploadImageToCloudinary } from 'src/utils/cloudinaryService'
+import { editStylistSlice, getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
 
 export default function StylistProfileScreen() {
   const [isReminderOn, setIsReminderOn] = useState(false)
@@ -23,16 +22,65 @@ export default function StylistProfileScreen() {
   const [isChecked, setChecked] = useState(false)
 
   const { stylistProfile }: any = useSelector((state: RootState) => state.profile)
-  const { isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth)
+  const { user, isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth)
 
+  console.log('user: ', user)
   console.log('stylistProfile: ', stylistProfile)
 
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(getStylistProfileSlice(user.id))
+    }
+  }, [user, dispatch, isLoggedIn])
 
-  const pickImage = async () => {
+  const editProfile = () => {}
+
+  const { data = {}, user: stylistUser = {} } = stylistProfile || {}
+  const {
+    active_status,
+    available_time_slots,
+    no_of_current_customers,
+    no_of_customer_bookings,
+    profile_picture,
+    // ratings,
+    sample_of_service_img,
+    services
+  } = data || {}
+
+  const [updatedProfile, setUpdatedProfile] = useState({
+    name: stylistUser.name || '',
+    email: stylistUser.email || '',
+    location: stylistUser.location || '',
+    number: stylistUser.number || '',
+    active_status: active_status || false,
+    available_time_slots: available_time_slots || [],
+    no_of_current_customers,
+    no_of_customer_bookings,
+    profile_picture: profile_picture || '',
+    // ratings,
+    sample_of_service_img: sample_of_service_img || '',
+    services
+  })
+
+  // For Available Time Slots
+  const [timeSlots, setTimeSlots] = useState(
+    available_time_slots?.map((slot: string) => {
+      const [start, end] = slot.split(' - ')
+      return { start, end }
+    }) || []
+  )
+
+  const updateTimeSlot = (i: number, key: 'start' | 'end', value: string) => {
+    const newSlots = [...timeSlots]
+    newSlots[i][key] = value
+    setTimeSlots([...newSlots])
+  }
+
+  // For Profile Image
+  const pickProfileImg = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -45,13 +93,47 @@ export default function StylistProfileScreen() {
     }
   }
 
-  const handleUpload = async () => {
+  const uploadProfileImg = async () => {
     if (!image) return
-
     setUploading(true)
-
     try {
       const uploadUrl = await uploadImageToCloudinary(image)
+      setUpdatedProfile((prev) => ({ ...prev, profile_picture: uploadUrl }))
+      setModalVisible(false)
+    } catch (error) {
+      console.error('Upload failed:', error)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // For Profile Image
+  const pickWorkSampleImg = async () => {
+    if (sample_of_service_img.length >= 2) {
+      Alert.alert('You can only upload 2 images')
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1
+    })
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri)
+      setModalVisible(true)
+    }
+  }
+
+  const pickSampleWorkImg = async () => {
+    if (!image) return
+    setUploading(true)
+    try {
+      const uploadUrl = await uploadImageToCloudinary(image)
+      setUpdatedProfile((prev) => ({
+        ...prev,
+        sample_of_service_img: [...prev.sample_of_service_img, uploadUrl].slice(-2)
+      }))
       //   dispatch(updateStylistProfileSlice({ profile_picture: uploadedUrl }))
       setModalVisible(false)
     } catch (error) {
@@ -61,7 +143,14 @@ export default function StylistProfileScreen() {
     }
   }
 
-  const editProfile = () => {}
+  const saveEditedProfile = () => {
+    const formData = {
+      ...updatedProfile,
+      available_time_slots: timeSlots.map((slot: any) => `${slot.start}-${slot.end}`)
+    }
+    dispatch(updateStylistSlice({ id: user.id, formData }))
+    Alert.alert('Success', 'Profile Updated Successfully!')
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -70,17 +159,23 @@ export default function StylistProfileScreen() {
       </View>
 
       <View style={styles.profileSection}>
-        <View style={styles.profileImageContainer}>
-          <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
-          <TouchableOpacity style={styles.plusIcon}>
-            <Ionicons name="add-circle" color={appTheme.primary} size={28} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.profileImageContainer} onPress={pickProfileImg}>
+          <Image
+            source={{
+              uri:
+                updatedProfile.profile_picture.length < 1
+                  ? 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg'
+                  : updatedProfile.profile_picture
+            }}
+            style={styles.img}
+          />
+          <Ionicons name="add-circle" color={appTheme.primary} size={28} style={styles.plusIcon} />
+        </TouchableOpacity>
 
         <View style={styles.profileNameCover}>
           <View style={styles.profileNameContainer}>
-            <Text style={styles.profileName}>David Olowomeye</Text>
-            <Text style={styles.profileEmail}>davidolowo2@gmail.com</Text>
+            <Text style={styles.profileName}>{user.name}</Text>
+            <Text style={styles.profileEmail}>{user.email}</Text>
           </View>
 
           <TouchableOpacity style={styles.pencilIcon} onPress={editProfile}>
@@ -95,34 +190,67 @@ export default function StylistProfileScreen() {
 
         <View style={styles.section}>
           <Text style={styles.subSectionText}>Business Name</Text>
-          <TextInput placeholder="ABC Cut's Ltd" placeholderTextColor="#BABABA" style={styles.textInput} />
+          <TextInput
+            placeholder="Enter your business name"
+            value={updatedProfile.name}
+            onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, name: text })}
+            placeholderTextColor="#BABABA"
+            style={styles.textInput}
+          />
+          <Text style={styles.subSectionText}>Email</Text>
+          <TextInput
+            placeholder="Enter your email"
+            value={updatedProfile.email}
+            onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, email: text })}
+            placeholderTextColor="#BABABA"
+            style={styles.textInput}
+          />
+          <Text style={styles.subSectionText}>Number</Text>
+          <TextInput
+            placeholder="Enter your Number"
+            value={updatedProfile.number}
+            onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, number: text })}
+            placeholderTextColor="#BABABA"
+            style={styles.textInput}
+          />
         </View>
 
         <View style={styles.locationContainer}>
-          <Text style={styles.sectionTitle}>Add Location</Text>
+          {/* <Text style={styles.sectionTitle}>Add Location</Text>
 
-          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
+          <TouchableOpacity style={styles.sectionItem}>
             <Switch
-              value={isReminderOn}
-              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
+              value={updatedProfile.location}
+              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, active_status: value })}
               // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
               trackColor={{ true: appTheme.primary, false: '#ffffff' }}
             />
 
             <Text style={styles.itemText}>Use My Current Location</Text>
+          </TouchableOpacity> */}
+
+          <TouchableOpacity style={styles.sectionItem}>
+            <Switch
+              value={updatedProfile.active_status}
+              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, active_status: value })}
+              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
+            />
+
+            <Text style={styles.itemText}>Availability (Online or Away)</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
+          <TouchableOpacity style={styles.sectionItem}>
             <Switch
-              value={isReminderOn}
-              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
+              value={updatedProfile.location}
+              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, location: value })}
               // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
               trackColor={{ true: appTheme.primary, false: '#ffffff' }}
             />
 
             <Text style={styles.itemText}>Enter Address Manually</Text>
           </TouchableOpacity>
-          <TextInput placeholder="123 Main Street, Cityville" placeholderTextColor="#BABABA" style={styles.textInput} />
+          <TextInput placeholder="Enter your location" placeholderTextColor="#BABABA" value={updatedProfile.location} style={styles.textInput} />
         </View>
       </View>
 
@@ -136,8 +264,18 @@ export default function StylistProfileScreen() {
               <Text style={styles.dayText}>{day}</Text>
 
               <View style={styles.timeInputCover}>
-                <TextInput placeholder="9:00 AM" style={styles.timeInput} />
-                <TextInput placeholder="10:00 PM" style={styles.timeInput} />
+                <TextInput
+                  placeholder="9:00 AM"
+                  value={timeSlots[i]?.start}
+                  onChangeText={(text) => updateTimeSlot(i, 'start', text)}
+                  style={styles.timeInput}
+                />
+                <TextInput
+                  placeholder="10:00 PM"
+                  value={timeSlots[i]?.end}
+                  onChangeText={(text) => updateTimeSlot(i, 'start', text)}
+                  style={styles.timeInput}
+                />
               </View>
             </View>
           </View>
@@ -148,7 +286,7 @@ export default function StylistProfileScreen() {
             <Text style={styles.cancelBtnText}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.saveBtn} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.saveBtn} onPress={saveEditedProfile}>
             <Text style={styles.saveBtnText}>Save</Text>
           </TouchableOpacity>
         </View>
@@ -159,7 +297,7 @@ export default function StylistProfileScreen() {
         <Text style={styles.subSectionText}>Upload high-quality images of your best work such as haircuts, styles etc</Text>
 
         <>
-          <TouchableOpacity style={styles.uploadIconCover}>
+          <TouchableOpacity style={styles.uploadIconCover} onPress={pickSampleWorkImg}>
             <Ionicons name="images-outline" color={appTheme.primary} size={28} style={styles.uploadIcon} />
             <Text style={styles.uploadText}>Upload media showcasing your best work</Text>
           </TouchableOpacity>
