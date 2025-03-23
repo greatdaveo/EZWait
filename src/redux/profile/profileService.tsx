@@ -16,7 +16,7 @@ const viewStylistProfile = async (id: string) => {
     withCredentials: true
   })
 
-  console.log('viewStylistProfile: ', response.data)
+  // console.log('viewStylistProfile: ', response.data)
 
   return response.data
 }

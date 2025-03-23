@@ -85,7 +85,7 @@ const profileSlice = createSlice({
         state.isSuccess = true
         state.isError = false
         state.stylistProfile = action.payload
-        console.log('Fulfilled Stylist fetched:', action.payload)
+        // console.log('Fulfilled Stylist fetched:', action.payload)
       })
 
       .addCase(getStylistProfileSlice.rejected, (state, action) => {
@@ -111,7 +111,7 @@ const profileSlice = createSlice({
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        console.log('Unable to fetch All Stylist data ❌')
+        // console.log('Unable to fetch All Stylist data ❌')
       })
 
       .addCase(editStylistSlice.pending, (state) => {
@@ -123,7 +123,7 @@ const profileSlice = createSlice({
         state.isSuccess = true
         state.isError = false
         state.stylistProfile = action.payload
-        console.log('Stylist Profile Edited Data:', action.payload)
+        // console.log('Stylist Profile Edited Data:', action.payload)
       })
 
       .addCase(editStylistSlice.rejected, (state, action) => {

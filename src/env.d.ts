@@ -7,4 +7,7 @@ declare module '@env' {
   export const FIREBASE_APP_ID: string
   export const FIREBASE_MEASUREMENT_ID: string
   export const Backend_Url: string
+  export const CLOUDINARY_URL: string
+  export const CLOUD_NAME: string
+  export const UPLOAD_PRESET: string
 }

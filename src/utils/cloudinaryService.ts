@@ -1,9 +1,7 @@
 import axios from 'axios'
+import { CLOUDINARY_URL, UPLOAD_PRESET } from '@env'
 
-const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload'
-const UPLOAD_PRESET = 'YOUR_UPLOAD_PRESET'
-
-// To convert image URI to Blob
+// Convert local image URI to blob
 const uriToBlob = async (uri: string): Promise<Blob> => {
   const response = await fetch(uri)
   const blob = await response.blob()
@@ -15,13 +13,20 @@ export const uploadImageToCloudinary = async (imageUri: string): Promise<string>
     const blob = await uriToBlob(imageUri)
 
     const formData = new FormData()
-    formData.append('file', blob, 'image.jpg')
+    formData.append('file', blob)
     formData.append('upload_preset', UPLOAD_PRESET)
 
     const response = await axios.post(CLOUDINARY_URL, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
 
+    console.log('Uploading to:', CLOUDINARY_URL)
+    console.log('Upload preset:', UPLOAD_PRESET)
+    console.log('Image URI:', imageUri)
+
+    console.log('Uploaded Image URL:', response.data.secure_url)
     return response.data.secure_url
   } catch (error) {
     console.error('Error uploading image:', error)
