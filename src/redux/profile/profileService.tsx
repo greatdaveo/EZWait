@@ -16,7 +16,7 @@ const viewStylistProfile = async (id: string) => {
     withCredentials: true
   })
 
-  console.log('viewStylistProfile: ', response.data)
+  // console.log('viewStylistProfile: ', response.data)
 
   return response.data
 }
@@ -39,7 +39,40 @@ const viewAllStylistProfile = async () => {
   return response.data
 }
 
+const editStylistProfile = async (id: string) => {
+  const token = await AsyncStorage.getItem('token')
+  if (!token) {
+    throw new Error('No token found. User is not authenticated.')
+  }
+
+  const response = await axios.get(API_URL + 'stylists/' + id, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    withCredentials: true
+  })
+
+  console.log('editAndUpdateStylistProfile: ', response.data)
+
+  return response.data
+}
+
+const updateStylistProfile = async (id: string, formData: any) => {
+  const token = await AsyncStorage.getItem('token')
+  if (!token) {
+    throw new Error('No token found. User is not authenticated.')
+  }
+
+  const response = await axios.get(API_URL + 'stylists/' + id, formData)
+
+  console.log('editAndUpdateStylistProfile: ', response.data)
+
+  return response.data
+}
+
 export const profileService = {
   viewStylistProfile,
-  viewAllStylistProfile
+  viewAllStylistProfile,
+  editStylistProfile,
+  updateStylistProfile
 }

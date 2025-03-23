@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Alert } from 'react-native'
 import { profileService } from './profileService'
+import { Alert } from 'react-native'
 
 export interface ProfileData {
   stylistProfile: any | null
@@ -42,6 +42,26 @@ export const getAllStylistProfileSlice = createAsyncThunk('all-stylists/profile'
   }
 })
 
+export const editStylistSlice = createAsyncThunk('edit/stylist-profile', async (id: string, thunkAPI) => {
+  try {
+    return await profileService.editStylistProfile(id)
+  } catch (error: string | any) {
+    console.log('getStylistProfileSlice: ', error)
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+export const updateStylistSlice = createAsyncThunk('update/stylist-profile', async ({ id, formData }: any, thunkAPI) => {
+  try {
+    return await profileService.updateStylistProfile(id, formData)
+  } catch (error: string | any) {
+    console.log('getStylistProfileSlice: ', error)
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
 const profileSlice = createSlice({
   name: 'profile',
   initialState,
@@ -59,14 +79,15 @@ const profileSlice = createSlice({
       .addCase(getStylistProfileSlice.pending, (state) => {
         state.isLoading = true
       })
+
       .addCase(getStylistProfileSlice.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
-        state.isLoggedIn = true
         state.isError = false
         state.stylistProfile = action.payload
-        console.log('Fulfilled Stylist fetched:', action.payload)
+        // console.log('Fulfilled Stylist fetched:', action.payload)
       })
+
       .addCase(getStylistProfileSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
@@ -77,19 +98,58 @@ const profileSlice = createSlice({
       .addCase(getAllStylistProfileSlice.pending, (state) => {
         state.isLoading = true
       })
+
       .addCase(getAllStylistProfileSlice.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
-        state.isLoggedIn = true
         state.isError = false
         state.allStylists = action.payload
-        console.log('Fulfilled All Stylists fetched:', action.payload)
+        // console.log('Fulfilled All Stylists fetched:', action.payload)
       })
+
       .addCase(getAllStylistProfileSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        console.log('Unable to fetch All Stylist data ❌')
+        // console.log('Unable to fetch All Stylist data ❌')
+      })
+
+      .addCase(editStylistSlice.pending, (state) => {
+        state.isLoading = true
+      })
+
+      .addCase(editStylistSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.stylistProfile = action.payload
+        // console.log('Stylist Profile Edited Data:', action.payload)
+      })
+
+      .addCase(editStylistSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        console.log('Unable to Edit Stylist data ❌')
+      })
+
+      .addCase(updateStylistSlice.pending, (state) => {
+        state.isLoading = true
+      })
+
+      .addCase(updateStylistSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        // state.stylistProfile = action.payload
+        console.log('Stylist Profile Updated Data:', action.payload)
+      })
+
+      .addCase(updateStylistSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        console.log('Unable to Update Stylist data ❌')
       })
   }
 })
