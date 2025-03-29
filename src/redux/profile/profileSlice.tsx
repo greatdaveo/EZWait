@@ -53,6 +53,7 @@ export const editStylistSlice = createAsyncThunk('edit/stylist-profile', async (
 })
 
 export const updateStylistSlice = createAsyncThunk('update/stylist-profile', async ({ id, formData }: any, thunkAPI) => {
+  console.log(id, formData)
   try {
     return await profileService.updateStylistProfile(id, formData)
   } catch (error: string | any) {
