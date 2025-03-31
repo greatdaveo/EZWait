@@ -92,7 +92,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="CustomerProfileScreen"
         options={{
-          title: 'Customer Profile Screen',
+          title: 'Profile',
           href: userRole === 'stylist' ? null : undefined,
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (

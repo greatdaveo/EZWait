@@ -16,7 +16,7 @@ const StylistProfileScreen: React.FC = () => {
   const [showAll, setShowAll] = useState(false)
   const router = useRouter()
 
-  // console.log('stylistProfile: ', stylistProfile)
+  console.log('stylistProfile: ', stylistProfile)
 
   useEffect(() => {
     dispatch(getStylistProfileSlice(id))
