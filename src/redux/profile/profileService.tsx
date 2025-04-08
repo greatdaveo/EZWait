@@ -45,7 +45,7 @@ const editStylistProfile = async (id: string) => {
     throw new Error('No token found. User is not authenticated.')
   }
 
-  const response = await axios.get(API_URL + 'stylists/' + id, {
+  const response = await axios.patch(API_URL + 'stylists/' + id, {
     headers: {
       Authorization: `Bearer ${token}`
     },
@@ -63,9 +63,17 @@ const updateStylistProfile = async (id: string, formData: any) => {
     throw new Error('No token found. User is not authenticated.')
   }
 
-  const response = await axios.get(API_URL + 'stylists/' + id, formData)
+  console.log(formData)
 
-  console.log('editAndUpdateStylistProfile: ', response.data)
+  const response = await axios.patch(API_URL + 'stylists/' + id, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    withCredentials: true
+  })
+
+  console.log('UpdateStylistProfile: ', response.data)
 
   return response.data
 }

@@ -1,33 +1,37 @@
-import axios from 'axios'
-import { CLOUDINARY_URL, UPLOAD_PRESET } from '@env'
-
-// Convert local image URI to blob
-const uriToBlob = async (uri: string): Promise<Blob> => {
-  const response = await fetch(uri)
-  const blob = await response.blob()
-  return blob
-}
+import { CLOUD_NAME, UPLOAD_PRESET } from '@env'
+import { upload } from 'cloudinary-react-native'
+import { Cloudinary } from '@cloudinary/url-gen'
 
 export const uploadImageToCloudinary = async (imageUri: string): Promise<string> => {
   try {
-    const blob = await uriToBlob(imageUri)
-
-    const formData = new FormData()
-    formData.append('file', blob)
-    formData.append('upload_preset', UPLOAD_PRESET)
-
-    const response = await axios.post(CLOUDINARY_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    const cld = new Cloudinary({
+      cloud: {
+        cloudName: CLOUD_NAME
+      },
+      url: {
+        secure: true
       }
     })
 
-    console.log('Uploading to:', CLOUDINARY_URL)
-    console.log('Upload preset:', UPLOAD_PRESET)
-    console.log('Image URI:', imageUri)
-
-    console.log('Uploaded Image URL:', response.data.secure_url)
-    return response.data.secure_url
+    const options = {
+      upload_preset: UPLOAD_PRESET,
+      unsigned: true
+    }
+    return new Promise((resolve, reject) => {
+      upload(cld, {
+        file: imageUri,
+        options,
+        callback: (error: any, response: any) => {
+          if (error) {
+            console.error('Error uploading image: ', error)
+            reject(error)
+          } else {
+            console.log('Uploaded Image URL: ', response.secure_url)
+            resolve(response.secure_url)
+          }
+        }
+      })
+    })
   } catch (error) {
     console.error('Error uploading image:', error)
     throw error
