@@ -28,6 +28,7 @@ export default function StylistProfileScreen() {
   const [isChecked, setChecked] = useState(false)
   const [uploadType, setUploadType] = useState('')
   const [showProfileDetails, setShowProfileDetails] = useState(false)
+  const [sampleOfServices, setSampleOfServices] = useState<{ img_url: string; caption: string }[]>([])
 
   const { stylistProfile, isLoading }: any = useSelector((state: RootState) => state.profile)
   const { user, isLoggedIn } = useSelector((state: RootState) => state.auth)
@@ -57,7 +58,7 @@ export default function StylistProfileScreen() {
     no_of_customer_bookings,
     profile_picture,
     // ratings,
-    sample_of_service_img,
+    sample_of_services,
     services
   } = data || {}
 
@@ -72,7 +73,7 @@ export default function StylistProfileScreen() {
     no_of_customer_bookings,
     profile_picture: profile_picture || 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg',
     // ratings,
-    sample_of_service_img: sample_of_service_img || [],
+    sample_of_services: sample_of_services || [],
     services: services || []
   })
 
@@ -178,7 +179,7 @@ export default function StylistProfileScreen() {
 
   // For Work Sample Image
   const pickWorkSampleImg = async () => {
-    // if (sample_of_service_img.length > 2) {
+    // if (sample_of_services.length > 2) {
     //   Alert.alert('You can only upload 2 images')
     // }
 
@@ -196,6 +197,7 @@ export default function StylistProfileScreen() {
       }
 
       setSampleImages((prev) => [...prev, uri])
+      setSampleOfServices((prevServices) => [...prevServices, { caption: '', img_url: uri }])
       setUploadType('sample')
       if (sampleImages.length + 1 === 2) {
         setModalVisible(true)
@@ -205,18 +207,27 @@ export default function StylistProfileScreen() {
   }
 
   const uploadSampleWorkImg = async () => {
-    if (sampleImages.length < 2 || sampleImages.length !== 2) {
+    if (sampleOfServices.some((service) => !service.caption || !service.img_url)) {
+      Alert.alert('Error', 'Please provide captions for all images')
+    }
+
+    if (sampleOfServices.length < 2 || sampleOfServices.length !== 2) {
       Alert.alert('Error', 'Please select exactly 2 images for your work samples.')
       return
     }
+
     setUploading(true)
     try {
-      const uploadUrl1 = await uploadImageToCloudinary(sampleImages[0])
-      const uploadUrl2 = await uploadImageToCloudinary(sampleImages[1])
+      const uploadedImages = await Promise.all(sampleOfServices.map((service) => uploadImageToCloudinary(service.img_url)))
+
+      const updatedSampleOfServices = sampleOfServices.map((service, i) => ({
+        caption: service.caption,
+        img_url: uploadedImages[i]
+      }))
 
       setUpdatedProfile((prev) => ({
         ...prev,
-        sample_of_service_img: [uploadUrl1, uploadUrl2]
+        sample_of_services: updatedSampleOfServices
       }))
       //   dispatch(updateStylistProfileSlice({ profile_picture: uploadedUrl }))
       setModalVisible(false)
@@ -484,23 +495,37 @@ export default function StylistProfileScreen() {
           <View style={styles.modalContent}>
             <Ionicons name="close-outline" color={appTheme.primary} size={28} style={styles.closeIcon} onPress={handleCancelModal} />
             <Text style={styles.modalTitle}>
-              {uploadType === 'sample' ? 'Check the files below before uploading' : 'Check the sample images before uploading (2 images required)'}
+              {uploadType === 'sample' ? 'Preview the sample images before uploading' : 'Check the profile image before uploading'}
             </Text>
 
             {uploadType === 'profile' ? (
               <Image source={{ uri: image || '' }} style={styles.uploadPreview} />
             ) : (
-              <View style={styles.sampleImagesContainer}>
+              <View>
                 <View style={styles.samplePreviewContainer}>
-                  {sampleImages.map((uri, i) => (
-                    <Image source={{ uri }} style={styles.samplePreview} key={i} />
+                  {sampleOfServices.map((service, i) => (
+                    <View key={i}>
+                      <Image source={{ uri: service.img_url }} style={styles.samplePreview} key={i} />
+
+                      <Text style={styles.modalSubTile}>Add Caption</Text>
+                      <TextInput
+                        placeholder="Low Cut"
+                        style={styles.captionInput}
+                        value={service.caption}
+                        onChangeText={(text) => {
+                          const updatedServices = [...sampleOfServices]
+                          updatedServices[i].caption = text
+                          setSampleOfServices(updatedServices)
+                        }}
+                      />
+                    </View>
                   ))}
                 </View>
-                {sampleImages.length > 2 && (
+                {/* {sampleImages.length < 2 && (
                   <TouchableOpacity onPress={pickWorkSampleImg} style={styles.addMoreButton}>
                     <Text style={styles.addMoreText}>Add More Image</Text>
                   </TouchableOpacity>
-                )}
+                )} */}
               </View>
             )}
 
