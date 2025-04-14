@@ -40,6 +40,11 @@ const makeBooking = async (formData: BookingData) => {
   return response.data
 }
 
+const getBooking = async (id: any) => {
+  const response = await axios.get(API_URL + '/' + id)
+  return response.data
+}
+
 const editBooking = async (id: string) => {
   const response = await axios.put(API_URL + '/edit/bookings' + id)
   return response.data

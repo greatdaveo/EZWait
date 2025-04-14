@@ -40,6 +40,14 @@ export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', as
   }
 })
 
+export const getSingleBookingSlice = createAsyncThunk("", async(id, thunkAPI)=> {
+  try {
+    return 
+  } catch (error:any) {
+    
+  }
+})
+
 export const makeBookingSlice = createAsyncThunk('bookings/make-bookings', async (formData: BookingData, thunkAPI) => {
   try {
     // console.log('makeBookingSlice Data: ', formData)

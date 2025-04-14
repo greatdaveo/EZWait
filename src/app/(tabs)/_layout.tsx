@@ -56,9 +56,9 @@ export default function TabLayout() {
         options={{
           title: 'Bookings',
           href: userRole === 'customer' ? null : undefined,
-          headerTitle: 'Booking dashboard',
+          headerTitle: 'Your Bookings',
           // tabBarLabel: 'Auth',
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />

@@ -4,67 +4,31 @@ import { Button, Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } f
 import { appTheme } from 'src/config/theme'
 import DropDownPicker from 'react-native-dropdown-picker'
 import LinkButton from 'src/components/LinkButton'
-import { router } from 'expo-router'
+import { Link, router } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
+import { TextInput } from 'react-native-paper'
 
 const DashboardScreen: React.FC = () => {
-  const data = [
-    {
-      name: 'Daniel Mayowa',
-      date: '20/11/24',
-      time: '4:30pm - 5:00pm',
-      service: 'Beard trimming',
-      img: require('../../assets/images/Frame1.png')
-    },
-
-    {
-      name: 'Angel erl',
-      date: '20/11/24',
-      time: '5:10pm - 5:40pm',
-      service: 'Braids',
-      img: require('../../assets/images/Frame2.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      date: '20/11/24',
-      time: '6:00pm - 6:40pm',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      date: '20/11/24',
-      time: '6:00pm - 6:40pm',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    },
-
-    {
-      name: 'Daniel Mayowa',
-      date: '20/11/24',
-      time: '4:30pm - 5:00pm',
-      service: 'Beard trimming',
-      img: require('../../assets/images/Frame1.png')
-    },
-
-    {
-      name: 'Benson Wonuola',
-      date: '20/11/24',
-      time: '6:00pm - 6:40pm',
-      service: 'Low cut and dye',
-      img: require('../../assets/images/Frame3.png')
-    }
-  ]
-
   const dispatch = useDispatch<AppDispatch>()
   const { stylistProfile }: any = useSelector((state: RootState) => state.profile)
   const { bookings, isLoading } = useSelector((state: RootState) => state.bookings)
-
+  const [showSearch, setShowSearch] = useState(false)
   const [stylistName, setStylistName] = useState<{ [key: number]: string }>({})
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const [userName, setUserName] = useState<string>(user?.name)
+
+  const searchItem = (query: string) => {
+    setSearchQuery(query)
+    console.log('Searching for: ', query)
+  }
+
+  const viewNotification = () => {
+    router.push('/notification')
+  }
 
   useEffect(() => {
     console.log(bookings)
@@ -76,8 +40,56 @@ const DashboardScreen: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View>
-        <Text>Stylist Home Screen</Text>
+      <View style={styles.topBarContainer}>
+        <View style={styles.imgCover}>
+          <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
+
+          <View style={styles.greetingsCover}>
+            <Text style={styles.subtext}>Good Afternoon, 👋 </Text>
+            <Text style={styles.nameText}>{userName}</Text>
+          </View>
+        </View>
+
+        <View style={styles.iconCover}>
+          <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
+            <Ionicons name="search-outline" size={30} color={'#757575'} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={viewNotification}>
+            <Ionicons name="notifications-outline" size={30} color={'#757575'} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.contentContainer}>
+        <Text style={styles.title}>Current Customer in Queue Today</Text>
+
+        <View style={styles.contentContainer}>
+          <Text>• Total Booked Clients Today: 5</Text>
+          <Text>• Available Slots Left: 2</Text>
+        </View>
+
+        <View style={styles.textContent}>
+          <Text style={styles.title}>Adjust Customer Count</Text>
+
+          <View style={styles.customerContainer}>
+            <TouchableOpacity onPress={() => setShowSearch(!showSearch)} style={styles.icons}>
+              <Ionicons name="remove-outline" size={30} color={appTheme.primary} />
+            </TouchableOpacity>
+
+            {/* <TextInput /> */}
+            <Text style={styles.textInput}>2</Text>
+
+            <TouchableOpacity onPress={() => setShowSearch(!showSearch)} style={styles.icons}>
+              <Ionicons name="add-outline" size={30} color={appTheme.primary} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.buttonContainer}>
+          <Link href="/(tabs)/ScheduleScreen" style={styles.btnText}>
+            Save Changes
+          </Link>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   )
@@ -90,54 +102,41 @@ const styles = StyleSheet.create({
     padding: 5
   },
 
-  headerCover: {
-    marginTop: 20,
+  // ::::::::::::::::::::::::::::::::::
+  topBarContainer: {
+    marginTop: 70,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    marginBottom: 30
   },
 
   imgCover: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10
-    // marginHorizontal: 10,
-    // paddingHorizontal: 10
   },
 
   img: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
     borderRadius: 50
   },
 
-  alarmCover: {
-    // position: 'absolute'
+  greetingsCover: {
+    gap: 5
   },
 
-  alarm: {
-    backgroundColor: appTheme.themeGray,
-    padding: 10,
-    borderRadius: 50,
-    position: 'relative'
+  iconCover: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
   },
 
-  alarmTextCover: {
-    position: 'absolute',
-    right: -12,
-    top: -10,
-    backgroundColor: '#F52933',
-    borderRadius: 100,
-    padding: 5,
-    paddingHorizontal: 10
-  },
-
-  alarmText: {
-    color: 'white',
-    fontWeight: 700,
-    fontSize: 16,
-    zIndex: 99
+  alarmIcon: {
+    width: 30,
+    height: 30
   },
 
   nameText: {
@@ -152,138 +151,70 @@ const styles = StyleSheet.create({
     color: appTheme.themeGray
   },
 
-  headerLine: {
-    borderBottomWidth: 1,
-    borderBottomColor: appTheme.themeGray
+  // :::::::::::::::::::::::::::::::
+
+  contentContainer: {
+    padding: 10
   },
 
-  headerText: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 30,
-    padding: 20,
+  textContent: {
+    padding: 10
+  },
+
+  title: {
+    marginBottom: 10,
+    fontWeight: 'bold'
+  },
+
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#959292',
+    fontSize: 16,
+    padding: 15,
+    paddingHorizontal: 10,
+    borderRadius: 30,
+    minWidth: '60%',
     textAlign: 'center',
-    gap: 150
+    fontWeight: 'bold'
+    // marginBottom: 20
   },
 
-  headerImg: {
+  customerContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 10,
-    marginTop: 30,
-    // padding: 10
-    marginHorizontal: 20,
+    marginTop: 30
+  },
+
+  icons: {
+    borderWidth: 1,
+    padding: 8,
+    borderRadius: 50
+  },
+
+  // :::::::::::::::::::::::::
+
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: appTheme.primary,
-    borderRadius: 20
-  },
-
-  headerImgCover: {
-    width: '70%',
-    textAlign: 'center',
-    paddingLeft: 60
-    // marginLeft: 60
-  },
-
-  headerImgText: {
-    color: appTheme.secondary,
-    fontSize: 24,
-    fontWeight: 600,
-    justifyContent: 'center',
-    textAlign: 'center',
-    width: '115%',
-    marginHorizontal: 'auto',
-    marginLeft: 20
-  },
-
-  viewAllButton: {
-    marginTop: 15,
-    backgroundColor: appTheme.secondary,
-    paddingVertical: 10,
-    // paddingHorizontal: 20,
-    borderRadius: 18,
-    alignContent: 'center',
-    marginLeft: 80
-  },
-
-  viewAllText: {
-    color: appTheme.primary,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18
-  },
-
-  headerImgRight: {
-    width: 170,
-    height: 180,
-    // paddingVertical: 50,
-    marginRight: 70,
-    borderRadius: 30
-  },
-
-  // ::::::::::::::::::::::
-
-  appointmentsCover: {
-    padding: 20
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: appTheme.themeBlack,
-    marginBottom: 10
-  },
-
-  eachAppointmentCover: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-
-  eachAppointment: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-
-  customerImg: {
-    borderRadius: 10,
-    height: 100,
-    width: 100
-  },
-
-  detailsCover: {
-    marginLeft: 10
-  },
-
-  appointmentDetailsCover: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 1
-  },
-
-  btnCover: {
+    width: '100%',
+    margin: 'auto',
+    padding: 25,
+    marginTop: 30,
+    marginBottom: 100,
+    borderRadius: 20,
     gap: 10
-  },
-
-  acceptBtn: {
-    backgroundColor: appTheme.primary,
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 10
-  },
-  declineBtn: {
-    backgroundColor: '#f52933',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 10
   },
 
   btnText: {
     color: 'white',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontSize: 18
+    // marginRight: 5
   }
+  // :::::::::::::::::::::::
 })
 
 export default DashboardScreen
