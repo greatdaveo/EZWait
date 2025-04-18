@@ -335,7 +335,7 @@ export default function StylistProfileScreen() {
         <TouchableOpacity style={styles.profileImageContainer} onPress={pickProfileImg}>
           <Image
             source={{
-              uri: updatedProfile?.profile_picture
+              uri: updatedProfile.profile_picture
             }}
             style={styles.img}
           />
@@ -521,6 +521,7 @@ export default function StylistProfileScreen() {
                     </View>
                   ))}
                 </View>
+                
                 {/* {sampleImages.length < 2 && (
                   <TouchableOpacity onPress={pickWorkSampleImg} style={styles.addMoreButton}>
                     <Text style={styles.addMoreText}>Add More Image</Text>
