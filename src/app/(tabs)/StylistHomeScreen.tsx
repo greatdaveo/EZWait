@@ -1,25 +1,27 @@
 import { Ionicons } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
-import { Button, Image, StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, Alert } from 'react-native'
 import { appTheme } from 'src/config/theme'
-import DropDownPicker from 'react-native-dropdown-picker'
-import LinkButton from 'src/components/LinkButton'
-import { Link, router } from 'expo-router'
+import { router } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
-import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
 import { TextInput } from 'react-native-paper'
+import { getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
+import { useDebounce } from 'src/hooks/useDebounce'
 
 const DashboardScreen: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>()
   const { stylistProfile }: any = useSelector((state: RootState) => state.profile)
-  const { bookings, isLoading } = useSelector((state: RootState) => state.bookings)
-  const [showSearch, setShowSearch] = useState(false)
-  const [stylistName, setStylistName] = useState<{ [key: number]: string }>({})
-  const [searchQuery, setSearchQuery] = useState('')
-
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
   const [userName, setUserName] = useState<string>(user?.name)
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const { data, user: stylistUser = {} } = stylistProfile || {}
+  const { no_of_current_customers, no_of_customer_bookings } = data || {}
+
+  const [customerCount, setCustomerCount] = useState(no_of_current_customers || 0)
+  const debouncedCustomerCount = useDebounce(customerCount, 3000)
+  const dispatch = useDispatch<AppDispatch>()
 
   const searchItem = (query: string) => {
     setSearchQuery(query)
@@ -31,12 +33,61 @@ const DashboardScreen: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(bookings)
-
-    if (stylistProfile?.stylist?.id) {
-      dispatch(getAllBookingsSlice())
+    if (isLoggedIn) {
+      dispatch(getStylistProfileSlice(user.id))
     }
-  }, [dispatch])
+  }, [user?.id, dispatch])
+
+  useEffect(() => {
+    if (debouncedCustomerCount !== no_of_current_customers) {
+      dispatch(
+        updateStylistSlice({
+          id: user?.id,
+          formData: {
+            ...data,
+            no_of_current_customers: debouncedCustomerCount
+          }
+        })
+      )
+      console.log('Auto-updated count:', debouncedCustomerCount)
+    }
+  }, [debouncedCustomerCount])
+
+  const increaseCount = () => {
+    const newCount = customerCount + 1
+    setCustomerCount(newCount)
+  }
+  const decreaseCount = () => {
+    if (customerCount > 0) {
+      const newCount = customerCount - 1
+      setCustomerCount(newCount)
+    }
+  }
+
+  // const updateCountImmediately = (count: number) => {
+  //   dispatch(
+  //     updateStylistSlice({
+  //       id: user?.id,
+  //       formData: {
+  //         ...data,
+  //         no_of_current_customers: count
+  //       }
+  //     })
+  //   )
+  // }
+
+  const saveChanges = () => {
+    dispatch(
+      updateStylistSlice({
+        id: user?.id,
+        formData: {
+          ...data,
+          no_of_current_customers: customerCount
+        }
+      })
+    )
+    Alert.alert('Saved', 'Customer count updated')
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -54,6 +105,7 @@ const DashboardScreen: React.FC = () => {
           <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
             <Ionicons name="search-outline" size={30} color={'#757575'} />
           </TouchableOpacity>
+
           <TouchableOpacity onPress={viewNotification}>
             <Ionicons name="notifications-outline" size={30} color={'#757575'} />
           </TouchableOpacity>
@@ -64,31 +116,41 @@ const DashboardScreen: React.FC = () => {
         <Text style={styles.title}>Current Customer in Queue Today</Text>
 
         <View style={styles.contentContainer}>
-          <Text>• Total Booked Clients Today: 5</Text>
-          <Text>• Available Slots Left: 2</Text>
+          <Text> • Total Booked Clients Today: {typeof no_of_customer_bookings === 'number' ? no_of_customer_bookings : 'Loading...'}</Text>
+        </View>
+
+        <View style={styles.contentContainer}>
+          <Text> • Total No of Current Customers: {typeof no_of_current_customers === 'number' ? no_of_current_customers : 'Loading...'}</Text>
         </View>
 
         <View style={styles.textContent}>
           <Text style={styles.title}>Adjust Customer Count</Text>
 
           <View style={styles.customerContainer}>
-            <TouchableOpacity onPress={() => setShowSearch(!showSearch)} style={styles.icons}>
+            <TouchableOpacity onPress={decreaseCount} style={styles.icons}>
               <Ionicons name="remove-outline" size={30} color={appTheme.primary} />
             </TouchableOpacity>
 
-            {/* <TextInput /> */}
-            <Text style={styles.textInput}>2</Text>
+            <TextInput
+              keyboardType="numeric"
+              value={customerCount.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text)
+                if (!isNaN(value)) {
+                  setCustomerCount(value)
+                }
+              }}
+              style={styles.countInput}
+            />
 
-            <TouchableOpacity onPress={() => setShowSearch(!showSearch)} style={styles.icons}>
+            <TouchableOpacity onPress={increaseCount} style={styles.icons}>
               <Ionicons name="add-outline" size={30} color={appTheme.primary} />
             </TouchableOpacity>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.buttonContainer}>
-          <Link href="/(tabs)/ScheduleScreen" style={styles.btnText}>
-            Save Changes
-          </Link>
+        <TouchableOpacity style={styles.buttonContainer} onPress={saveChanges}>
+          <Text style={styles.btnText}>Save Changes</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -154,7 +216,8 @@ const styles = StyleSheet.create({
   // :::::::::::::::::::::::::::::::
 
   contentContainer: {
-    padding: 10
+    padding: 10,
+    justifyContent: 'space-between'
   },
 
   textContent: {
@@ -166,17 +229,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
-  textInput: {
-    borderWidth: 1,
+  countInput: {
+    // borderWidth: 1,
     borderColor: '#959292',
     fontSize: 16,
-    padding: 15,
     paddingHorizontal: 10,
-    borderRadius: 30,
+    // borderRadius: 20,
     minWidth: '60%',
     textAlign: 'center',
     fontWeight: 'bold'
-    // marginBottom: 20
   },
 
   customerContainer: {

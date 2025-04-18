@@ -14,7 +14,6 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const router = useRouter()
-
   const [userName, setUserName] = useState<string>(user?.name)
 
   const searchItem = (query: string) => {

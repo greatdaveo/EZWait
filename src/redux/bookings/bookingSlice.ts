@@ -34,23 +34,22 @@ export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', as
   try {
     return await bookingService.getAllBookings()
   } catch (error: string | any) {
-    console.log('Get Booking Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
 })
 
-export const getSingleBookingSlice = createAsyncThunk("", async(id, thunkAPI)=> {
+export const getSingleBookingSlice = createAsyncThunk('bookings/view-booking', async (bookingId: string, thunkAPI) => {
   try {
-    return 
-  } catch (error:any) {
-    
+    return await bookingService.getSingleBooking(bookingId)
+  } catch (error: string | any) {
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
   }
 })
 
 export const makeBookingSlice = createAsyncThunk('bookings/make-bookings', async (formData: BookingData, thunkAPI) => {
   try {
-    // console.log('makeBookingSlice Data: ', formData)
     return await bookingService.makeBooking(formData)
   } catch (error: string | any) {
     // console.log('Make Booking Slice Error', error)
@@ -79,6 +78,18 @@ export const deleteBookings = createAsyncThunk('bookings/delete-bookings', async
   }
 })
 
+export const updateBookingStatusSlice = createAsyncThunk(
+  'bookings/update-status',
+  async ({ id, newStatus }: { id: string; newStatus: string }, thunkAPI) => {
+    try {
+      return await bookingService.updateBookingStatus(id, newStatus)
+    } catch (error: string | any) {
+      const message = error.response?.data?.message || error.message || error.toString()
+      return thunkAPI.rejectWithValue(message)
+    }
+  }
+)
+
 const bookingSlice = createSlice({
   name: 'bookings',
   initialState,
@@ -102,18 +113,38 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.bookings = action.payload
-        // console.log('Fulfilled bookings fetched:', action.payload)
+        console.log('Fulfilled bookings fetched:', action.payload)
       })
       .addCase(getAllBookingsSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        // Alert.alert('Bookings Scheduled Fail! ❌')
+        console.log('Unable to Fetch Booking! ❌')
+      })
+
+      .addCase(getSingleBookingSlice.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getSingleBookingSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isLoggedIn = true
+        state.isError = false
+        state.booking = action.payload
+        console.log('Fulfilled booking fetched:', action.payload)
+      })
+
+      .addCase(getSingleBookingSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        console.log('Unable to Fetch Booking! ❌')
       })
 
       .addCase(makeBookingSlice.pending, (state) => {
         state.isLoading = true
       })
+
       .addCase(makeBookingSlice.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
@@ -165,6 +196,24 @@ const bookingSlice = createSlice({
         state.message = action.payload as string
         state.booking = null
         Alert.alert('Unable to Delete Bookings! ❌')
+      })
+
+      .addCase(updateBookingStatusSlice.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateBookingStatusSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.booking = action.payload
+        Alert.alert('Bookings Status Updated Successful! ✅')
+      })
+      .addCase(updateBookingStatusSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        state.booking = null
+        Alert.alert('Unable to Booking Status! ❌')
       })
   }
 })

@@ -9,8 +9,10 @@ import { RootState } from 'src/redux/store'
 export default function TabLayout() {
   const { user } = useSelector((state: RootState) => state.auth)
   const [userRole, setUserRole] = useState<string>(user?.role)
-  // console.log(user?.data?.role)
-  // console.log(userRole)
+
+  // useEffect(() => {
+  //   console.log(userRole)
+  // }, [userRole, user])
 
   return (
     <Tabs
@@ -52,7 +54,7 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="BookingScreen"
+        name="AppointmentBookingScreen"
         options={{
           title: 'Bookings',
           href: userRole === 'customer' ? null : undefined,

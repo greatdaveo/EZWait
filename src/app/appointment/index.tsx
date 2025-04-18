@@ -11,7 +11,7 @@ const Appointment: React.FC = () => {
   const { id } = useLocalSearchParams() as { id: string }
   const navigation = useNavigation()
   const dispatch = useDispatch<AppDispatch>()
-  const { booking, isLoading } = useSelector((state: RootState) => state.bookings)
+  const { booking, isLoading, bookings } = useSelector((state: RootState) => state.bookings)
   const [showAll, setShowAll] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const router = useRouter()
@@ -19,7 +19,7 @@ const Appointment: React.FC = () => {
   console.log('Customer Booking: ', booking)
 
   useEffect(() => {
-    // dispatch(getAllBookingsSlice())
+    dispatch(getAllBookingsSlice())
   }, [])
 
   if (isLoading) {
@@ -97,9 +97,7 @@ const Appointment: React.FC = () => {
 
           <View>
             <TouchableOpacity style={[styles.buttonContainer, styles.confirmButton]} onPress={acceptBooking}>
-              <Link href="/(tabs)/ScheduleScreen" style={styles.btnText}>
-                Accept Booking
-              </Link>
+              <Text style={styles.btnText}>Accept Booking</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.buttonContainer, styles.cancelButton]} onPress={() => router.back()}>
@@ -112,7 +110,7 @@ const Appointment: React.FC = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <>
-                <Text style={styles.modalHeader}>Confirn Appointment!</Text>
+                <Text style={styles.modalHeader}>Confirm Appointment!</Text>
                 <Text style={styles.modalText}>
                   You are about to accept this booking. The client will be notified, and the appointment will be added to your schedule.
                 </Text>
@@ -326,6 +324,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ddd',
     marginBottom: 0
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7'
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f7f7f7'
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center'
   }
 })
 export default Appointment
