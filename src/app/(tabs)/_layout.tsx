@@ -65,7 +65,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="ScheduleScreen"
         options={{
           title: 'Schedule',
@@ -76,7 +76,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
-      />
+      /> */}
 
       <Tabs.Screen
         name="Bookings"

@@ -98,7 +98,7 @@ const StylistProfileScreen: React.FC = () => {
         </View>
 
         <View style={styles.ImgCover}>
-          {sample_of_service_img.map((img: string, index: number) => (
+          {sample_of_service_img?.map((img: string, index: number) => (
             <View key={index} style={styles.sampleContainer}>
               <Image source={{ uri: img }} style={styles.workSampleImg} />
               <Text style={styles.styleName}>Haircut + Bread Trim</Text>
@@ -162,10 +162,8 @@ const StylistProfileScreen: React.FC = () => {
         {/* <Text style={styles.service}>Total Bookings: {data.no_of_customer_bookings}</Text> */}
       </View>
 
-      <TouchableOpacity style={styles.buttonContainer}>
-        <Link href="/(tabs)/ScheduleScreen" style={styles.btnText}>
-          Book Appointment
-        </Link>
+      <TouchableOpacity style={styles.buttonContainer} onPress={() => router.push(`/screens/schedule/${id}`)}>
+        <Text style={styles.btnText}>Book Appointment</Text>
       </TouchableOpacity>
     </ScrollView>
   )
@@ -175,9 +173,9 @@ export default StylistProfileScreen
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 80,
-    padding: 20,
-    backgroundColor: '#f7f7f7'
+    marginTop: 40,
+    padding: 20
+    // backgroundColor: '#f7f7f7'
   },
 
   topBar: {

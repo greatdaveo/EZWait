@@ -51,7 +51,7 @@ const makeBooking = async (formData: BookingData) => {
     throw new Error('No token found. User is not authenticated.')
   }
 
-  const response = await axios.post(API_URL + '/bookings', formData, {
+  const response = await axios.post(API_URL + '/customer/bookings', formData, {
     headers: {
       Authorization: `Bearer ${token}`
     },

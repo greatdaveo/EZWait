@@ -23,14 +23,7 @@ const Appointment: React.FC = () => {
   // const bookingData = booking?.data
   // const id = booking?.data?.id
 
-  const {
-    booking_day,
-    start_time,
-    end_time,
-    booking_status,
-    stylist,
-    user: customer // the customer who booked you
-  } = booking?.data
+  const { booking_day, start_time, end_time, booking_status, stylist, user: customer } = booking?.data
 
   console.log(booking_day, booking_status, end_time, start_time, stylist, customer)
 
