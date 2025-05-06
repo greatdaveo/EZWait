@@ -3,11 +3,10 @@ import { bookingService } from './bookingService'
 import { Alert } from 'react-native'
 
 export interface BookingData {
-  user_id: number | null
   stylist_id: number | null
-  booking_time: string | null
   booking_day: string | null
-  booking_status: string | null
+  start_time: string | null
+  end_time: string | null
 }
 
 interface BookingState {
@@ -151,6 +150,7 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.booking = action.payload
+        console.log(state.booking)
         Alert.alert('Bookings Scheduled Successful! ✅')
       })
       .addCase(makeBookingSlice.rejected, (state, action) => {
@@ -158,6 +158,7 @@ const bookingSlice = createSlice({
         state.isError = true
         state.message = action.payload as string
         state.booking = null
+        console.log(action.payload)
         Alert.alert('Bookings Scheduled Fail! ❌')
       })
 
