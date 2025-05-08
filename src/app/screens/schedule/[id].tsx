@@ -23,7 +23,7 @@ const ScheduleScreen = () => {
   const { bookings, isLoading: loadingBookings } = useSelector((state: RootState) => state.bookings)
 
   const [selectedDate, setSelectedDate] = useState<string>('')
-  const [startTime, setStartTime] = useState<Date>(new Date())
+  const [startTime, setStartTime] = useState<Date | null>(null)
   const [showTimePicker, setShowTimePicker] = useState(false)
 
   // To fetch stylist slots and bookings
@@ -53,6 +53,18 @@ const ScheduleScreen = () => {
     marked[selectedDate] = { ...(marked[selectedDate] || {}), selected: true, selectedColor: appTheme.primary }
   }
 
+  // To parse your chosen date (midnight at UTC)
+  const day = moment(selectedDate, 'YYYY-MM-DD')
+
+  // To extract the hours/minutes from the user’s time picker
+  const t = moment(startTime)
+
+  // To merge the selected date and time to be similar to "2025-05-10T14:30:00Z"
+  const combinedDayAndTime = day.hour(t.hour()).minute(t.minute()).second(0)
+
+  // To build the end by adding the appointment duration (20 minutes + the selected time)
+  const endTime = combinedDayAndTime.clone().add(20, 'minutes')
+
   const confirmBooking = () => {
     if (!selectedDate) {
       return Alert.alert('Pick a date first')
@@ -60,13 +72,11 @@ const ScheduleScreen = () => {
     if (!startTime) {
       return Alert.alert('Pick a start time')
     }
-    // end = start + duration
-    const DURATION_MINUTES = 20
-    const endTime = new Date(startTime.getTime() + DURATION_MINUTES * 60_000)
+
     const payload = {
       stylist_id: Number(id),
       booking_day: selectedDate,
-      start_time: startTime.toISOString(),
+      start_time: combinedDayAndTime.toISOString(),
       end_time: endTime.toISOString()
     }
 
@@ -124,11 +134,11 @@ const ScheduleScreen = () => {
 
             {showTimePicker && (
               <DateTimePicker
-                value={startTime}
+                value={startTime || new Date()}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={(_, time) => {
-                  if (time) setStartTime(time)
+                onChange={(_, chosenTime) => {
+                  if (chosenTime) setStartTime(chosenTime)
                   setShowTimePicker(false)
                 }}
               />
