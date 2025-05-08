@@ -1,27 +1,22 @@
 import { Ionicons } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Button, Alert, ScrollView, ActivityIndicator } from 'react-native'
-import DatePicker from 'react-native-date-picker'
+import { View, Text, StyleSheet, TouchableOpacity, Button, Alert, ScrollView, ActivityIndicator } from 'react-native'
 import { appTheme } from 'src/config/theme'
-import { getFirestore, doc, setDoc, collection, addDoc } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
-import { Calendar, CalendarList } from 'react-native-calendars'
 import moment from 'moment'
 import { useNavigation, useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { getAllBookingsSlice, getSingleBookingSlice } from 'src/redux/bookings/bookingSlice'
 
-export default function ScheduleScreen() {
+export default function AppointmentBookingScreen() {
   const router = useRouter()
-
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth)
-  const { isLoading, bookings, booking } = useSelector((state: RootState) => state.bookings)
   const dispatch = useDispatch<AppDispatch>()
   const navigation = useNavigation()
 
-  console.log('Bookings: ', bookings)
-  console.log('Booking: ', booking)
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth)
+  const { isLoading, bookings } = useSelector((state: RootState) => state.bookings)
+
+  // console.log('Bookings: ', bookings)
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -37,13 +32,13 @@ export default function ScheduleScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9747FF" />
+        <ActivityIndicator size="large" color={appTheme.primary} />
         <Text>Loading Bookings Data...</Text>
       </View>
     )
   }
 
-  if (!bookings) {
+  if (!bookings?.data?.length) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>No bookings data available</Text>
@@ -52,64 +47,84 @@ export default function ScheduleScreen() {
     )
   }
 
+  // To match each booking to include a JS Date for sorting
+  const now = moment()
+
+  // To partition the bookings into upcoming vs completed
+  const upcoming = bookings.data
+    .filter((booking: any) => moment(booking.start_time).isAfter(now))
+    .sort((a: any, b: any) => moment(a.start_time).diff(moment(b.start_time)))
+
+  // console.log('upcoming', upcoming)
+
+  const completed = bookings.data
+    .filter((booking: any) => !moment(booking.start_time).isAfter(now))
+    .sort((a: any, b: any) => moment(b.start_time).diff(moment(a.start_time)))
+
+  // console.log('completed', completed)
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
-        {/* <View style={styles.upcomingAppointments}>
-          <View style={styles.appointmentHeader}>
+        <View style={styles.upcomingAppointments}>
+          <View>
             <Text>Upcoming Appointments ------------------------------</Text>
           </View>
 
-          <TouchableOpacity style={styles.appointmentDetailsCover} onPress={viewBookingDetails}>
-            <View style={styles.detailsCover}>
-              <Ionicons name="create-outline" color={appTheme.themeBlack} size={28} />
+          {upcoming.map((item: any, i: number) => (
+            <TouchableOpacity
+              key={i}
+              onPress={() => router.push(`screens/appointment/${item.id}`)}
+              style={[styles.upcomingBooking, styles.appointmentDetailsCover]}>
+              <View style={styles.detailsCover}>
+                <Ionicons name="create-outline" color={appTheme.themeBlack} size={28} />
 
-              <View style={styles.customerDetails}>
-                <Text style={styles.customerName}>Jane Smith</Text>
-                <Text style={styles.date}>March, 12, 2025</Text>
-                <Text style={styles.time}>🕒 2:00 PM - 3:00 PM</Text>
+                <View style={styles.customerDetails}>
+                  <Text style={styles.customerName}>{item.user?.name}</Text>
+                  <Text style={styles.date}>{moment(item.start_time).format('MMMM D, YYYY')}</Text>
+                  <Text style={styles.time}>
+                    🕒 {moment(item.start_time).format('h:mm A')} - {moment(item.end_time).format('h:mm A')}
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            <TouchableOpacity style={styles.acceptBtn} onPress={acceptBookings}>
-              <Text style={styles.btnText}>Accept</Text>
+              {item.booking_status === 'pending' ? (
+                <TouchableOpacity style={styles.acceptBtn} onPress={acceptBookings}>
+                  <Text style={styles.btnText}>Accept</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.acceptBtn}>
+                  <Text style={styles.btnText}>Confirmed</Text>
+                </View>
+              )}
             </TouchableOpacity>
-          </TouchableOpacity>
-        </View> */}
+          ))}
+        </View>
 
         <View style={styles.upcomingAppointments}>
           <View>
             <Text>Completed Appointments ------------------------------</Text>
           </View>
 
-          {bookings?.data?.map((item: any, i: number) => {
-            console.log('item.id: ', item.id)
-            return (
-              <TouchableOpacity key={i} style={styles.appointmentDetailsCover} onPress={() => router.push(`screens/appointment/${item.id}`)}>
-                <View style={styles.detailsCover}>
-                  <Ionicons name="create-outline" color={appTheme.themeBlack} size={28} />
+          {completed.map((item: any, i: number) => (
+            <View key={i} style={styles.appointmentDetailsCover}>
+              <View style={styles.detailsCover}>
+                <Ionicons name="checkmark-done-outline" color={appTheme.themeGray} size={28} />
 
-                  <View style={styles.customerDetails}>
-                    <Text style={styles.customerName}>{item.user?.name}</Text>
-                    <Text style={styles.date}>{moment(item.booking_day).format('MMMM D, YYYY')}</Text>
-                    <Text style={styles.time}>
-                      🕒 {moment(item.start_time).format('h:mm A')} - {moment(item.end_time).format('h:mm A')}
-                    </Text>
-                  </View>
+                <View style={styles.customerDetails}>
+                  <Text style={styles.customerName}>{item.user?.name}</Text>
+                  <Text style={styles.date}>{moment(item.start_time).format('MMMM D, YYYY')}</Text>
+                  <Text style={styles.time}>
+                    🕒 {moment(item.start_time).format('h:mm A')} - {moment(item.end_time).format('h:mm A')}
+                  </Text>
                 </View>
+              </View>
 
-                {item.booking_status === 'pending' ? (
-                  <TouchableOpacity style={styles.acceptBtn} onPress={acceptBookings}>
-                    <Text style={styles.btnText}>Accept</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity style={styles.acceptBtn}>
-                    <Text style={styles.btnText}>Confirmed</Text>
-                  </TouchableOpacity>
-                )}
+              <TouchableOpacity style={styles.acceptBtn} disabled={true}>
+                <Text style={styles.btnText}>Confirmed</Text>
               </TouchableOpacity>
-            )
-          })}
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -131,6 +146,10 @@ const styles = StyleSheet.create({
 
   appointmentHeader: {
     marginBottom: 10
+  },
+
+  upcomingBooking: {
+    backgroundColor: '#f7f7f7'
   },
 
   appointmentDetailsCover: {
