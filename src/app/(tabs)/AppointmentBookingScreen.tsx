@@ -60,7 +60,7 @@ export default function AppointmentBookingScreen() {
   }
 
   // console.log('bookings.data:', bookings.data)
-  
+
   // To match each booking to include a JS Date for sorting
   const now = moment()
 
@@ -215,12 +215,9 @@ const styles = StyleSheet.create({
   btnText: {
     color: appTheme.primary,
     fontWeight: 'bold',
-    textAlign: 'center',
     borderWidth: 1,
     borderColor: appTheme.primary,
     padding: 10,
-    fontSize: 14,
-    paddingHorizontal: 20,
     borderRadius: 30
   },
 
@@ -230,13 +227,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f7f7f7'
   },
+
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f7f7f7'
+    alignItems: 'center'
   },
+
   errorText: {
     fontSize: 16,
     color: 'red',
