@@ -202,6 +202,7 @@ const bookingSlice = createSlice({
       .addCase(updateBookingStatusSlice.pending, (state) => {
         state.isLoading = true
       })
+      
       .addCase(updateBookingStatusSlice.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true
@@ -212,11 +213,12 @@ const bookingSlice = createSlice({
         }
         Alert.alert('Bookings Status Updated Successful! ✅')
       })
+
       .addCase(updateBookingStatusSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        state.booking = null
+        // state.booking = null
         Alert.alert('Unable to update Booking Status! ❌')
       })
   }

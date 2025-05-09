@@ -47,6 +47,7 @@ export default function StylistProfileScreen() {
   const [tempServices, setTempServices] = useState<{ name: string; price: number }[]>([])
   const [showProfileDetails, setShowProfileDetails] = useState(false)
   const [useCurrentLocation, setUseCurrentLocation] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -135,6 +136,7 @@ export default function StylistProfileScreen() {
 
   const handleUpload = async () => {
     if (uploadType === 'profile' && imageUri && updatedProfile) {
+      setUploading(true)
       const url = await uploadImageToCloudinary(imageUri)
       setUpdatedProfile((p) => p! && { ...p, profile_picture: url })
       setImageUri(null)
@@ -146,6 +148,7 @@ export default function StylistProfileScreen() {
         return Alert.alert('Error', 'Select 2 images and add captions')
       }
 
+      setUploading(true)
       const urls = await Promise.all(sampleOfServices.map((s) => uploadImageToCloudinary(s.img_url)))
       setUpdatedProfile(
         (p) =>
@@ -154,10 +157,10 @@ export default function StylistProfileScreen() {
             sample_of_services: sampleOfServices.map((s, i) => ({ caption: s.caption, img_url: urls[i] }))
           }
       )
-
       setSampleImages([])
       setSampleOfServices([])
     }
+    setUploading(false)
     setModalVisible(false)
     setUploadType('')
   }
@@ -189,11 +192,11 @@ export default function StylistProfileScreen() {
   // console.log('updatedProfile ', updatedProfile)
   // console.log('useCurrentLocation ', useCurrentLocation)
 
-  if (isLoading && !updatedProfile) {
+  if ((isLoading && !updatedProfile) || uploading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={appTheme.primary} />
-        {/* <Text>Loading Stylist Profile...</Text> */}
+        <Text>Loading...</Text>
       </View>
     )
   }

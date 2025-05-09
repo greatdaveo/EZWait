@@ -1,17 +1,90 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import React from 'react'
-import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
+import { editUserProfileSlice } from 'src/redux/auth/authSlice'
+import { AppDispatch, RootState } from 'src/redux/store'
+import * as ImagePicker from 'expo-image-picker'
+import * as ImageManipulator from 'expo-image-manipulator'
+import { uploadImageToCloudinary } from 'src/utils/cloudinaryService'
 
 const Index = () => {
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const { user, isLoading } = useSelector((state: RootState) => state.auth)
+  const [uploading, setUploading] = useState(false)
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    number: '',
+    location: '',
+    profile_picture: ''
+  })
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name,
+        email: user.email,
+        number: user.number,
+        location: user.location,
+        profile_picture: user.profile_picture
+      })
+    }
+  }, [dispatch])
+
+  const handleUpdatedProfile = async () => {
+    try {
+      await dispatch(editUserProfileSlice(form)).unwrap()
+      // Alert.alert('Saved ✅', 'Your profile has been updated.')
+      router.push('(tabs)/CustomerProfileScreen')
+    } catch (err: any) {
+      // console.error('❌ handleUpdatedProfile caught:', err)
+      Alert.alert('Error ❌', err.message || String(err))
+    }
+  }
 
   const handlePreviousStep = () => {
     router.back()
   }
 
-  const handleUpdatedProfile = () => {}
+  const pickAndUploadImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1
+    })
+
+    if (result.canceled) return
+
+    // compress
+    const { uri: compressedUri } = await ImageManipulator.manipulateAsync(result.assets[0].uri, [{ resize: { width: 800 } }], {
+      compress: 0.7,
+      format: ImageManipulator.SaveFormat.JPEG
+    })
+
+    setUploading(true)
+    try {
+      const secureUrl = await uploadImageToCloudinary(compressedUri)
+      setForm((f) => ({ ...f, profile_picture: secureUrl }))
+    } catch (err: any) {
+      Alert.alert('Upload failed ❌', err.message ?? 'Unable to upload')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (isLoading || uploading) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color={appTheme.primary} />
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -27,17 +100,25 @@ const Index = () => {
         </View>
 
         <View style={styles.profileSection}>
-          <View style={styles.profileImageContainer}>
-            <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
-            <TouchableOpacity style={styles.plusIcon}>
+          <TouchableOpacity style={styles.profileImageContainer} onPress={() => pickAndUploadImage()}>
+            <Image
+              source={{
+                uri: !form?.profile_picture
+                  ? 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg'
+                  : form?.profile_picture
+              }}
+              style={styles.img}
+            />
+
+            <View style={styles.plusIcon}>
               <Ionicons name="add-circle" color={appTheme.primary} size={28} />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
           <View style={styles.profileNameCover}>
             <View style={styles.profileNameContainer}>
-              <Text style={styles.profileName}>David Olowomeye</Text>
-              <Text style={styles.profileEmail}>davidolowo2@gmail.com</Text>
+              <Text style={styles.profileName}>{user?.name}</Text>
+              <Text style={styles.profileEmail}>{user?.email}</Text>
             </View>
           </View>
         </View>
@@ -49,9 +130,35 @@ const Index = () => {
             <Text style={styles.subSectionText}>
               Make sure your details are correct. Your email is used for account verification and notifications.
             </Text>
-            <TextInput placeholder="David Olowomeye" placeholderTextColor="#BABABA" style={styles.textInput} />
-            <TextInput placeholder="davidolowo2@gmail.com" placeholderTextColor="#BABABA" style={styles.textInput} />
-            <TextInput placeholder="Enter Service" placeholderTextColor="#BABABA" style={styles.textInput} />
+            <TextInput
+              placeholder="Name"
+              value={form?.name}
+              onChangeText={(text) => setForm((f) => ({ ...f, name: text }))}
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+            />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              keyboardType="email-address"
+              value={form?.email}
+              onChangeText={(text) => setForm((f) => ({ ...f, email: text }))}
+            />
+            <TextInput
+              placeholder="Number"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              value={form?.number}
+              onChangeText={(text) => setForm((f) => ({ ...f, number: text }))}
+            />
+            <TextInput
+              placeholder="Location"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              value={form?.location}
+              onChangeText={(text) => setForm((f) => ({ ...f, location: text }))}
+            />
           </View>
 
           <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedProfile}>
@@ -69,11 +176,16 @@ const Index = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    flexGrow: 1,
+    paddingTop: 70,
     padding: 20,
-    backgroundColor: '#FFFFFF',
-    height: '100%'
-    // position: 'static'
+    backgroundColor: '#FFFFFF'
+  },
+
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   topBar: {

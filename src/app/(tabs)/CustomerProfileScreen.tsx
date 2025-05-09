@@ -9,38 +9,23 @@ import { AppDispatch, RootState } from 'src/redux/store'
 import { logoutUserSlice } from 'src/redux/auth/authSlice'
 import { useRouter } from 'expo-router'
 import { ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native'
 
 export default function ProfileScreen() {
-  const [currentStep, setCurrentStep] = useState(1)
   const [isReminderOn, setIsReminderOn] = useState(false)
-  const { isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth)
-
+  const { isLoading, isLoggedIn, user } = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const handlePreviousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1)
-    }
-  }
-
-  const handleNavigate = (page: any) => {
-    console.log(`Navigating to ${page}`)
-  }
-
-  const editProfile = () => {
-    router.push('/profileInfo')
-  }
-
   const handleUpdatedPassword = () => {
-    // console.log('Logout')
-
     if (isLoggedIn) {
       dispatch(logoutUserSlice())
     }
+  }
 
-    router.push('/(onboarding)/ThirdScreen')
+  const handleLogout = () => {
+    if (isLoggedIn) {
+      dispatch(logoutUserSlice())
+    }
   }
 
   return (
@@ -51,19 +36,23 @@ export default function ProfileScreen() {
 
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
-          <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} />
-          <TouchableOpacity style={styles.plusIcon}>
-            <Ionicons name="add-circle" color={appTheme.primary} size={28} />
-          </TouchableOpacity>
+          <Image
+            source={{
+              uri: !user?.profile_picture
+                ? 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg'
+                : user?.profile_picture
+            }}
+            style={styles.img}
+          />
         </View>
 
         <View style={styles.profileNameCover}>
           <View style={styles.profileNameContainer}>
-            <Text style={styles.profileName}>David Olowomeye</Text>
-            <Text style={styles.profileEmail}>davidolowo2@gmail.com</Text>
+            <Text style={styles.profileName}>{user?.name}</Text>
+            <Text style={styles.profileEmail}>{user?.email}</Text>
           </View>
 
-          <TouchableOpacity style={styles.pencilIcon} onPress={editProfile}>
+          <TouchableOpacity style={styles.pencilIcon} onPress={() => router.push('/profileInfo')}>
             <Ionicons name="pencil-outline" color={appTheme.primary} size={24} />
           </TouchableOpacity>
         </View>
@@ -83,28 +72,6 @@ export default function ProfileScreen() {
 
             <Text style={styles.itemText}>Appointment Reminders</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
-            <Switch
-              value={isReminderOn}
-              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
-              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
-              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
-            />
-
-            <Text style={styles.itemText}>New Barber Availability</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem} onPress={() => setIsReminderOn((prevState) => !prevState)}>
-            <Switch
-              value={isReminderOn}
-              onValueChange={() => setIsReminderOn((prevState) => !prevState)}
-              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
-              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
-            />
-
-            <Text style={styles.itemText}>Promotions & Offers</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -120,6 +87,9 @@ export default function ProfileScreen() {
 
         <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedPassword}>
           <Text style={styles.updateBtn}>Update Password</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.updateBtnCover} onPress={handleLogout}>
+          <Text style={styles.updateBtn}>Logout</Text>
         </TouchableOpacity>
       </View>
 

@@ -19,17 +19,7 @@ const Login: React.FC = () => {
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
   const [userRole, setUserRole] = useState<string>(user?.data?.role)
 
-  // const saveToken = async (token: string) => {
-  //   try {
-  //     await AsyncStorage.setItem('authToken', token)
-  //   } catch (error) {
-  //     console.log('Error saving token', error)
-  //   }
-  // }
-
   const dispatch = useDispatch<AppDispatch>()
-
-  // const navigation = useNavigation()
 
   const validEMail = (email: any) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -38,7 +28,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
-      Alert.alert('Login Successful.')
+      // Alert.alert('Login Successful.')
       router.navigate(userRole === 'stylist' ? '/(tabs)/StylistHomeScreen' : '/(tabs)/CustomerHomeScreen')
     }
 
