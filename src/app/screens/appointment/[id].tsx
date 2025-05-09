@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Modal, ActivityIndicator, Button, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
-import { getSingleBookingSlice, updateBookingStatusSlice } from 'src/redux/bookings/bookingSlice'
+import { getAllBookingsSlice, getSingleBookingSlice, updateBookingStatusSlice } from 'src/redux/bookings/bookingSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 import moment from 'moment'
 
@@ -23,16 +23,10 @@ const Appointment: React.FC = () => {
   // const bookingData = booking?.data
   // const id = booking?.data?.id
 
-  const { booking_day, start_time, end_time, booking_status, stylist, user: customer } = booking?.data
-
-  console.log(booking_day, booking_status, end_time, start_time, stylist, customer)
-
-  const dateLabel = moment(booking_day).format('MMMM D, YYYY')
-  const startLabel = moment(start_time).format('h:mm A')
-  const endLabel = moment(end_time).format('h:mm A')
-
   useEffect(() => {
-    dispatch(getSingleBookingSlice(id))
+    if (isLoggedIn) {
+      dispatch(getSingleBookingSlice(id))
+    }
   }, [dispatch, id, isLoggedIn])
 
   if (isLoading) {
@@ -44,7 +38,7 @@ const Appointment: React.FC = () => {
     )
   }
 
-  if (!booking) {
+  if (!booking?.data) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>No booking data available</Text>
@@ -53,21 +47,45 @@ const Appointment: React.FC = () => {
     )
   }
 
+  const { booking_day, start_time, end_time, booking_status, stylist, user: customer } = booking?.data
+
+  console.log(booking_day, booking_status, end_time, start_time, stylist, customer)
+
+  const dateLabel = moment(booking_day).format('MMMM D, YYYY')
+  const startLabel = moment(start_time).format('h:mm A')
+  const endLabel = moment(end_time).format('h:mm A')
+
   const handlePreviousStep = () => {
     router.back()
   }
 
   const confirmBooking = () => {
-    dispatch(updateBookingStatusSlice({ id: booking?.data?.id, newStatus: 'confirmed' }))
+    dispatch(updateBookingStatusSlice({ id: booking.data?.id.toString(), newStatus: 'confirmed' }))
       .unwrap()
       .then(() => {
-        Alert.alert('Success', 'Appointment confirmed.')
+        Alert.alert('Success ✅', 'Appointment confirmed.')
+        dispatch(getAllBookingsSlice())
         setModalVisible(false)
         router.push('/(tabs)/StylistHomeScreen')
       })
       .catch((err: any) => {
         console.error('Error confirming:', err)
-        Alert.alert('Error', 'Could not confirm appointment.')
+        Alert.alert('Error ❌', 'Could not confirm appointment.')
+      })
+  }
+
+  const declineBooking = () => {
+    dispatch(updateBookingStatusSlice({ id: booking.data?.id.toString(), newStatus: 'cancelled' }))
+      .unwrap()
+      .then(() => {
+        Alert.alert('Declined ☹️', 'Appointment has been declined.')
+        setModalVisible(false)
+        router.push('/(tabs)/StylistHomeScreen')
+      })
+      .catch((err: any) => {
+        Alert.alert('Error ❌', 'Could not decline appointment.')
+        console.error('Confirm error', err)
+        // Alert.alert('Error', err.toString())
       })
   }
 
@@ -131,11 +149,12 @@ const Appointment: React.FC = () => {
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
+              <Ionicons name="close-outline" color={appTheme.primary} size={28} style={styles.closeIcon} onPress={() => setModalVisible(false)} />
+
               <>
                 <Text style={styles.modalHeader}>Confirm Appointment?</Text>
-                <Text style={styles.modalText}>
-                  You are about to accept this booking. The client will be notified, and the appointment will be added to your schedule.
-                </Text>
+                <Text style={styles.modalText}>kindly accept or cancel this booking.</Text>
+                <Text style={styles.modalText}>Note: Your client will be notified if you accept or decline. </Text>
               </>
 
               <View style={styles.buttonContainer}>
@@ -143,7 +162,7 @@ const Appointment: React.FC = () => {
                   <Text style={styles.btnText}>Confirm</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.buttonContainer, styles.backHomeBtn]} onPress={() => setModalVisible(false)}>
+                <TouchableOpacity style={[styles.buttonContainer, styles.backHomeBtn]} onPress={declineBooking}>
                   <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
@@ -314,6 +333,10 @@ const styles = StyleSheet.create({
     gap: 20
   },
 
+  closeIcon: {
+    alignSelf: 'flex-end'
+  },
+
   checkmarkImage: {
     width: 80,
     height: 80,
@@ -331,7 +354,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#555',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 2,
     width: '75%'
   },
 

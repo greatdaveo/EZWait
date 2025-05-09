@@ -71,9 +71,24 @@ const deleteBooking = async (id: string) => {
 }
 
 const updateBookingStatus = async (id: string, newStatus: string) => {
-  const response = await axios.patch(`${API_URL}/bookings/${id}/status`, {
-    new_status: newStatus
-  })
+  const token = await AsyncStorage.getItem('token')
+
+  if (!token) {
+    throw new Error('No token found. User is not authenticated.')
+  }
+  
+  const response = await axios.patch(
+    `${API_URL}/bookings/${id}/status`,
+    {
+      new_status: newStatus
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true
+    }
+  )
 
   return response.data
 }

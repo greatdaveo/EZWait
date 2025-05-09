@@ -85,11 +85,11 @@ const ScheduleScreen = () => {
     dispatch(makeBookingSlice(payload))
       .unwrap()
       .then(() => {
-        Alert.alert('Booked!', 'You appointment is pending confirmation.')
+        Alert.alert('Booked! ✅', 'You appointment is pending confirmation.')
         router.push('/(tabs)/Bookings')
       })
       .catch((err: any) => {
-        console.log(err)
+        console.log('makeBookingSlice Error: ❌', err)
         // Alert.alert('Error', err.message || err.toString())
       })
   }

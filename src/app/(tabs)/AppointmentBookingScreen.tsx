@@ -6,7 +6,7 @@ import moment from 'moment'
 import { useNavigation, useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
-import { getAllBookingsSlice, getSingleBookingSlice } from 'src/redux/bookings/bookingSlice'
+import { getAllBookingsSlice, getSingleBookingSlice, updateBookingStatusSlice } from 'src/redux/bookings/bookingSlice'
 
 export default function AppointmentBookingScreen() {
   const router = useRouter()
@@ -25,8 +25,20 @@ export default function AppointmentBookingScreen() {
     }
   }, [isLoggedIn, dispatch])
 
-  const acceptBookings = () => {
-    router.push('/appointment')
+  const acceptBookings = (bookingId: number) => {
+    dispatch(
+      updateBookingStatusSlice({
+        id: bookingId.toString(),
+        newStatus: 'confirmed'
+      })
+    )
+      .unwrap()
+      .then(() => {
+        dispatch(getAllBookingsSlice())
+      })
+      .catch((err: any) => {
+        Alert.alert('Error ❌', 'Could not update booking.')
+      })
   }
 
   if (isLoading) {
@@ -47,6 +59,8 @@ export default function AppointmentBookingScreen() {
     )
   }
 
+  // console.log('bookings.data:', bookings.data)
+  
   // To match each booking to include a JS Date for sorting
   const now = moment()
 
@@ -75,7 +89,8 @@ export default function AppointmentBookingScreen() {
             <TouchableOpacity
               key={i}
               onPress={() => router.push(`screens/appointment/${item.id}`)}
-              style={[styles.upcomingBooking, styles.appointmentDetailsCover]}>
+              style={[styles.upcomingBooking, styles.appointmentDetailsCover]}
+              disabled={item.booking_status === 'confirmed' ? true : false}>
               <View style={styles.detailsCover}>
                 <Ionicons name="create-outline" color={appTheme.themeBlack} size={28} />
 
@@ -89,9 +104,13 @@ export default function AppointmentBookingScreen() {
               </View>
 
               {item.booking_status === 'pending' ? (
-                <TouchableOpacity style={styles.acceptBtn} onPress={acceptBookings}>
+                <TouchableOpacity style={styles.acceptBtn} onPress={() => acceptBookings(item.id)}>
                   <Text style={styles.btnText}>Accept</Text>
                 </TouchableOpacity>
+              ) : item.booking_status === 'cancelled' ? (
+                <View style={styles.acceptBtn}>
+                  <Text style={styles.btnText}>Cancelled</Text>
+                </View>
               ) : (
                 <View style={styles.acceptBtn}>
                   <Text style={styles.btnText}>Confirmed</Text>
