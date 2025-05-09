@@ -1,6 +1,15 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import authService from './authService'
 import { Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+export interface UserProfile {
+  name?: string
+  email?: string
+  number?: string
+  location?: string
+  profile_picture?: string
+}
 
 export interface UserData {
   name: string | null
@@ -10,6 +19,7 @@ export interface UserData {
   location?: string | null
   password: string | null
   confirm_password: string | null
+  profile_picture?: string | null
 }
 
 export interface LoginData {
@@ -66,6 +76,16 @@ export const logoutUserSlice = createAsyncThunk('auth/logout', async (_, thunkAP
   }
 })
 
+export const editUserProfileSlice = createAsyncThunk('auth/edit-profile', async (userData: UserProfile, thunkAPI) => {
+  try {
+    return await authService.editUserProfileService(userData)
+  } catch (error: string | any) {
+    console.log('Edit Profile Slice Error', error)
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -89,7 +109,7 @@ const authSlice = createSlice({
         state.user = action.payload
         console.log('registerSlice success user:', state.user)
 
-        console.log('registerSlice fulfilled:', action.payload)
+        // console.log('registerSlice fulfilled:', action.payload)
       })
       .addCase(registerUserSlice.rejected, (state, action) => {
         state.isLoading = false
@@ -110,6 +130,7 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isLoggedIn = true
         state.user = action.payload
+        Alert.alert('Login Successful.')
         // console.log(action.payload);
       })
 
@@ -137,6 +158,27 @@ const authSlice = createSlice({
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
+      })
+
+      .addCase(editUserProfileSlice.pending, (state) => {
+        state.isLoading
+      })
+
+      .addCase(editUserProfileSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.user = action.payload?.data
+        // AsyncStorage.setItem('user', JSON.stringify(action.payload.data.user))
+        Alert.alert('Saved ✅', 'Your profile has been updated.')
+      })
+
+      .addCase(editUserProfileSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        // state.user = null
+        Alert.alert('Profile Editing Fail! ❌')
       })
   }
 })
