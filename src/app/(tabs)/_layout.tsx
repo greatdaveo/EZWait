@@ -79,14 +79,14 @@ export default function TabLayout() {
       /> */}
 
       <Tabs.Screen
-        name="Bookings"
+        name="CustomerPastBookings"
         options={{
           title: 'Bookings',
           href: userRole === 'stylist' ? null : undefined,
           // href: null,
-          headerTitle: 'Schedule Bookings',
+          headerTitle: 'Your Bookings',
           // tabBarLabel: 'Auth',
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? 'calendar' : 'calendar-outline'} color={appTheme.primary} size={24} />
         }}
       />
