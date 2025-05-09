@@ -112,7 +112,7 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.bookings = action.payload
-        console.log('Fulfilled bookings fetched:', action.payload)
+        // console.log('Fulfilled bookings fetched:', action.payload)
       })
       .addCase(getAllBookingsSlice.rejected, (state, action) => {
         state.isLoading = false
@@ -130,7 +130,7 @@ const bookingSlice = createSlice({
         state.isLoggedIn = true
         state.isError = false
         state.booking = action.payload
-        console.log('Fulfilled booking fetched:', action.payload)
+        // console.log('Fulfilled booking fetched:', action.payload)
       })
 
       .addCase(getSingleBookingSlice.rejected, (state, action) => {
@@ -207,6 +207,9 @@ const bookingSlice = createSlice({
         state.isSuccess = true
         state.isError = false
         state.booking = action.payload
+        if (state.bookings?.data) {
+          state.bookings.data = state.bookings.data.map((b: any) => (b.id === action.payload.data.id ? action.payload.data : b))
+        }
         Alert.alert('Bookings Status Updated Successful! ✅')
       })
       .addCase(updateBookingStatusSlice.rejected, (state, action) => {
@@ -214,7 +217,7 @@ const bookingSlice = createSlice({
         state.isError = true
         state.message = action.payload as string
         state.booking = null
-        Alert.alert('Unable to Booking Status! ❌')
+        Alert.alert('Unable to update Booking Status! ❌')
       })
   }
 })

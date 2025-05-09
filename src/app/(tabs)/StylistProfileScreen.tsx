@@ -8,93 +8,83 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { useRouter } from 'expo-router'
 import { ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native'
-import Checkbox from 'expo-checkbox'
-import { upload } from 'cloudinary-react-native'
-import { Cloudinary } from '@cloudinary/url-gen'
 import * as ImageManipulator from 'expo-image-manipulator'
 
-import { editStylistSlice, getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
-import { CLOUD_NAME, UPLOAD_PRESET } from '@env'
+import { getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
+import { uploadImageToCloudinary } from 'src/utils/cloudinaryService'
+
+type TimeSlot = { start: string; end: string }
 
 export default function StylistProfileScreen() {
-  const [isReminderOn, setIsReminderOn] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [servicesModalVisible, setServicesModalVisible] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [image, setImage] = useState<string | null>(null)
-  const [sampleImages, setSampleImages] = useState<string[]>([])
-  const [caption, setCaption] = useState('')
-  const [isChecked, setChecked] = useState(false)
-  const [uploadType, setUploadType] = useState('')
-  const [showProfileDetails, setShowProfileDetails] = useState(false)
-  const [sampleOfServices, setSampleOfServices] = useState<{ img_url: string; caption: string }[]>([])
+  const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
   const { stylistProfile, isLoading }: any = useSelector((state: RootState) => state.profile)
   const { user, isLoggedIn } = useSelector((state: RootState) => state.auth)
 
-  // console.log('user: ', user)
-  // console.log('stylistProfile: ', stylistProfile)
+  const [updatedProfile, setUpdatedProfile] = useState<{
+    name: string
+    email: string
+    location: string
+    number: string
+    active_status: boolean
+    available_time_slots: string[]
+    no_of_current_customers: number
+    no_of_customer_bookings: number
+    profile_picture: string
+    sample_of_services: { img_url: string; caption: string }[]
+    services: { name: string; price: number }[]
+  } | null>(null)
 
-  const dispatch = useDispatch<AppDispatch>()
-  const router = useRouter()
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+  const [uploadType, setUploadType] = useState<'profile' | 'sample' | ''>('')
+  const [imageUri, setImageUri] = useState<string | null>(null)
+  const [sampleImages, setSampleImages] = useState<string[]>([])
+  const [sampleOfServices, setSampleOfServices] = useState<{ img_url: string; caption: string }[]>([])
+  const [captionInput, setCaptionInput] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+  const [servicesModalVisible, setServicesModalVisible] = useState(false)
+  const [tempServices, setTempServices] = useState<{ name: string; price: number }[]>([])
+  const [showProfileDetails, setShowProfileDetails] = useState(false)
+  const [useCurrentLocation, setUseCurrentLocation] = useState(false)
 
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(getStylistProfileSlice(user.id))
+      dispatch(getStylistProfileSlice(user.id.toString()))
     }
-  }, [user, dispatch, isLoggedIn])
+  }, [dispatch, isLoggedIn, user?.id])
 
-  const editProfile = () => {
-    setShowProfileDetails(false)
-  }
+  // To initialize local form state when data arrives
+  useEffect(() => {
+    const data = stylistProfile?.data
 
-  const { data, user: stylistUser = {} } = stylistProfile || {}
-  // console.log(stylistProfile)
-  const {
-    active_status,
-    available_time_slots,
-    no_of_current_customers,
-    no_of_customer_bookings,
-    profile_picture,
-    // ratings,
-    sample_of_services,
-    services
-  } = data || {}
+    if (data && user) {
+      setUpdatedProfile({
+        name: user.name,
+        email: user.email,
+        location: user.location,
+        number: user.number,
+        active_status: data.active_status,
+        available_time_slots: data.available_time_slots,
+        no_of_current_customers: data.no_of_current_customers,
+        no_of_customer_bookings: data.no_of_customer_bookings,
+        profile_picture: data.profile_picture,
+        sample_of_services: data.sample_of_services,
+        services: data.services
+      })
 
-  const [updatedProfile, setUpdatedProfile] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    location: user?.location || '',
-    number: user?.number || '',
-    active_status: active_status || false,
-    available_time_slots: available_time_slots || [],
-    no_of_current_customers,
-    no_of_customer_bookings,
-    profile_picture: profile_picture || 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg',
-    // ratings,
-    sample_of_services: sample_of_services || [],
-    services: services || []
-  })
-
-  // For Available Time Slots
-  const [timeSlots, setTimeSlots] = useState(
-    available_time_slots?.map((slot: string) => {
-      const [start, end] = slot.split(' - ')
-      return { start, end }
-    }) || []
-  )
-
-  // console.log(timeSlots)
-
-  const updateTimeSlot = (i: number, key: 'start' | 'end', value: string) => {
-    const newSlots = [...timeSlots]
-    if (!newSlots[i]) {
-      newSlots[i] = { start: '', end: '' }
+      if (data) {
+        const parsed = data.available_time_slots.map((slot: any) => {
+          const [start, end] = slot.split(' - ')
+          return { start, end }
+        })
+        const fullWeek: TimeSlot[] = Array(7)
+          .fill(0)
+          .map((_, i) => parsed[i] || { start: '', end: '' })
+        setTimeSlots(fullWeek)
+      }
     }
-    newSlots[i][key] = value
-    setTimeSlots([...newSlots])
-  }
+  }, [stylistProfile, user])
 
   // To compress the size of the upload images
   const compressImage = async (uri: string) => {
@@ -106,8 +96,8 @@ export default function StylistProfileScreen() {
     return manipResult.uri
   }
 
-  // For Profile Image
-  const pickProfileImg = async () => {
+  // To upload Profile Image to cloudinary
+  const pickImage = async (type: 'profile' | 'sample', idx?: number) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -115,175 +105,79 @@ export default function StylistProfileScreen() {
     })
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri
+      let uri = result.assets[0].uri
+      uri = await compressImage(uri)
+
+      if (type === 'sample') {
+        setSampleImages((imgs) => (typeof idx === 'number' ? imgs.map((u, i) => (i === idx ? uri : u)) : imgs.length < 2 ? [...imgs, uri] : imgs))
+
+        setSampleOfServices((svcs) =>
+          typeof idx === 'number'
+            ? svcs.map((s, i) => (i === idx ? { img_url: uri, caption: s.caption } : s))
+            : [...svcs, { img_url: uri, caption: '' }]
+        )
+      } else {
+        setImageUri(uri)
+      }
+
+      setUploadType(type)
+      setModalVisible(true)
 
       const fileSize = result.assets[0]?.fileSize
       if (fileSize && fileSize > 10485760) {
         Alert.alert('Image Too Large', 'Please choose an image less than 10MB')
         return
       }
-
-      // Optionally compress the image:
-      // uri = await compressImage(uri)
-
-      setImage(uri)
-      setUploadType('profile')
-      setModalVisible(true)
-      console.log('pickProfileImg Image Uri', uri)
     }
   }
 
-  const uploadImageToCloudinary = async (imageUri: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const cld = new Cloudinary({
-        cloud: { cloudName: CLOUD_NAME },
-        url: { secure: true }
-      })
-      const options = {
-        upload_preset: UPLOAD_PRESET,
-        unsigned: true
+  // console.log('handleUpload:', { uploadType, imageUri, sampleOfServices })
+
+  const handleUpload = async () => {
+    if (uploadType === 'profile' && imageUri && updatedProfile) {
+      const url = await uploadImageToCloudinary(imageUri)
+      setUpdatedProfile((p) => p! && { ...p, profile_picture: url })
+      setImageUri(null)
+    }
+
+    if (uploadType === 'sample') {
+      //  To ensure 2 images and captions
+      if (sampleOfServices.length !== 2 || sampleOfServices.some((s) => !s.caption)) {
+        return Alert.alert('Error', 'Select 2 images and add captions')
       }
 
-      upload(cld, {
-        file: imageUri,
-        options,
-        callback: (error: any, response: any) => {
-          if (error) {
-            console.error('uploadImageToCloudinary Error Uploading Image: ', error)
-            reject(error)
-          } else {
-            console.log('Uploaded Image URL: ', response.secure_url)
-            resolve(response.secure_url)
+      const urls = await Promise.all(sampleOfServices.map((s) => uploadImageToCloudinary(s.img_url)))
+      setUpdatedProfile(
+        (p) =>
+          p! && {
+            ...p,
+            sample_of_services: sampleOfServices.map((s, i) => ({ caption: s.caption, img_url: urls[i] }))
           }
-        }
-      })
-    })
-  }
+      )
 
-  const uploadProfileImg = async (imageUri: string) => {
-    if (!imageUri) {
-      console.log('No Image')
-      return
-    }
-    setUploading(true)
-    try {
-      const uploadUrl = await uploadImageToCloudinary(imageUri)
-      setUpdatedProfile((prev) => ({ ...prev, profile_picture: uploadUrl }))
-      setModalVisible(false)
-    } catch (error: any) {
-      console.error('Upload failed:', error)
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  // For Work Sample Image
-  const pickWorkSampleImg = async () => {
-    // if (sample_of_services.length > 2) {
-    //   Alert.alert('You can only upload 2 images')
-    // }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      quality: 1
-    })
-
-    if (!result.canceled) {
-      const uri = result.assets[0].uri
-      if (sampleImages.length >= 2) {
-        Alert.alert('Error', 'You can only upload 2 images.')
-        return
-      }
-
-      setSampleImages((prev) => [...prev, uri])
-      setSampleOfServices((prevServices) => [...prevServices, { caption: '', img_url: uri }])
-      setUploadType('sample')
-      if (sampleImages.length + 1 === 2) {
-        setModalVisible(true)
-      }
-      // console.log('pickWorkSampleImg Image Uri', result.assets[0].uri)
-    }
-  }
-
-  const uploadSampleWorkImg = async () => {
-    if (sampleOfServices.some((service) => !service.caption || !service.img_url)) {
-      Alert.alert('Error', 'Please provide captions for all images')
-    }
-
-    if (sampleOfServices.length < 2 || sampleOfServices.length !== 2) {
-      Alert.alert('Error', 'Please select exactly 2 images for your work samples.')
-      return
-    }
-
-    setUploading(true)
-    try {
-      const uploadedImages = await Promise.all(sampleOfServices.map((service) => uploadImageToCloudinary(service.img_url)))
-
-      const updatedSampleOfServices = sampleOfServices.map((service, i) => ({
-        caption: service.caption,
-        img_url: uploadedImages[i]
-      }))
-
-      setUpdatedProfile((prev) => ({
-        ...prev,
-        sample_of_services: updatedSampleOfServices
-      }))
-      //   dispatch(updateStylistProfileSlice({ profile_picture: uploadedUrl }))
-      setModalVisible(false)
-    } catch (error) {
-      console.error('Upload failed:', error)
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const handleUpload = () => {
-    if (uploadType === 'profile') {
-      // Use the image from state
-      uploadProfileImg(image!)
-    } else if (uploadType === 'sample') {
-      uploadSampleWorkImg()
-    }
-  }
-
-  const saveEditedProfile = () => {
-    try {
-      const formData = {
-        ...updatedProfile,
-        available_time_slots: timeSlots.map((slot: any) => `${slot.start}-${slot.end}`)
-      }
-      console.log('saveEditedProfile: ', formData)
-      dispatch(updateStylistSlice({ id: user.id, formData }))
-      Alert.alert('Success', 'Profile Updated Successfully!')
-    } catch (error: any) {
-      console.log('saveEditedProfile Error: ', error)
-    }
-  }
-
-  const handleCancelModal = () => {
-    setModalVisible(false)
-    if (uploadType === 'profile') {
-      setImage(null)
-    } else if (uploadType === 'sample') {
       setSampleImages([])
-      setCaption('')
-    } else {
-      return
+      setSampleOfServices([])
     }
+    setModalVisible(false)
+    setUploadType('')
   }
 
-  // ::::::::::: To Manage Services Edited :::::::::::
-  const [tempServices, setTempServices] = useState(updatedProfile.services)
-  const openServicesModal = () => {
-    setTempServices(updatedProfile.services)
-    setServicesModalVisible(true)
+  const saveProfile = () => {
+    if (!updatedProfile) return
+    const payload = {
+      ...updatedProfile,
+      available_time_slots: timeSlots.map((s) => `${s.start} - ${s.end}`)
+    }
+
+    dispatch(updateStylistSlice({ id: user.id, formData: payload }))
+      .unwrap()
+      .then(() => Alert.alert('Success ✅', 'Profile Updated Successfully!'))
   }
 
   const handleAddService = () => {
     const newService = { name: '', price: 0 }
     setTempServices((prev: any) => [...prev, newService])
-    Alert.alert('Service Added', 'A new service field has been added.')
+    // Alert.alert('Service Added', 'A new service field has been added.')
   }
 
   const handleRemoveService = (index: number) => {
@@ -291,35 +185,14 @@ export default function StylistProfileScreen() {
     Alert.alert('Service Removed', 'Service removed successfully.')
   }
 
-  const handleUpdateService = (index: number, field: 'name' | 'price', value: string) => {
-    const newServices = tempServices.map((service: any, idx: number) => {
-      if (idx === index) {
-        return { ...service, [field]: field === 'price' ? parseFloat(value) || 0 : value }
-      }
+  // console.log('Active Status: ', updatedProfile?.active_status)
+  // console.log('updatedProfile ', updatedProfile)
+  // console.log('useCurrentLocation ', useCurrentLocation)
 
-      return service
-    })
-
-    setTempServices(newServices)
-  }
-
-  const saveServices = () => {
-    if (!tempServices.length || tempServices.every((s: any) => s.name.trim() === '')) {
-      Alert.alert('Error', 'Please add at least one valid service.')
-      return
-    }
-
-    setUpdatedProfile((prev) => ({ ...prev, services: tempServices }))
-    setServicesModalVisible(false)
-    Alert.alert('Success', 'Services updated successfully')
-  }
-
-  // ::::::::::: End of Services Management :::::::::::
-
-  if (isLoading) {
+  if (isLoading && !updatedProfile) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#9747FF" />
+        <ActivityIndicator size="large" color={appTheme.primary} />
         {/* <Text>Loading Stylist Profile...</Text> */}
       </View>
     )
@@ -332,10 +205,10 @@ export default function StylistProfileScreen() {
       </View>
 
       <View style={styles.profileSection}>
-        <TouchableOpacity style={styles.profileImageContainer} onPress={pickProfileImg}>
+        <TouchableOpacity style={styles.profileImageContainer} onPress={() => pickImage('profile')}>
           <Image
             source={{
-              uri: updatedProfile.profile_picture
+              uri: updatedProfile?.profile_picture
             }}
             style={styles.img}
           />
@@ -366,24 +239,36 @@ export default function StylistProfileScreen() {
               <Text style={styles.subSectionText}>Business Name</Text>
               <TextInput
                 placeholder="Enter your business name"
-                value={updatedProfile.name}
-                onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, name: text })}
+                value={updatedProfile?.name}
+                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, name: text })}
                 placeholderTextColor="#BABABA"
                 style={styles.textInput}
               />
+
               <Text style={styles.subSectionText}>Email</Text>
               <TextInput
-                placeholder="Enter your email"
-                value={updatedProfile.email}
-                onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, email: text })}
+                placeholder={updatedProfile?.email}
+                value={updatedProfile?.email}
+                // onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, email: text })}
                 placeholderTextColor="#BABABA"
                 style={styles.textInput}
+                editable={false}
               />
+
               <Text style={styles.subSectionText}>Number</Text>
               <TextInput
                 placeholder="Enter your Number"
-                value={updatedProfile.number}
-                onChangeText={(text) => setUpdatedProfile({ ...updatedProfile, number: text })}
+                value={updatedProfile?.number}
+                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, number: text })}
+                placeholderTextColor="#BABABA"
+                style={styles.textInput}
+              />
+
+              <Text style={styles.subSectionText}>Location</Text>
+              <TextInput
+                placeholder="Enter your Address"
+                value={updatedProfile?.location}
+                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, number: text })}
                 placeholderTextColor="#BABABA"
                 style={styles.textInput}
               />
@@ -392,41 +277,27 @@ export default function StylistProfileScreen() {
         )}
 
         <View style={styles.locationContainer}>
-          {/* <Text style={styles.sectionTitle}>Add Location</Text>
+          <Text style={styles.sectionTitle}>Add Location</Text>
 
           <TouchableOpacity style={styles.sectionItem}>
             <Switch
-              value={updatedProfile.location}
-              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, active_status: value })}
-              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              value={useCurrentLocation}
+              onValueChange={(value) => setUseCurrentLocation(!useCurrentLocation)}
               trackColor={{ true: appTheme.primary, false: '#ffffff' }}
             />
 
             <Text style={styles.itemText}>Use My Current Location</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.sectionItem}>
+          <View style={styles.sectionItem}>
             <Switch
-              value={updatedProfile.active_status}
-              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, active_status: value })}
-              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
+              value={updatedProfile?.active_status}
+              onValueChange={(value) => setUpdatedProfile((p) => p && { ...p, active_status: value })}
               trackColor={{ true: appTheme.primary, false: '#ffffff' }}
             />
 
             <Text style={styles.itemText}>Availability (Online or Away)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.sectionItem}>
-            <Switch
-              value={updatedProfile.location}
-              onValueChange={(value) => setUpdatedProfile({ ...updatedProfile, location: value })}
-              // thumbColor={isReminderOn ? '#D2D5DA' : appTheme.primary}
-              trackColor={{ true: appTheme.primary, false: '#ffffff' }}
-            />
-
-            <Text style={styles.itemText}>Enter Address Manually</Text>
-          </TouchableOpacity>
-          <TextInput placeholder="Enter your location" placeholderTextColor="#BABABA" value={updatedProfile.location} style={styles.textInput} />
+          </View>
         </View>
       </View>
 
@@ -435,56 +306,87 @@ export default function StylistProfileScreen() {
         <Text style={styles.subSectionText}>Set your working hours for customers to know when to book.</Text>
         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, i) => (
           <View style={styles.availabilityCover} key={i}>
-            <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} color={isChecked ? appTheme.primary : undefined} />
+            {/* <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} color={isChecked ? appTheme.primary : undefined} /> */}
             <View style={styles.dayAndTime}>
               <Text style={styles.dayText}>{day}</Text>
 
               <View style={styles.timeInputCover}>
                 <TextInput
+                  style={styles.timeInput}
                   placeholder="9:00 AM"
                   value={timeSlots[i]?.start}
-                  onChangeText={(text) => updateTimeSlot(i, 'start', text)}
-                  style={styles.timeInput}
+                  onChangeText={(t) => {
+                    const ts = [...timeSlots]
+                    ts[i].start = t
+                    setTimeSlots(ts)
+                  }}
                 />
                 <TextInput
+                  style={styles.timeInput}
                   placeholder="10:00 PM"
                   value={timeSlots[i]?.end}
-                  onChangeText={(text) => updateTimeSlot(i, 'end', text)}
-                  style={styles.timeInput}
+                  onChangeText={(t) => {
+                    const ts = [...timeSlots]
+                    ts[i].end = t
+                    setTimeSlots(ts)
+                  }}
                 />
               </View>
             </View>
           </View>
         ))}
+      </View>
 
+      {/* === Sample Images === */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Preview Your Sample Images: </Text>
+
+        {/* // if we already have images, show them as tappable previews */}
+        {updatedProfile?.sample_of_services?.length ? (
+          <View style={styles.samplePreviewContainer}>
+            {updatedProfile.sample_of_services.map((service, i) => (
+              <TouchableOpacity
+                key={i}
+                onPress={() => pickImage('sample')} // you could pass i here to re-pick that slot
+              >
+                <Image source={{ uri: service.img_url }} style={styles.samplePreview} />
+                <Text style={styles.captionText}>{service.caption}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>Upload Your Work</Text>
+            <Text style={styles.subSectionText}>Upload high-quality images of your best work such as haircuts, styles etc</Text>
+
+            <TouchableOpacity style={styles.uploadIconCover} onPress={() => pickImage('sample')}>
+              <Ionicons name="images-outline" color={appTheme.primary} size={28} style={styles.uploadIcon} />
+              <Text style={styles.uploadText}>Upload 2 images showing your best work</Text>
+            </TouchableOpacity>
+          </>
+        )}
         <View style={styles.buttonContainerCover}>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
             <Text style={styles.cancelBtnText}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.saveBtn} onPress={saveEditedProfile}>
+          <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
             <Text style={styles.saveBtnText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Upload Your Work</Text>
-        <Text style={styles.subSectionText}>Upload high-quality images of your best work such as haircuts, styles etc</Text>
-
-        <>
-          <TouchableOpacity style={styles.uploadIconCover} onPress={pickWorkSampleImg}>
-            <Ionicons name="images-outline" color={appTheme.primary} size={28} style={styles.uploadIcon} />
-            <Text style={styles.uploadText}>Upload media showcasing your best work</Text>
-          </TouchableOpacity>
-        </>
-      </View>
-
+      {/* === Services === */}
       <View style={styles.serviceSection}>
         <Text style={styles.sectionTitle}>Select Services Offered & Pricing</Text>
         <Text style={styles.subSectionText}>Add the services you provide and set your prices for customers to book easily </Text>
 
-        <TouchableOpacity style={styles.manageBtn} onPress={openServicesModal}>
+        <TouchableOpacity
+          style={styles.manageBtn}
+          onPress={() => {
+            setTempServices(updatedProfile?.services ?? [])
+            setServicesModalVisible(true)
+          }}>
           <Text style={styles.manageBtnText}>Manage Services</Text>
         </TouchableOpacity>
       </View>
@@ -493,18 +395,18 @@ export default function StylistProfileScreen() {
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Ionicons name="close-outline" color={appTheme.primary} size={28} style={styles.closeIcon} onPress={handleCancelModal} />
+            <Ionicons name="close-outline" color={appTheme.primary} size={28} style={styles.closeIcon} onPress={() => setModalVisible(false)} />
             <Text style={styles.modalTitle}>
               {uploadType === 'sample' ? 'Preview the sample images before uploading' : 'Check the profile image before uploading'}
             </Text>
 
             {uploadType === 'profile' ? (
-              <Image source={{ uri: image || '' }} style={styles.uploadPreview} />
+              <Image source={{ uri: imageUri! }} style={styles.uploadPreview} />
             ) : (
               <View>
                 <View style={styles.samplePreviewContainer}>
                   {sampleOfServices.map((service, i) => (
-                    <View key={i}>
+                    <TouchableOpacity key={i} onPress={() => pickImage('sample', i)}>
                       <Image source={{ uri: service.img_url }} style={styles.samplePreview} key={i} />
 
                       <Text style={styles.modalSubTile}>Add Caption</Text>
@@ -518,23 +420,20 @@ export default function StylistProfileScreen() {
                           setSampleOfServices(updatedServices)
                         }}
                       />
-                    </View>
+                    </TouchableOpacity>
                   ))}
                 </View>
-                
+
                 {/* {sampleImages.length < 2 && (
-                  <TouchableOpacity onPress={pickWorkSampleImg} style={styles.addMoreButton}>
+                  <TouchableOpacity onPress={() => pickImage('sample')} style={styles.addMoreButton}>
                     <Text style={styles.addMoreText}>Add More Image</Text>
                   </TouchableOpacity>
                 )} */}
               </View>
             )}
 
-            {/* <Text style={styles.modalSubTile}>Add Captions</Text> */}
-            {/* <TextInput placeholder="Fade Haircut" style={styles.captionInput} value={caption} onChangeText={setCaption} /> */}
-
             <View style={styles.buttonContainerCover}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={handleCancelModal}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
                 <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
 
@@ -559,25 +458,33 @@ export default function StylistProfileScreen() {
             />
             <Text style={styles.modalTitle}>Manage Services</Text>
             <ScrollView contentContainerStyle={styles.container}>
-              {tempServices.map((service: any, index: number) => (
-                <View key={index} style={styles.serviceNameCover}>
+              {tempServices.map((service: any, i: number) => (
+                <View key={i} style={styles.serviceNameCover}>
                   <Text style={styles.subSectionText}>Service Name</Text>
                   <TextInput
                     placeholder="Fade Haircut"
                     placeholderTextColor="#BABABA"
                     style={styles.textInput}
                     value={service.name}
-                    onChangeText={(text) => handleUpdateService(index, 'name', text)}
+                    onChangeText={(text) => {
+                      const arr = [...tempServices]
+                      arr[i].name = text
+                      setTempServices(arr)
+                    }}
                   />
                   <Text style={styles.subSectionText}>Price</Text>
                   <TextInput
                     placeholder="£20"
                     placeholderTextColor="#BABABA"
                     style={styles.textInput}
-                    value={service.price ? service.price.toString() : ''}
-                    onChangeText={(text) => handleUpdateService(index, 'price', text)}
+                    value={service.price.toString()}
+                    onChangeText={(text) => {
+                      const arr = [...tempServices]
+                      arr[i].price = parseFloat(text) || 0
+                      setTempServices(arr)
+                    }}
                   />
-                  <TouchableOpacity onPress={() => handleRemoveService(index)}>
+                  <TouchableOpacity onPress={() => handleRemoveService(i)}>
                     <Text style={{ color: 'red', marginVertical: 5 }}>Remove</Text>
                   </TouchableOpacity>
                 </View>
@@ -588,7 +495,12 @@ export default function StylistProfileScreen() {
               <TouchableOpacity style={styles.addServiceBtn} onPress={handleAddService}>
                 <Text style={styles.addBtnText}>+ Add Service</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveServiceBtn} onPress={saveServices}>
+              <TouchableOpacity
+                style={styles.saveServiceBtn}
+                onPress={() => {
+                  setUpdatedProfile((p) => p! && { ...p, services: tempServices })
+                  setServicesModalVisible(false)
+                }}>
                 <Text style={styles.saveBtnText}>Save Services</Text>
               </TouchableOpacity>
             </View>
@@ -747,6 +659,11 @@ const styles = StyleSheet.create({
   subSectionText: {
     fontSize: 16,
     marginVertical: 15
+  },
+
+  captionText: {
+    fontSize: 16,
+    fontWeight: 'medium'
   },
 
   textInput: {
@@ -941,7 +858,8 @@ const styles = StyleSheet.create({
 
   samplePreviewContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginTop: 10
   },
 
   samplePreview: {
