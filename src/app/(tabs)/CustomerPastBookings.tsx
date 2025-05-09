@@ -79,12 +79,15 @@ export default function CustomerPastBookings() {
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <View style={styles.upcomingAppointments}>
-          <Text>Upcoming Appointments ------------------------------</Text>
+          <View>
+            <Text style={styles.appointmentHeader}>Upcoming Appointments ------------------------------</Text>
+          </View>
 
           {upcoming.map((booking: any, i: number) => (
             <View key={i} style={styles.appointmentDetailsCover}>
               <View style={styles.detailsCover}>
                 <Ionicons name="calendar-outline" size={28} color={appTheme.themeBlack} />
+
                 <View style={styles.customerDetails}>
                   <Text style={styles.customerName}>{booking.stylist?.name || booking.user?.name}</Text>
                   <Text style={styles.date}>{moment(booking.start_time).format('MMMM D, YYYY')}</Text>
@@ -117,13 +120,16 @@ export default function CustomerPastBookings() {
           ))}
 
           {/* For Past Appointments */}
-          <View style={styles.upcomingAppointments}>
-            <Text style={styles.appointmentHeader}>Past Appointments ------------------------------</Text>
+          <View style={styles.passAppointments}>
+            <View>
+              <Text style={styles.appointmentHeader}>Past Appointments ------------------------------</Text>
+            </View>
 
             {completed.map((b: any, i: number) => (
               <View key={i} style={styles.appointmentDetailsCover}>
                 <View style={styles.detailsCover}>
                   <Ionicons name="checkmark-done-outline" size={28} color={appTheme.themeGray} />
+
                   <View style={styles.customerDetails}>
                     <Text style={styles.customerName}>{b.stylist?.name || b.user?.name}</Text>
                     <Text style={styles.date}>{moment(b.start_time).format('MMMM D, YYYY')}</Text>
@@ -149,21 +155,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF'
-    // padding: 60
   },
 
   // ::::::::::::::::
   upcomingAppointments: {
+    marginTop: 15,
+    padding: 20
+  },
+
+  passAppointments: {
     marginTop: 10,
     padding: 20
   },
 
   appointmentHeader: {
-    marginBottom: 5
-  },
-
-  upcomingBooking: {
-    backgroundColor: '#f7f7f7'
+    marginBottom: 10,
+    fontWeight: 'bold'
   },
 
   appointmentDetailsCover: {
@@ -172,8 +179,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 30,
     gap: 5,
-    marginTop: 10,
-    padding: 30
+    backgroundColor: '#f7f7f7',
+    marginTop: 20,
+    padding: 20
   },
 
   detailsCover: {
@@ -212,7 +220,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: appTheme.primary,
     padding: 10,
-    borderRadius: 20
+    borderRadius: 20,
+    fontSize: 12
   },
 
   cancelBtn: {},
@@ -223,11 +232,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'red',
     padding: 10,
-    borderRadius: 20
+    borderRadius: 20,
+    fontSize: 12
   },
 
   acceptBtn: {
-    marginLeft: 10
+    // marginLeft: 10
   },
 
   btnText: {
@@ -236,7 +246,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: appTheme.primary,
     padding: 10,
-    borderRadius: 30
+    borderRadius: 30,
+    fontSize: 12
   },
 
   loadingContainer: {
