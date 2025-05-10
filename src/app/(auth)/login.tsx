@@ -14,9 +14,8 @@ const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+  const { user, isLoggedIn, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.auth)
   const [userRole, setUserRole] = useState<string>(user?.data?.role)
 
   const dispatch = useDispatch<AppDispatch>()
@@ -32,9 +31,9 @@ const Login: React.FC = () => {
       router.navigate(userRole === 'stylist' ? '/(tabs)/StylistHomeScreen' : '/(tabs)/CustomerHomeScreen')
     }
 
-    if (isError) {
-      Alert.alert('Incorrect Email or Password')
-    }
+    // if (isError) {
+    //   Alert.alert('Incorrect Email or Password')
+    // }
 
     dispatch(RESET_AUTH())
   }, [isSuccess, isLoggedIn, isError, dispatch, userRole])
@@ -50,7 +49,12 @@ const Login: React.FC = () => {
   }
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color={appTheme.primary} />
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={appTheme.primary} />
+        <Text>Loading...</Text>
+      </View>
+    )
   }
 
   return (
@@ -120,6 +124,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 50,
     backgroundColor: appTheme.secondary
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7'
   },
 
   inputContainer: {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Backend_Url } from '@env'
-import { LoginData, UserData, UserProfile } from './authSlice'
+import { LoginData, PasswordData, UserData, UserProfile } from './authSlice'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const API_URL = `${Backend_Url}/api/v1/user`
@@ -33,6 +33,38 @@ const logoutService = async () => {
   return response.data
 }
 
+const deleteAccountService = async () => {
+  const token = await AsyncStorage.getItem('token')
+
+  if (!token) {
+    throw new Error('No token found. User is not authenticated.')
+  }
+  const response = await axios.delete(API_URL + '/delete-account', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    withCredentials: true
+  })
+  return response.data
+}
+
+const changePasswordService = async (passwordData: PasswordData) => {
+  const token = await AsyncStorage.getItem('token')
+
+  if (!token) {
+    throw new Error('No token found. User is not authenticated.')
+  }
+
+  const response = await axios.put(API_URL + '/change-password', passwordData, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    withCredentials: true
+  })
+
+  return response.data
+}
+
 const editUserProfileService = async (userData: UserProfile) => {
   const token = await AsyncStorage.getItem('token')
 
@@ -54,6 +86,8 @@ const authService = {
   registerService,
   loginService,
   logoutService,
+  deleteAccountService,
+  changePasswordService,
   editUserProfileService
 }
 

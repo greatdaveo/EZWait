@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import PhoneInput from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
@@ -13,7 +13,7 @@ import axios from 'axios'
 
 interface FormData {
   name: string
-  email: string
+  email: string 
   number: string
   role: string | null
   location?: string | undefined
@@ -128,6 +128,15 @@ const Register: React.FC = () => {
     // console.log(userData)
 
     await dispatch(registerUserSlice(payload))
+  }
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={appTheme.primary} />
+        <Text>Loading...</Text>
+      </View>
+    )
   }
 
   return (
@@ -266,6 +275,13 @@ const styles = StyleSheet.create({
     backgroundColor: appTheme.secondary,
     // backgroundColor: 'red',
     paddingTop: 100
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7'
   },
 
   topBar: {
