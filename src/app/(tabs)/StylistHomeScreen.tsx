@@ -34,7 +34,7 @@ const DashboardScreen: React.FC = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(getStylistProfileSlice(user.id))
+      dispatch(getStylistProfileSlice(user?.id))
     }
   }, [user?.id, dispatch])
 

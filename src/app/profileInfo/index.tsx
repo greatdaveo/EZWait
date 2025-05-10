@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { appTheme } from 'src/config/theme'
-import { editUserProfileSlice } from 'src/redux/auth/authSlice'
+import { changePasswordSlice, editUserProfileSlice } from 'src/redux/auth/authSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
@@ -15,6 +15,8 @@ const Index = () => {
   const router = useRouter()
   const { user, isLoading } = useSelector((state: RootState) => state.auth)
   const [uploading, setUploading] = useState(false)
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
+  const [updating, setUpdating] = useState(false)
 
   const [form, setForm] = useState({
     name: '',
@@ -22,6 +24,12 @@ const Index = () => {
     number: '',
     location: '',
     profile_picture: ''
+  })
+
+  const [passwords, setPasswords] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
   })
 
   useEffect(() => {
@@ -36,6 +44,7 @@ const Index = () => {
     }
   }, [dispatch])
 
+  // To edit profile details
   const handleUpdatedProfile = async () => {
     try {
       await dispatch(editUserProfileSlice(form)).unwrap()
@@ -47,10 +56,36 @@ const Index = () => {
     }
   }
 
+  // To change password
+  const handleUpdatedPassword = async () => {
+    if (!passwords.current_password || !passwords.new_password || !passwords.confirm_password) {
+      return Alert.alert('Error ❌', 'Please fill all fields.')
+    }
+
+    if (passwords.new_password !== passwords.confirm_password) {
+      return Alert.alert('Error ❌', 'New passwords do not match')
+    }
+
+    try {
+      setUpdating(true)
+      await dispatch(changePasswordSlice(passwords)).unwrap()
+      Alert.alert('Success ✅', 'Your password has been changed.')
+      setPasswords({ current_password: '', new_password: '', confirm_password: '' })
+      router.back()
+      setUpdating(false)
+    } catch (error: any) {
+      setUpdating(false)
+      // Alert.alert('Error ❌', error)
+      Alert.alert('Error ❌', 'Your current password is incorrect')
+      // console.log('changePasswordSlice Error: ', error)
+    }
+  }
+
   const handlePreviousStep = () => {
     router.back()
   }
 
+  // To pick profile image or work sample images
   const pickAndUploadImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -77,7 +112,7 @@ const Index = () => {
     }
   }
 
-  if (isLoading || uploading) {
+  if (isLoading || uploading || updating) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={appTheme.primary} />
@@ -126,40 +161,102 @@ const Index = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Profile Information</Text>
 
-          <View style={styles.passwordCover}>
+          <View style={styles.textInputCover}>
             <Text style={styles.subSectionText}>
               Make sure your details are correct. Your email is used for account verification and notifications.
             </Text>
-            <TextInput
-              placeholder="Name"
-              value={form?.name}
-              onChangeText={(text) => setForm((f) => ({ ...f, name: text }))}
-              placeholderTextColor="#BABABA"
-              style={styles.textInput}
-            />
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor="#BABABA"
-              style={styles.textInput}
-              keyboardType="email-address"
-              value={form?.email}
-              onChangeText={(text) => setForm((f) => ({ ...f, email: text }))}
-            />
-            <TextInput
-              placeholder="Number"
-              placeholderTextColor="#BABABA"
-              style={styles.textInput}
-              value={form?.number}
-              onChangeText={(text) => setForm((f) => ({ ...f, number: text }))}
-            />
-            <TextInput
-              placeholder="Location"
-              placeholderTextColor="#BABABA"
-              style={styles.textInput}
-              value={form?.location}
-              onChangeText={(text) => setForm((f) => ({ ...f, location: text }))}
-            />
+
+            <View style={styles.section}>
+              <Text style={styles.subSectionText}>Business Name</Text>
+              <TextInput
+                placeholder="Name"
+                value={form?.name}
+                onChangeText={(text) => setForm((f) => ({ ...f, name: text }))}
+                placeholderTextColor="#BABABA"
+                style={styles.textInput}
+              />
+
+              <Text style={styles.subSectionText}>Email</Text>
+              <TextInput
+                placeholder="Email"
+                placeholderTextColor="#BABABA"
+                style={styles.textInput}
+                keyboardType="email-address"
+                value={form?.email}
+                onChangeText={(text) => setForm((f) => ({ ...f, email: text }))}
+              />
+
+              <Text style={styles.subSectionText}>Number</Text>
+              <TextInput
+                placeholder="Number"
+                placeholderTextColor="#BABABA"
+                style={styles.textInput}
+                value={form?.number}
+                onChangeText={(text) => setForm((f) => ({ ...f, number: text }))}
+              />
+
+              <Text style={styles.subSectionText}>Location</Text>
+              <TextInput
+                placeholder="Location"
+                placeholderTextColor="#BABABA"
+                style={styles.textInput}
+                value={form?.location}
+                onChangeText={(text) => setForm((f) => ({ ...f, location: text }))}
+              />
+            </View>
           </View>
+
+          {/* <View style={styles.passwordCover}>
+            <Text style={styles.sectionTitle}>Change Password</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="Current Password"
+                placeholderTextColor="#BABABA"
+                style={styles.passwordInput}
+                secureTextEntry={!passwordVisible}
+                value={passwords.current_password}
+                onChangeText={(text) => setPasswords((p) => ({ ...p, current_password: text }))}
+              />
+
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="New Password"
+                placeholderTextColor="#BABABA"
+                style={styles.passwordInput}
+                secureTextEntry={!passwordVisible}
+                value={passwords.new_password}
+                onChangeText={(text) => setPasswords((p) => ({ ...p, new_password: text }))}
+              />
+
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder="Confirm Password"
+                placeholderTextColor="#BABABA"
+                style={styles.passwordInput}
+                secureTextEntry={!passwordVisible}
+                value={passwords.confirm_password}
+                onChangeText={(text) => setPasswords((p) => ({ ...p, confirm_password: text }))}
+              />
+
+              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedPassword}>
+            <Text style={styles.updateBtn}>Update Password</Text>
+          </TouchableOpacity> */}
 
           <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedProfile}>
             <Text style={styles.updateBtn}>Save Changes</Text>
@@ -321,8 +418,8 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
 
-  passwordCover: {
-    gap: 30
+  textInputCover: {
+    // gap: 0
   },
 
   subSectionText: {
@@ -337,6 +434,34 @@ const styles = StyleSheet.create({
     borderColor: '#959292',
     fontSize: 16
   },
+
+  // ::::::::::::::::::::::::
+  passwordCover: {
+    gap: 30
+  },
+
+  passwordInput: {
+    flex: 1,
+    padding: 20,
+    borderRadius: 10,
+    fontSize: 16
+  },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // backgroundColor: '#f2f2f2',
+    borderColor: '#959292',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    marginTop: 1
+  },
+
+  inputIcon: {
+    marginRight: 12
+  },
+  // ::::::::::::::::::::::::
 
   updateBtnCover: {
     marginTop: 35,

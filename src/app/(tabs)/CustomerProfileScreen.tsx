@@ -1,31 +1,108 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, Button, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Button, TextInput, Alert, ActivityIndicator } from 'react-native'
 import { useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
 import { Switch } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
-import { logoutUserSlice } from 'src/redux/auth/authSlice'
+import { changePasswordSlice, deleteProfileSlice, logoutUserSlice } from 'src/redux/auth/authSlice'
 import { useRouter } from 'expo-router'
 import { ScrollView } from 'react-native'
 
 export default function ProfileScreen() {
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
   const [isReminderOn, setIsReminderOn] = useState(false)
   const { isLoading, isLoggedIn, user } = useSelector((state: RootState) => state.auth)
+  const [updating, setUpdating] = useState(false)
+
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const handleUpdatedPassword = () => {
-    if (isLoggedIn) {
-      dispatch(logoutUserSlice())
+  const [passwords, setPasswords] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  })
+
+  const handleUpdatedPassword = async () => {
+    if (!passwords.current_password || !passwords.new_password || !passwords.confirm_password) {
+      return Alert.alert('Error ❌', 'Please fill all fields.')
+    }
+
+    if (passwords.new_password !== passwords.confirm_password) {
+      return Alert.alert('Error ❌', 'New passwords do not match')
+    }
+
+    try {
+      setUpdating(true)
+      await dispatch(changePasswordSlice(passwords)).unwrap()
+      Alert.alert('Success ✅', 'Your password has been changed.')
+      setPasswords({ current_password: '', new_password: '', confirm_password: '' })
+      setUpdating(false)
+      // router.back()
+    } catch (error: any) {
+      setUpdating(false)
+      // Alert.alert('Error ❌', error)
+      Alert.alert('Error ❌', 'Your current password is incorrect')
+      // console.log('changePasswordSlice Error: ', error)
     }
   }
 
   const handleLogout = () => {
-    if (isLoggedIn) {
-      dispatch(logoutUserSlice())
-    }
+    Alert.alert(
+      'Log out?',
+      'Are you sure you want to log out?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            if (isLoggedIn) {
+              await dispatch(logoutUserSlice())
+            }
+            router.push('(auth)/login')
+          }
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete account?',
+      'This action is irreversible. Are you sure you want to permanently delete your account?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            if (isLoggedIn) {
+              try {
+                await dispatch(deleteProfileSlice()).unwrap()
+                // after successful deletion, send back to login/onboarding
+                router.replace('(auth)/login')
+              } catch (err: any) {
+                Alert.alert('Error', err.message || 'Could not delete account.')
+              }
+            }
+          }
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
+  if (isLoading || updating) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={appTheme.primary} />
+        <Text>Loading...</Text>
+      </View>
+    )
   }
 
   return (
@@ -80,23 +157,65 @@ export default function ProfileScreen() {
 
         <View style={styles.passwordCover}>
           <Text style={styles.subSectionText}>Change Password</Text>
-          <TextInput placeholder="Current Password" placeholderTextColor="#BABABA" style={styles.textInput} />
-          <TextInput placeholder="New Password" placeholderTextColor="#BABABA" style={styles.textInput} />
-          <TextInput placeholder="Confirm Password" placeholderTextColor="#BABABA" style={styles.textInput} />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Current Password"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              secureTextEntry={!passwordVisible}
+              value={passwords.current_password}
+              onChangeText={(text) => setPasswords((p) => ({ ...p, current_password: text }))}
+            />
+
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="New Password"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              secureTextEntry={!passwordVisible}
+              value={passwords.new_password}
+              onChangeText={(text) => setPasswords((p) => ({ ...p, new_password: text }))}
+            />
+
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              placeholder="Confirm Password"
+              placeholderTextColor="#BABABA"
+              style={styles.textInput}
+              secureTextEntry={!passwordVisible}
+              value={passwords.confirm_password}
+              onChangeText={(text) => setPasswords((p) => ({ ...p, confirm_password: text }))}
+            />
+
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity style={styles.updateBtnCover} onPress={handleUpdatedPassword}>
           <Text style={styles.updateBtn}>Update Password</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.updateBtnCover} onPress={handleLogout}>
-          <Text style={styles.updateBtn}>Logout</Text>
+
+        <TouchableOpacity style={styles.logoutBtnCover} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
       <View>
         <Text style={styles.sectionTitle}>Delete Account</Text>
         <Text style={styles.subSectionText}>Permanently delete your account and all associated data. This action cannon be undone.</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDeleteAccount}>
           <Text style={styles.deleteBtn}>Delete account</Text>
         </TouchableOpacity>
       </View>
@@ -109,6 +228,13 @@ const styles = StyleSheet.create({
     // flex: 1,
     flexGrow: 1,
     marginHorizontal: 20
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7'
   },
 
   topBar: {
@@ -243,11 +369,25 @@ const styles = StyleSheet.create({
   },
 
   textInput: {
+    flex: 1,
     padding: 20,
-    borderWidth: 1,
     borderRadius: 10,
-    borderColor: '#959292',
     fontSize: 16
+  },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // backgroundColor: '#f2f2f2',
+    borderColor: '#959292',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    marginTop: 10
+  },
+
+  inputIcon: {
+    marginRight: 12
   },
 
   updateBtnCover: {
@@ -263,6 +403,17 @@ const styles = StyleSheet.create({
     backgroundColor: appTheme.primary,
     paddingVertical: 18,
     borderRadius: 10
+  },
+
+  logoutBtnCover: {},
+
+  logoutText: {
+    color: 'white',
+    backgroundColor: '#FF0000',
+    textAlign: 'center',
+    paddingVertical: 18,
+    borderRadius: 10,
+    fontSize: 20
   },
 
   deleteBtn: {

@@ -3,6 +3,12 @@ import authService from './authService'
 import { Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+export interface PasswordData {
+  current_password: string
+  new_password: string
+  confirm_password: string
+}
+
 export interface UserProfile {
   name?: string
   email?: string
@@ -61,7 +67,7 @@ export const loginUserSlice = createAsyncThunk('auth/login', async (userData: Lo
     // console.log('Login Slice userData', userData)
     return await authService.loginService(userData)
   } catch (error: string | any) {
-    console.log('Login Slice Error', error)
+    // console.log('Login Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -71,6 +77,25 @@ export const logoutUserSlice = createAsyncThunk('auth/logout', async (_, thunkAP
   try {
     return await authService.logoutService()
   } catch (error: string | any) {
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+export const deleteProfileSlice = createAsyncThunk('auth/delete-account', async (_, thunkAPI) => {
+  try {
+    return await authService.deleteAccountService()
+  } catch (error: string | any) {
+    console.log('Edit Profile Slice Error', error)
+    const message = error.response?.data?.message || error.message || error.toString()
+    return thunkAPI.rejectWithValue(message)
+  }
+})
+
+export const changePasswordSlice = createAsyncThunk('auth/change-password', async (passwordData: PasswordData, thunkAPI) => {
+  try {
+    return await authService.changePasswordService(passwordData)
+  } catch (error: any) {
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -139,6 +164,7 @@ const authSlice = createSlice({
         state.isError = true
         state.message = action.payload as string
         state.user = null
+        Alert.alert('Error ❌', 'Invalid Credentials')
       })
 
       // For the User Logout
@@ -151,13 +177,52 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isLoggedIn = false
         state.user = null
-        Alert.alert('Logout Successful', 'We hope to see you soon!')
+        Alert.alert('Logout Successful ✅', 'We hope to see you again soon! ☹️')
       })
 
       .addCase(logoutUserSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
+      })
+
+      .addCase(deleteProfileSlice.pending, (state) => {
+        state.isLoading = true
+      })
+
+      .addCase(deleteProfileSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isLoggedIn = false
+        state.user = null
+        Alert.alert('Logout Successful ✅', 'We hope to see you again soon! ☹️')
+      })
+
+      .addCase(deleteProfileSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+      })
+
+      .addCase(changePasswordSlice.pending, (state) => {
+        state.isLoading
+      })
+
+      .addCase(changePasswordSlice.fulfilled, (state, action) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.user = action.payload?.data
+        // console.log(action.payload)
+        Alert.alert('Saved ✅', 'Your profile has been updated.')
+      })
+
+      .addCase(changePasswordSlice.rejected, (state, action) => {
+        state.isLoading = false
+        state.isError = true
+        state.message = action.payload as string
+        // state.user = null
+        // Alert.alert('❌ Error ❌', 'Unable to change your password')
       })
 
       .addCase(editUserProfileSlice.pending, (state) => {
@@ -169,7 +234,6 @@ const authSlice = createSlice({
         state.isSuccess = true
         state.isError = false
         state.user = action.payload?.data
-        // AsyncStorage.setItem('user', JSON.stringify(action.payload.data.user))
         Alert.alert('Saved ✅', 'Your profile has been updated.')
       })
 

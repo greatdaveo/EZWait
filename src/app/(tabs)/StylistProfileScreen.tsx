@@ -12,6 +12,7 @@ import * as ImageManipulator from 'expo-image-manipulator'
 
 import { getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
 import { uploadImageToCloudinary } from 'src/utils/cloudinaryService'
+import { deleteProfileSlice, logoutUserSlice } from 'src/redux/auth/authSlice'
 
 type TimeSlot = { start: string; end: string }
 
@@ -188,6 +189,53 @@ export default function StylistProfileScreen() {
     Alert.alert('Service Removed', 'Service removed successfully.')
   }
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Log out?',
+      'Are you sure you want to log out?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            if (isLoggedIn) {
+              await dispatch(logoutUserSlice())
+            }
+            router.push('(auth)/login')
+          }
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete account?',
+      'Are you sure you want to permanently delete your account?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            if (isLoggedIn) {
+              try {
+                await dispatch(deleteProfileSlice()).unwrap()
+                // after successful deletion, send back to login/onboarding
+                router.replace('(auth)/login')
+              } catch (err: any) {
+                Alert.alert('Error', err.message || 'Could not delete account.')
+              }
+            }
+          }
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
   // console.log('Active Status: ', updatedProfile?.active_status)
   // console.log('updatedProfile ', updatedProfile)
   // console.log('useCurrentLocation ', useCurrentLocation)
@@ -224,61 +272,13 @@ export default function StylistProfileScreen() {
             <Text style={styles.profileEmail}>{user?.email}</Text>
           </View>
 
-          <TouchableOpacity style={styles.pencilIcon} onPress={() => setShowProfileDetails(!showProfileDetails)}>
+          <TouchableOpacity style={styles.pencilIcon} onPress={() => router.push('profileInfo')}>
             <Ionicons name="pencil-outline" color={appTheme.primary} size={24} />
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.section}>
-        {showProfileDetails && (
-          <>
-            <Text style={styles.sectionTitle}>Profile Information</Text>
-            <Text style={styles.subSectionText}>
-              Make sure your details are correct. Your email is used for account verification and notifications.
-            </Text>
-
-            <View style={styles.section}>
-              <Text style={styles.subSectionText}>Business Name</Text>
-              <TextInput
-                placeholder="Enter your business name"
-                value={updatedProfile?.name}
-                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, name: text })}
-                placeholderTextColor="#BABABA"
-                style={styles.textInput}
-              />
-
-              <Text style={styles.subSectionText}>Email</Text>
-              <TextInput
-                placeholder={updatedProfile?.email}
-                value={updatedProfile?.email}
-                // onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, email: text })}
-                placeholderTextColor="#BABABA"
-                style={styles.textInput}
-                editable={false}
-              />
-
-              <Text style={styles.subSectionText}>Number</Text>
-              <TextInput
-                placeholder="Enter your Number"
-                value={updatedProfile?.number}
-                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, number: text })}
-                placeholderTextColor="#BABABA"
-                style={styles.textInput}
-              />
-
-              <Text style={styles.subSectionText}>Location</Text>
-              <TextInput
-                placeholder="Enter your Address"
-                value={updatedProfile?.location}
-                onChangeText={(text) => setUpdatedProfile((p) => p && { ...p, number: text })}
-                placeholderTextColor="#BABABA"
-                style={styles.textInput}
-              />
-            </View>
-          </>
-        )}
-
         <View style={styles.locationContainer}>
           <Text style={styles.sectionTitle}>Add Location</Text>
 
@@ -392,6 +392,18 @@ export default function StylistProfileScreen() {
           }}>
           <Text style={styles.manageBtnText}>Manage Services</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutBtnCover} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+
+        <View style={styles.deleteCover}>
+          <Text style={styles.sectionTitle}>Delete Account</Text>
+          <Text style={styles.subSectionText}>Permanently delete your account and all associated data. This action cannon be undone.</Text>
+          <TouchableOpacity onPress={handleDeleteAccount}>
+            <Text style={styles.deleteBtn}>Delete account</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Modal for Image Upload Preview */}
@@ -821,6 +833,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
+  // :::::::::::::::::::::::
+
+  logoutBtnCover: {
+    marginTop: 20,
+    marginBottom: 40
+  },
+
+  logoutText: {
+    color: 'white',
+    backgroundColor: '#FF0000',
+    textAlign: 'center',
+    paddingVertical: 18,
+    borderRadius: 10,
+    fontSize: 20
+  },
+
   // :::::::: Modal ::::::::::::
 
   modalContainer: {
@@ -918,5 +946,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     paddingHorizontal: 20
-  }
+  },
+
+  deleteCover: {}
 })
