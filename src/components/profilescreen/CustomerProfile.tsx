@@ -10,7 +10,7 @@ import { changePasswordSlice, deleteProfileSlice, logoutUserSlice } from 'src/re
 import { useRouter } from 'expo-router'
 import { ScrollView } from 'react-native'
 
-export default function ProfileScreen() {
+export default function CustomerProfile() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
   const [isReminderOn, setIsReminderOn] = useState(false)
   const { isLoading, isLoggedIn, user } = useSelector((state: RootState) => state.auth)
@@ -107,10 +107,6 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.title}>Profile</Text>
-      </View>
-
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
           <Image
@@ -235,19 +231,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f7f7f7'
-  },
-
-  topBar: {
-    paddingTop: 80,
-    borderBottomWidth: 2,
-    borderBottomColor: '#E3E3E3',
-    paddingBottom: 20
-  },
-
-  title: {
-    textAlign: 'center',
-    fontSize: 18
-    // fontWeight: 'bold'
   },
 
   settings: {

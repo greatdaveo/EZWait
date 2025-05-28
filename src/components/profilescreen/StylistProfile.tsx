@@ -16,7 +16,7 @@ import { deleteProfileSlice, logoutUserSlice } from 'src/redux/auth/authSlice'
 
 type TimeSlot = { start: string; end: string }
 
-export default function StylistProfileScreen() {
+export default function StylistProfile() {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
@@ -251,10 +251,6 @@ export default function StylistProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.title}>Profile</Text>
-      </View>
-
       <View style={styles.profileSection}>
         <TouchableOpacity style={styles.profileImageContainer} onPress={() => pickImage('profile')}>
           <Image
@@ -538,19 +534,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f7f7f7'
-  },
-
-  topBar: {
-    paddingTop: 80,
-    borderBottomWidth: 2,
-    borderBottomColor: '#E3E3E3',
-    paddingBottom: 20
-  },
-
-  title: {
-    textAlign: 'center',
-    fontSize: 18
-    // fontWeight: 'bold'
   },
 
   settings: {

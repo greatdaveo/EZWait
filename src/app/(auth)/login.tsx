@@ -15,28 +15,22 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState('')
-  const { user, isLoggedIn, isLoading, isSuccess, isError } = useSelector((state: RootState) => state.auth)
-  const [userRole, setUserRole] = useState<string>(user?.data?.role)
+  const { user, isLoggedIn, isLoading, isSuccess } = useSelector((state: RootState) => state.auth)
 
   const dispatch = useDispatch<AppDispatch>()
+
+  useEffect(() => {
+    if (isSuccess && isLoggedIn) {
+      router.navigate('/(tabs)/ProtectedHomeScreen')
+    }
+
+    dispatch(RESET_AUTH())
+  }, [isSuccess, isLoggedIn, dispatch])
 
   const validEMail = (email: any) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
-
-  useEffect(() => {
-    if (isSuccess && isLoggedIn) {
-      // Alert.alert('Login Successful.')
-      router.navigate(userRole === 'stylist' ? '/(tabs)/StylistHomeScreen' : '/(tabs)/CustomerHomeScreen')
-    }
-
-    // if (isError) {
-    //   Alert.alert('Incorrect Email or Password')
-    // }
-
-    dispatch(RESET_AUTH())
-  }, [isSuccess, isLoggedIn, isError, dispatch, userRole])
 
   const handleLogin = async () => {
     if (!validEMail(email)) {

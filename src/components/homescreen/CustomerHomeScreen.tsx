@@ -42,6 +42,7 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
         <View style={styles.topBarContainer}>
           <View style={styles.imgCover}>
             {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
+            {/* <Image source={require('../../../assets/images/customers/CustomerImg.png')} style={styles.img} /> */}
             <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
 
             <View style={styles.greetingsCover}>
@@ -64,7 +65,7 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
   )
 }
 
-const UserHomeScreen = () => {
+const CustomerHomeScreen = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth)
   const { allStylists } = useSelector((state: RootState) => state.profile)
   const [showSearch, setShowSearch] = useState(false)
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   // ::::::::::::::::
 
   topBarContainer: {
-    marginTop: 70,
+    marginTop: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -456,4 +457,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default UserHomeScreen
+export default CustomerHomeScreen

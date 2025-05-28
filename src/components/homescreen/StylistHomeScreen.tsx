@@ -9,7 +9,7 @@ import { TextInput } from 'react-native-paper'
 import { getStylistProfileSlice, updateStylistSlice } from 'src/redux/profile/profileSlice'
 import { useDebounce } from 'src/hooks/useDebounce'
 
-const DashboardScreen: React.FC = () => {
+const StylistHomeScreen: React.FC = () => {
   const { stylistProfile }: any = useSelector((state: RootState) => state.profile)
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
 
@@ -90,7 +90,7 @@ const DashboardScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View>
       <View style={styles.topBarContainer}>
         <View style={styles.imgCover}>
           <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
@@ -153,7 +153,7 @@ const DashboardScreen: React.FC = () => {
           <Text style={styles.btnText}>Save Changes</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   )
 }
 
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
 
   // ::::::::::::::::::::::::::::::::::
   topBarContainer: {
-    marginTop: 70,
+    marginTop: 50,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -278,4 +278,4 @@ const styles = StyleSheet.create({
   // :::::::::::::::::::::::
 })
 
-export default DashboardScreen
+export default StylistHomeScreen

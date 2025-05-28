@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/redux/store'
 import { getAllBookingsSlice, getSingleBookingSlice, updateBookingStatusSlice } from 'src/redux/bookings/bookingSlice'
 
-export default function AppointmentBookingScreen() {
+export default function StylistAppointmentBookings() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const navigation = useNavigation()
