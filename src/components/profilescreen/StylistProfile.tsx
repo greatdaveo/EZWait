@@ -70,7 +70,7 @@ export default function StylistProfile() {
         available_time_slots: data.available_time_slots,
         no_of_current_customers: data.no_of_current_customers,
         no_of_customer_bookings: data.no_of_customer_bookings,
-        profile_picture: data.profile_picture,
+        profile_picture: user.profile_picture,
         sample_of_services: data.sample_of_services,
         services: data.services
       })
@@ -252,7 +252,7 @@ export default function StylistProfile() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileSection}>
-        <TouchableOpacity style={styles.profileImageContainer} onPress={() => pickImage('profile')}>
+        {/* <TouchableOpacity style={styles.profileImageContainer} onPress={() => pickImage('profile')}>
           <Image
             source={{
               uri: updatedProfile?.profile_picture
@@ -260,7 +260,21 @@ export default function StylistProfile() {
             style={styles.img}
           />
           <Ionicons name="add-circle" color={appTheme.primary} size={28} style={styles.plusIcon} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        {/* <Image
+          source={{
+            uri: updatedProfile?.profile_picture
+          }}
+          style={styles.img}
+        /> */}
+
+        <Image
+          source={{
+            uri: user?.profile_picture
+          }}
+          style={styles.img}
+        />
 
         <View style={styles.profileNameCover}>
           <View style={styles.profileNameContainer}>
@@ -364,6 +378,7 @@ export default function StylistProfile() {
             </TouchableOpacity>
           </>
         )}
+
         <View style={styles.buttonContainerCover}>
           <TouchableOpacity style={styles.cancelBtn} onPress={() => router.back()}>
             <Text style={styles.cancelBtnText}>Cancel</Text>
@@ -435,11 +450,11 @@ export default function StylistProfile() {
                   ))}
                 </View>
 
-                {/* {sampleImages.length < 2 && (
+                {sampleImages.length < 2 && (
                   <TouchableOpacity onPress={() => pickImage('sample')} style={styles.addMoreButton}>
                     <Text style={styles.addMoreText}>Add More Image</Text>
                   </TouchableOpacity>
-                )} */}
+                )}
               </View>
             )}
 
@@ -900,6 +915,12 @@ const styles = StyleSheet.create({
 
     marginBottom: 20
   },
+
+  addMoreText: {
+    color: appTheme.primary
+  },
+
+  addMoreButton: {},
 
   serviceModalContainer: {
     // paddingHorizontal: 50,

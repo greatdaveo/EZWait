@@ -49,7 +49,7 @@ const Index = () => {
     try {
       await dispatch(editUserProfileSlice(form)).unwrap()
       // Alert.alert('Saved ✅', 'Your profile has been updated.')
-      router.push('(tabs)/CustomerProfileScreen')
+      await router.push('(tabs)/ProtectedProfileScreen')
     } catch (err: any) {
       // console.error('❌ handleUpdatedProfile caught:', err)
       Alert.alert('Error ❌', err.message || String(err))
