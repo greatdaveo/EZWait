@@ -25,6 +25,8 @@ const FirstScreen = () => {
   )
 }
 
+export default FirstScreen
+
 const styles = StyleSheet.create({
   Content: {
     flex: 1
@@ -68,5 +70,3 @@ const styles = StyleSheet.create({
     marginBottom: 20
   }
 })
-
-export default FirstScreen

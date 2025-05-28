@@ -8,8 +8,6 @@ import { Image } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 
 export default function ThirdScreen() {
-  const onPress = () => {}
-
   return (
     // <ScreenLayout testID="home-screen-layout">
     <View style={styles.Content}>

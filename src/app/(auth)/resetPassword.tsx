@@ -43,6 +43,8 @@ const ResetPassword = () => {
   )
 }
 
+export default ResetPassword
+
 const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
@@ -75,4 +77,3 @@ const styles = StyleSheet.create({
   }
 })
 
-export default ResetPassword
