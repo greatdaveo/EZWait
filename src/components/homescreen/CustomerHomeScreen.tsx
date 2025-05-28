@@ -8,6 +8,29 @@ import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
 import { getAllStylistProfileSlice } from 'src/redux/profile/profileSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
 
+const sampleData = [
+  {
+    img: require('../../assets/images/stylists/image (4).png'),
+    caption: 'Fade'
+  },
+  {
+    img: require('../../assets/images/stylists/image (5).png'),
+    caption: 'Beard trim'
+  },
+  {
+    img: require('../../assets/images/stylists/image (6).png'),
+    caption: 'Kids Cut'
+  },
+  {
+    img: require('../../assets/images/stylists/image (7).png'),
+    caption: 'Package Deals'
+  },
+  {
+    img: require('../../assets/images/stylists/image (8).png'),
+    caption: 'Buzz Cut'
+  }
+]
+
 export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
   // const [showSearch, setShowSearch] = useState(true)
   const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
@@ -68,6 +91,7 @@ export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
 const CustomerHomeScreen = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth)
   const { allStylists } = useSelector((state: RootState) => state.profile)
+  // console.log('Stylists Data: ', allStylists?.data)
   const [showSearch, setShowSearch] = useState(false)
 
   const dispatch = useDispatch<AppDispatch>()
@@ -106,32 +130,14 @@ const CustomerHomeScreen = () => {
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.servicesCover}>
-              <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/image (4).png')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Fade</Text>
+            {sampleData.map((sample, i) => (
+              <View style={styles.servicesCover} key={i}>
+                <View style={styles.stylistCover}>
+                  <Image source={sample.img} style={styles.stylistImg} />
+                  <Text style={styles.stylistServiceText}>{sample.caption}</Text>
+                </View>
               </View>
-
-              <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/image (5).png')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Beard Trim</Text>
-              </View>
-
-              <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/image (6).png')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Kids Cut</Text>
-              </View>
-
-              <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/image (7).png')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Package Deals</Text>
-              </View>
-
-              <View style={styles.stylistCover}>
-                <Image source={require('../../assets/images/stylists/image (8).png')} style={styles.stylistImg} />
-                <Text style={styles.stylistServiceText}>Buzz Cut</Text>
-              </View>
-            </View>
+            ))}
           </ScrollView>
         </View>
 
@@ -144,43 +150,48 @@ const CustomerHomeScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {(allStylists?.data || []).map((stylist: any, i: number) => (
-            <View style={styles.stylistCardContainer} key={i}>
-              <View style={styles.stylistCard}>
-                <Image
-                  source={{
-                    uri: stylist.profile_picture
-                  }}
-                  style={styles.stylistImg}
-                />
+          {(allStylists?.data || []).map((stylist: any, i: number) => {
+            console.log(stylist.profile_picture)
+            return (
+              <View style={styles.stylistCardContainer} key={i}>
+                <View style={styles.stylistCard}>
+                  <Image
+                    source={{
+                      uri: !stylist?.profile_picture
+                        ? 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg'
+                        : stylist.profile_picture
+                    }}
+                    style={styles.stylistImg}
+                  />
 
-                <View style={styles.detailsCover}>
-                  <Text style={styles.nameText}>{stylist.name}</Text>
+                  <View style={styles.detailsCover}>
+                    <Text style={styles.nameText}>{stylist.name}</Text>
 
-                  <View style={styles.ratingsIcons}>
-                    {[...Array(5)].map((_, i) => (
-                      <Ionicons
-                        key={i}
-                        name={i < stylist.ratings ? 'star' : 'star-outline'}
-                        color={i < stylist.ratings ? '#f0a437' : 'black'}
-                        size={18}
-                      />
-                    ))}
-                    <Text style={styles.ratingsText}>{stylist.ratings}</Text>
-                  </View>
+                    <View style={styles.ratingsIcons}>
+                      {[...Array(5)].map((_, i) => (
+                        <Ionicons
+                          key={i}
+                          name={i < stylist.ratings ? 'star' : 'star-outline'}
+                          color={i < stylist.ratings ? '#f0a437' : 'black'}
+                          size={18}
+                        />
+                      ))}
+                      <Text style={styles.ratingsText}>{stylist.ratings}</Text>
+                    </View>
 
-                  <View style={styles.appointmentDetailsCover}>
-                    <Ionicons name="location-sharp" color={'#F0433F'} size={24} />
-                    <Text style={styles.appointmentText}>{stylist.location}</Text>
+                    <View style={styles.appointmentDetailsCover}>
+                      <Ionicons name="location-sharp" color={'#F0433F'} size={24} />
+                      <Text style={styles.appointmentText}>{stylist.location}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.stylist_id}`)}>
-                <Text style={styles.btnText}>Book Now</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+                <TouchableOpacity style={styles.btnCover} onPress={() => router.push(`screens/profile/${stylist.stylist_id}`)}>
+                  <Text style={styles.btnText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
+            )
+          })}
         </View>
       </View>
     </ScrollView>
