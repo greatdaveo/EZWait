@@ -3,8 +3,8 @@ import { Backend_Url } from '@env'
 import { BookingData } from './bookingSlice'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const API_URL = `${Backend_Url}/api/v1`
-console.log(API_URL)
+const API_URL = `${Backend_Url}/api/v1`
+// console.log('BookingService: ', API_URL)
 
 const getAllBookings = async () => {
   const token = await AsyncStorage.getItem('token')
@@ -76,7 +76,7 @@ const updateBookingStatus = async (id: string, newStatus: string) => {
   if (!token) {
     throw new Error('No token found. User is not authenticated.')
   }
-  
+
   const response = await axios.patch(
     `${API_URL}/bookings/${id}/status`,
     {

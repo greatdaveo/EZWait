@@ -1,34 +1,14 @@
-import 'expo-dev-client'
-import { Slot, Stack, Tabs } from 'expo-router'
-import { appTheme, navTheme } from 'src/config/theme'
-import { Button, SafeAreaView, StyleSheet, View } from 'react-native'
-import { useState } from 'react'
+import { appTheme } from 'src/config/theme'
+import { StyleSheet } from 'react-native'
 import { Provider } from 'react-redux'
 import store from 'src/redux/store'
-import { PaperProvider } from 'react-native-paper'
+import InnerLayout from './InnerLayout'
 
 export default function AppLayout() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true)
-
   return (
-    <PaperProvider>
-      <Provider store={store}>
-        <Stack screenOptions={{ headerShown: false }}>
-          {isLoggedIn ? (
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          ) : (
-            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-          )}
-
-          <Stack.Screen
-            name="+not-found"
-            options={{
-              title: 'Page Not Found'
-            }}
-          />
-        </Stack>
-      </Provider>
-    </PaperProvider>
+    <Provider store={store}>
+      <InnerLayout />
+    </Provider>
   )
 }
 

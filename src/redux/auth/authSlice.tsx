@@ -78,6 +78,8 @@ export const logoutUserSlice = createAsyncThunk('auth/logout', async (_, thunkAP
     return await authService.logoutService()
   } catch (error: string | any) {
     const message = error.response?.data?.message || error.message || error.toString()
+    console.log('logoutUserSlice: ', message)
+    
     return thunkAPI.rejectWithValue(message)
   }
 })

@@ -10,9 +10,9 @@ export default function TabLayout() {
   const { user } = useSelector((state: RootState) => state.auth)
   const [userRole, setUserRole] = useState<string>(user?.role)
 
-  // useEffect(() => {
-  //   console.log(userRole)
-  // }, [userRole, user])
+  useEffect(() => {
+    setUserRole(userRole)
+  }, [userRole, user])
 
   return (
     <Tabs

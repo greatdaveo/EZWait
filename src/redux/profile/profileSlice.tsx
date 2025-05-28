@@ -26,7 +26,7 @@ export const getStylistProfileSlice = createAsyncThunk('stylist/profile', async 
   try {
     return await profileService.viewStylistProfile(id)
   } catch (error: string | any) {
-    console.log('getStylistProfileSlice: ', error)
+    // console.log('getStylistProfileSlice: ', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -36,7 +36,7 @@ export const getAllStylistProfileSlice = createAsyncThunk('all-stylists/profile'
   try {
     return await profileService.viewAllStylistProfile()
   } catch (error: string | any) {
-    console.log('getStylistProfileSlice: ', error)
+    // console.log('getStylistProfileSlice: ', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -46,18 +46,18 @@ export const editStylistSlice = createAsyncThunk('edit/stylist-profile', async (
   try {
     return await profileService.editStylistProfile(id)
   } catch (error: string | any) {
-    console.log('getStylistProfileSlice: ', error)
+    // console.log('getStylistProfileSlice: ', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
 })
 
 export const updateStylistSlice = createAsyncThunk('update/stylist-profile', async ({ id, formData }: any, thunkAPI) => {
-  console.log(id, formData)
+  // console.log(id, formData)
   try {
     return await profileService.updateStylistProfile(id, formData)
   } catch (error: string | any) {
-    console.log('getStylistProfileSlice: ', error)
+    // console.log('getStylistProfileSlice: ', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -93,7 +93,7 @@ const profileSlice = createSlice({
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        console.log('Unable to fetch Stylist data ❌')
+        // console.log('Unable to fetch Stylist data ❌')
       })
 
       .addCase(getAllStylistProfileSlice.pending, (state) => {
@@ -131,7 +131,7 @@ const profileSlice = createSlice({
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        console.log('Unable to Edit Stylist data ❌')
+        // console.log('Unable to Edit Stylist data ❌')
       })
 
       .addCase(updateStylistSlice.pending, (state) => {
@@ -143,14 +143,14 @@ const profileSlice = createSlice({
         state.isSuccess = true
         state.isError = false
         // state.stylistProfile = action.payload
-        console.log('Stylist Profile Updated Data:', action.payload)
+        // console.log('Stylist Profile Updated Data:', action.payload)
       })
 
       .addCase(updateStylistSlice.rejected, (state, action) => {
         state.isLoading = false
         state.isError = true
         state.message = action.payload as string
-        console.log('Unable to Update Stylist data ❌')
+        // console.log('Unable to Update Stylist data ❌')
       })
   }
 })

@@ -45,6 +45,7 @@ const Login: React.FC = () => {
     }
 
     const payload = { email, password }
+    // console.log(payload)
     await dispatch(loginUserSlice(payload))
   }
 

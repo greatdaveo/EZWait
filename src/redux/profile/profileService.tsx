@@ -2,7 +2,8 @@ import axios from 'axios'
 import { Backend_Url } from '@env'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const API_URL = `${Backend_Url}/api/v1/`
+const API_URL = `${Backend_Url}/api/v1/`
+// console.log('ProfileService: ', API_URL)
 
 const viewStylistProfile = async (id: string) => {
   const token = await AsyncStorage.getItem('token')
