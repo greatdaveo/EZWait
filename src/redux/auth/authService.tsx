@@ -4,7 +4,7 @@ import { LoginData, PasswordData, UserData, UserProfile } from './authSlice'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const API_URL = `${Backend_Url}/api/v1/user`
-// console.log('AuthService: ', API_URL)
+console.log('AuthService: ', API_URL)
 
 // For registration
 const registerService = async (userData: UserData) => {

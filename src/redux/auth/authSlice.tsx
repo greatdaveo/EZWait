@@ -67,7 +67,7 @@ export const loginUserSlice = createAsyncThunk('auth/login', async (userData: Lo
     // console.log('Login Slice userData', userData)
     return await authService.loginService(userData)
   } catch (error: string | any) {
-    // console.log('Login Slice Error', error)
+    console.log('Login Slice Error', error)
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -78,8 +78,8 @@ export const logoutUserSlice = createAsyncThunk('auth/logout', async (_, thunkAP
     return await authService.logoutService()
   } catch (error: string | any) {
     const message = error.response?.data?.message || error.message || error.toString()
-    console.log('logoutUserSlice: ', message)
-    
+    console.log('logoutUserSlice: ', error)
+
     return thunkAPI.rejectWithValue(message)
   }
 })
@@ -166,6 +166,7 @@ const authSlice = createSlice({
         state.isError = true
         state.message = action.payload as string
         state.user = null
+        console.log(action.payload as string)
         Alert.alert('Error ❌', 'Invalid Credentials')
       })
 

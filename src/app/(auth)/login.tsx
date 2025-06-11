@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Button, Pressable, ActivityIndicator } from 'react-native'
-import { Link, router, useNavigation } from 'expo-router'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Button, Pressable, ActivityIndicator, Platform, StatusBar } from 'react-native'
+import { Link, router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { appTheme } from 'src/config/theme'
-import LinkButton from 'src/components/LinkButton'
-import { fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { useDispatch, useSelector } from 'react-redux'
 import { RESET_AUTH, loginUserSlice } from 'src/redux/auth/authSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Login: React.FC = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
@@ -18,6 +15,7 @@ const Login: React.FC = () => {
   const { user, isLoggedIn, isLoading, isSuccess } = useSelector((state: RootState) => state.auth)
 
   const dispatch = useDispatch<AppDispatch>()
+  // const router = useRouter()
 
   useEffect(() => {
     if (isSuccess && isLoggedIn) {
@@ -92,8 +90,8 @@ const Login: React.FC = () => {
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonCover}>
-          <Button title="Login" onPress={handleLogin} color={appTheme.secondary} />
+        <TouchableOpacity style={styles.btnCover} onPress={handleLogin}>
+          <Text style={styles.btnText}>Login</Text>
         </TouchableOpacity>
       </View>
 
@@ -118,6 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 50,
+
     backgroundColor: appTheme.secondary
   },
 
@@ -174,16 +173,21 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 35
   },
-
-  buttonCover: {
-    gap: 15,
-    textAlign: 'center',
-    justifyContent: 'center',
-    width: '100%',
+  btnCover: {
     backgroundColor: appTheme.primary,
+    alignItems: 'center',
+    // paddingVertical: 20,
+    padding: 20,
+    borderRadius: 10,
+    marginTop: 10,
+    marginBottom: 20
+  },
+
+  btnText: {
+    fontSize: 20,
     color: appTheme.secondary,
-    padding: 15,
-    borderRadius: 10
+    textAlign: 'center',
+    fontWeight: '600'
   },
 
   belowTextCover: {

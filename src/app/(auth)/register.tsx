@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import PhoneInput from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
@@ -13,7 +13,7 @@ import axios from 'axios'
 
 interface FormData {
   name: string
-  email: string 
+  email: string
   number: string
   role: string | null
   location?: string | undefined
@@ -140,7 +140,7 @@ const Register: React.FC = () => {
   }
 
   return (
-    <View style={styles.authContainer}>
+    <ScrollView style={styles.authContainer}>
       <View style={styles.topBar}>
         <View style={styles.titleCover}>
           <Text style={styles.title}>Welcome</Text>
@@ -158,6 +158,7 @@ const Register: React.FC = () => {
             onBlur={() => handleBlur('name')}
             style={styles.input}
           />
+
           {errors.name && <Text style={{ color: 'red' }}>{errors.name} </Text>}
 
           <TextInput
@@ -196,8 +197,8 @@ const Register: React.FC = () => {
             textContainerStyle={styles.phoneTextInput}
             textInputStyle={styles.phoneTextInputInner}
             placeholder="Phone Number"
-            value={userData.number}
-            onChangeText={(value) => handleInputChange('number', value)}
+            value={userData?.number}
+            onChangeFormattedText={(value) => handleInputChange('number', value)}
           />
 
           <View style={styles.locationContainer}>
@@ -244,6 +245,7 @@ const Register: React.FC = () => {
               <Ionicons name={passwordVisible ? 'eye-off' : 'eye'} size={20} color="grey" style={styles.inputIcon} />
             </TouchableOpacity>
           </View>
+
           {errors.confirm_password && <Text style={{ color: 'red' }}>{errors.confirm_password}</Text>}
         </>
 
@@ -261,7 +263,7 @@ const Register: React.FC = () => {
           </Link>
         </Text>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: appTheme.secondary,
     // backgroundColor: 'red',
-    paddingTop: 100
+    paddingTop: 40
   },
 
   loadingContainer: {
