@@ -36,7 +36,11 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "13c9a5e4-c3f8-41f2-ac2b-81740de90c51"
       }
-    }
+    },
+    "owner": "greatdaveo"
   }
 }

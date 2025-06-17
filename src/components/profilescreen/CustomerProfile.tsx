@@ -12,7 +12,7 @@ import { ScrollView } from 'react-native'
 
 export default function CustomerProfile() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false)
-  const [isReminderOn, setIsReminderOn] = useState(false)
+  const [isReminderOn, setIsReminderOn] = useState<boolean>(false)
   const { isLoading, isLoggedIn, user } = useSelector((state: RootState) => state.auth)
   const [updating, setUpdating] = useState(false)
 
