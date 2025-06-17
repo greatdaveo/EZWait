@@ -107,9 +107,9 @@ const Register: React.FC = () => {
   const handleRegister = async () => {
     const { name, email, number, role, password, confirm_password, location } = userData
 
-    // if (!name || !email || !number || !role || !password || !confirm_password) {
-    //   return Alert.alert('All fields are required.')
-    // }
+    if (!name || !email || !number || !role || !password || !confirm_password) {
+      return Alert.alert('All fields are required.')
+    }
 
     if (password !== confirm_password) {
       return Alert.alert('Passwords do not match.')
@@ -148,7 +148,6 @@ const Register: React.FC = () => {
       </View>
 
       <View style={styles.inputContainer}>
-        {/* {currentStep === 1 && ( */}
         <>
           <TextInput
             placeholder="Full Name"
@@ -256,12 +255,12 @@ const Register: React.FC = () => {
           </TouchableOpacity>
         </>
 
-        <Text style={styles.belowTextCover}>
-          Already have an account?{' '}
-          <Link href={'/(auth)/login'} style={styles.belowText}>
-            Login
-          </Link>
-        </Text>
+        <View style={styles.belowCover}>
+          <Text style={styles.belowTextCover}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+            <Text style={styles.belowText}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   )
@@ -272,11 +271,9 @@ export default Register
 const styles = StyleSheet.create({
   authContainer: {
     flex: 1,
-    // justifyContent: 'center',
     paddingHorizontal: 20,
     backgroundColor: appTheme.secondary,
-    // backgroundColor: 'red',
-    paddingTop: 40
+    paddingTop: 80
   },
 
   loadingContainer: {
@@ -452,11 +449,17 @@ const styles = StyleSheet.create({
     marginBottom: 35
   },
 
+  belowCover: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    marginTop: 10
+    // marginTop: -50
+  },
+
   belowTextCover: {
-    textAlign: 'center',
-    // marginTop: 20,
-    marginBottom: 100,
-    fontSize: 16
+    textAlign: 'center'
   },
 
   belowText: {

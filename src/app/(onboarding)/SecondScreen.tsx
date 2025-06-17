@@ -1,25 +1,23 @@
-import LinkButton from 'src/components/LinkButton'
-import ScreenLayout from 'src/components/ScreenLayout'
 import { Image, ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
-import { Link } from 'expo-router'
 
 export default function SecondScreen() {
   return (
-    <ScreenLayout testID="home-screen-layout">
-      <View style={styles.Content}>
-        <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
-          <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
-            <View style={styles.overlay}>
+    <View style={styles.Content}>
+      <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
+        <ImageBackground source={require('../../assets/images/onboarding/Stylist3.png')} style={styles.backgroundImage}>
+          <View style={styles.overlay}>
+            <View style={styles.titleCover}>
               <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
-              <Text style={styles.title}>Book in seconds with EZWait</Text>
-              <Text style={styles.subtitle}>Schedule easily within a second. Reserve and manage your appointments</Text>
+              <Text style={styles.title}>EzWait</Text>
             </View>
-          </LinearGradient>
+
+            <Text style={styles.subtitle}>Schedule easily within a second. Reserve and manage your appointments</Text>
+          </View>
         </ImageBackground>
-      </View>
-    </ScreenLayout>
+      </LinearGradient>
+    </View>
   )
 }
 
@@ -32,38 +30,49 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     width: '100%',
-    height: '90%',
-    justifyContent: 'space-between'
-
+    height: '100%',
+    justifyContent: 'flex-end'
   },
 
   gradient: {
     ...StyleSheet.absoluteFillObject
   },
 
-  logo: {},
-
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    gap: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+
+  titleCover: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  logo: {
+    width: 40,
+    height: 35,
+    resizeMode: 'contain',
+    marginRight: 4
   },
 
   title: {
     color: appTheme.secondary,
-    fontSize: 42,
-    paddingHorizontal: 30,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 20
+    fontSize: 40,
+    fontWeight: '500',
+    textAlign: 'center'
+    // marginBottom: 10
   },
 
   subtitle: {
     color: appTheme.secondary2,
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 200,
+    maxWidth: '60%'
   }
 })

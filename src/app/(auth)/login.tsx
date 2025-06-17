@@ -95,13 +95,11 @@ const Login: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <View>
-        <Text style={styles.belowTextCover}>
-          Don't have an account?{' '}
-          <Link href="/(auth)/register" style={styles.belowText}>
-            Sign Up
-          </Link>
-        </Text>
+      <View style={styles.belowCover}>
+        <Text style={styles.belowTextCover}>Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+          <Text style={styles.belowText}>Sign Up</Text>
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -190,9 +188,16 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
 
+  belowCover: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5
+    // marginTop: -50
+  },
+
   belowTextCover: {
-    textAlign: 'center',
-    marginTop: -50
+    textAlign: 'center'
   },
 
   belowText: {

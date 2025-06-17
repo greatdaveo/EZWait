@@ -8,7 +8,9 @@ module.exports = function (api) {
         {
           envName: 'APP_ENV',
           moduleName: '@env',
-          path: '.env'
+          safe: false,
+          path: '.env',
+          allowUndefined: true
         }
       ],
       // Compile Exported Namespaces

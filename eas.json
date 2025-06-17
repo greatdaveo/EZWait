@@ -1,3 +1,39 @@
 {
-  "build": { "preview": { "ios": { "simulator": true } }, "production": {} }
+  "build": {
+    "preview": {
+      "distribution": "store",
+      "developmentClient": false,
+      "ios": { "simulator": false },
+      "env": {
+        "BACKEND_URL": "@BACKEND_URL",
+        "CLOUDINARY_URL": "@CLOUDINARY_URL",
+        "CLOUD_NAME": "@CLOUD_NAME",
+        "UPLOAD_PRESET": "@UPLOAD_PRESET"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "developmentClient": false,
+      "env": {
+        "BACKEND_URL": "@BACKEND_URL",
+        "CLOUDINARY_URL": "@CLOUDINARY_URL",
+        "CLOUD_NAME": "@CLOUD_NAME",
+        "UPLOAD_PRESET": "@UPLOAD_PRESET"
+      }
+    }
+  },
+  "submit": {
+    "preview": {
+      "ios": {
+        "appleId": "olowomeyedavid242@gmail.com",
+        "ascAppId": "6747401156"
+      }
+    },
+    "production": {
+      "ios": {
+        "appleId": "olowomeyedavid242@gmail.com",
+        "ascAppId": "6747401156"
+      }
+    }
+  }
 }

@@ -1,44 +1,46 @@
 {
   "expo": {
-    "name": "EZWAit App",
-    "slug": "expo-router-typescript",
+    "name": "EZWAit-App",
+    "slug": "EZWAit-App",
+    "version": "1.0.3",
     "scheme": "app",
-    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/app-icon.png",
+    "icon": "./src/assets/images/icons/AppIcon.png",
     "splash": {
       "image": "./src/assets/images/splash.png",
+      "resizeMode": "contain",
       "backgroundColor": "#222"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.yourcompany.ezwait"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.greatdaveo.ezwait",
+      "buildNumber": "1.0.3",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "We need to access your photo library so you can attach images to your wait list entries and profile.",
+        "NSCameraUsageDescription": "We need to access your camera so you can take photos directly within the app."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/app-icon.png",
+        "foregroundImage": "./src/assets/images/icons/AppIcon.png",
         "backgroundColor": "#222"
       },
-      "package": "com.haytherecharlie.exporoutertypescript"
+      "package": "com.greatdaveo.ezwait",
+      "versionCode": 2
     },
     "web": {
-      "favicon": "./src/assets/images/app-icon.png",
+      "favicon": "./src/assets/images/icons/AppIcon.png",
       "bundler": "metro"
     },
-    "plugins": [
-      "expo-router",
-      "expo-font",
-      "expo-asset"
-    ],
+    "plugins": ["expo-router", "expo-font", "expo-asset"],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "13c9a5e4-c3f8-41f2-ac2b-81740de90c51"
+        "projectId": "38cdd3e3-685e-4644-8c21-922f20820c88"
       }
     },
     "owner": "greatdaveo"

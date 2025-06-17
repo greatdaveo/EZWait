@@ -1,6 +1,4 @@
-import LinkButton from 'src/components/LinkButton'
-import ScreenLayout from 'src/components/ScreenLayout'
-import { Button, ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { appTheme } from 'src/config/theme'
 import { Link, router, useNavigation } from 'expo-router'
@@ -9,29 +7,25 @@ import { Ionicons } from '@expo/vector-icons'
 
 export default function ThirdScreen() {
   return (
-    // <ScreenLayout testID="home-screen-layout">
     <View style={styles.Content}>
       <LinearGradient colors={['transparent', 'white']} style={styles.gradient}>
-        <ImageBackground source={require('../../assets/images/backgroundImg.png')} style={styles.backgroundImage}>
+        <ImageBackground source={require('../../assets/images/onboarding/Stylist1.png')} style={styles.backgroundImage}>
           <View style={styles.overlay}>
             <View style={styles.titleCover}>
               <Image source={require('../../assets/images/Logo.png')} style={styles.logo} />
-              <Text style={styles.title}>Ezwait</Text>
+              <Text style={styles.title}>EzWait</Text>
             </View>
 
-            <Text style={styles.subtitle}>Book top barbers easily and stay sharp. Your perfect cut is a tap away!</Text>
+            <Text style={styles.subtitle}>Book top stylist easily and stay sharp. Your perfect style is a tap away!</Text>
 
-            <TouchableOpacity style={styles.buttonContainer}>
-              <Link href="/(auth)/login" style={styles.btnText}>
-                Get Started
-              </Link>
+            <TouchableOpacity style={styles.buttonContainer} onPress={() => router.push('/(auth)/login')}>
+              <Text style={styles.btnText}>Get Started</Text>
               <Ionicons name="arrow-forward" color={'white'} size={20} />
             </TouchableOpacity>
           </View>
         </ImageBackground>
       </LinearGradient>
     </View>
-    //  </ScreenLayout>
   )
 }
 
