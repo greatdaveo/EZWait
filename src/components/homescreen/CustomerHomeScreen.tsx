@@ -7,6 +7,7 @@ import { appTheme } from 'src/config/theme'
 import { getAllBookingsSlice } from 'src/redux/bookings/bookingSlice'
 import { getAllStylistProfileSlice } from 'src/redux/profile/profileSlice'
 import { AppDispatch, RootState } from 'src/redux/store'
+import { UserTopContent } from '../utils/UserTopContent'
 
 const sampleData = [
   {
@@ -30,63 +31,6 @@ const sampleData = [
     caption: 'Buzz Cut'
   }
 ]
-
-export const UserTopContent = ({ showSearch, setShowSearch }: any) => {
-  // const [showSearch, setShowSearch] = useState(true)
-  const { user, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
-  const [searchQuery, setSearchQuery] = useState('')
-
-  const router = useRouter()
-  const [userName, setUserName] = useState<string>(user?.name)
-
-  const searchItem = (query: string) => {
-    setSearchQuery(query)
-    console.log('Searching for: ', query)
-  }
-
-  const viewNotification = () => {
-    router.push('/notification')
-  }
-
-  return (
-    <>
-      {showSearch ? (
-        <View style={styles.searchBarContainer}>
-          <View style={styles.searchInputContainer}>
-            <TextInput placeholder="Search" placeholderTextColor={'#757575'} style={styles.search} onChangeText={() => searchItem('')} />
-            <Ionicons name="search-outline" size={24} color={'#757575'} style={styles.searchIcon} />
-          </View>
-
-          <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
-            <Ionicons name="close-outline" size={30} color={'#757575'} style={styles.cancelIcon} />
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.topBarContainer}>
-          <View style={styles.imgCover}>
-            {/* <Image source={{ uri: 'https://i.ibb.co/Ch0KY50/default-avatar-photo-placeholder-profile-icon-vector.jpg' }} style={styles.img} /> */}
-            {/* <Image source={require('../../../assets/images/customers/CustomerImg.png')} style={styles.img} /> */}
-            <Image source={require('../../assets/images/customers/CustomerImg.png')} style={styles.img} />
-
-            <View style={styles.greetingsCover}>
-              <Text style={styles.subtext}>Good Afternoon, 👋 </Text>
-              <Text style={styles.nameText}>{userName}</Text>
-            </View>
-          </View>
-
-          <View style={styles.iconCover}>
-            <TouchableOpacity onPress={() => setShowSearch(!showSearch)}>
-              <Ionicons name="search-outline" size={30} color={'#757575'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={viewNotification}>
-              <Ionicons name="notifications-outline" size={30} color={'#757575'} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-    </>
-  )
-}
 
 const CustomerHomeScreen = () => {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth)
@@ -201,82 +145,7 @@ const CustomerHomeScreen = () => {
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    // marginTop: 40,
     padding: 5
-  },
-
-  searchBarContainer: {
-    flexDirection: 'row',
-    marginTop: 100
-    // backgroundColor: 'red'
-  },
-
-  searchInputContainer: {
-    flex: 1,
-    position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    // gap: 10,
-    backgroundColor: '#FAF8FF',
-    borderRadius: 10,
-    marginBottom: 30
-  },
-
-  search: {
-    padding: 15,
-    fontSize: 18,
-    color: 'red'
-  },
-
-  searchIcon: {
-    position: 'absolute',
-    right: 15,
-    alignContent: 'center'
-  },
-
-  cancelIcon: {
-    alignContent: 'center',
-    padding: 10
-  },
-
-  // ::::::::::::::::
-
-  topBarContainer: {
-    marginTop: 30,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20
-  },
-
-  imgCover: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10
-    // marginHorizontal: 10,
-    // paddingHorizontal: 10
-  },
-
-  img: {
-    width: 50,
-    height: 50,
-    borderRadius: 50
-  },
-
-  greetingsCover: {
-    gap: 5
-  },
-
-  iconCover: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10
-  },
-
-  alarmIcon: {
-    width: 30,
-    height: 30
   },
 
   nameText: {

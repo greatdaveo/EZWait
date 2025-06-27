@@ -12,6 +12,7 @@ web-build/
 build-*.tar.gz
 coverage
 .env
-
+android
+ios
 # macOS
 .DS_Store

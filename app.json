@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "EZWAit-App",
+    "name": "EZWait",
     "slug": "EZWAit-App",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "scheme": "app",
     "orientation": "portrait",
     "icon": "./src/assets/images/icons/AppIcon.png",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.greatdaveo.ezwait",
-      "buildNumber": "1.0.3",
+      "buildNumber": "1.0.5",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "We need to access your photo library so you can attach images to your wait list entries and profile.",
@@ -28,7 +28,7 @@
         "backgroundColor": "#222"
       },
       "package": "com.greatdaveo.ezwait",
-      "versionCode": 2
+      "versionCode": 1
     },
     "web": {
       "favicon": "./src/assets/images/icons/AppIcon.png",

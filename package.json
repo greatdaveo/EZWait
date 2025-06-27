@@ -17,7 +17,9 @@
     "start": "expo start --go",
     "test": "jest",
     "upgrade": "expo upgrade",
-    "web": "expo start --web --no-dev --host localhost --port 3000"
+    "web": "expo start --web --no-dev --host localhost --port 3000",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "overrides": {
     "semver": ">=7.5.4"
@@ -98,5 +100,6 @@
     "react-native-dotenv": "^3.4.11",
     "react-test-renderer": "19.0.0",
     "typescript": "~5.8.3"
-  }
+  },
+  "version": "1.0.0"
 }
