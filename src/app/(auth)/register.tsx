@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import PhoneInput from 'react-native-phone-number-input'
+import PhoneInputRaw, { PhoneInputProps } from 'react-native-phone-number-input'
 import { appTheme } from 'src/config/theme'
 import { Link, router, useNavigation } from 'expo-router'
 import DropDownPicker from 'react-native-dropdown-picker'
@@ -42,6 +42,8 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false)
 
   const { isLoading, isLoggedIn, isSuccess, isError } = useSelector((state: RootState) => state.auth)
+
+  const PhoneInput = PhoneInputRaw as unknown as React.ComponentType<PhoneInputProps>
 
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigation()
@@ -176,7 +178,6 @@ const Register: React.FC = () => {
             items={dropdownItems}
             setOpen={setOpen}
             placeholder="Select a role"
-            // setValue={(callback) => handleInputChange('role', callback(userData.role))}
             setValue={(callback) => {
               const value = callback(userData.role)
               handleInputChange('role', value)
@@ -186,17 +187,19 @@ const Register: React.FC = () => {
             dropDownContainerStyle={styles.dropdownContainer}
             textStyle={styles.dropdownText}
             labelStyle={styles.dropdownLabel}
-            // onChangeValue={(value) => handleInputChange('role', value)}
+            listMode="SCROLLVIEW"
           />
 
           <PhoneInput
             defaultCode="GB"
             layout="first"
+            // withShadow
             containerStyle={styles.phoneInputContainer}
             textContainerStyle={styles.phoneTextInput}
             textInputStyle={styles.phoneTextInputInner}
             placeholder="Phone Number"
             value={userData?.number}
+            // countryPickerButtonStyle={styles.flagButton}
             onChangeFormattedText={(value) => handleInputChange('number', value)}
           />
 
@@ -390,6 +393,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10
   },
+
+  flagButton: {
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
   phoneTextInput: {
     backgroundColor: '#f2f2f2',
     borderRadius: 8

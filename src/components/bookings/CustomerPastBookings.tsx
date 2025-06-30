@@ -64,7 +64,10 @@ export default function CustomerPastBookings() {
             dispatch(updateBookingStatusSlice({ id: id.toString(), newStatus: 'cancelled' }))
               .unwrap()
               .then(() => dispatch(getAllBookingsSlice()))
-              .catch(() => Alert.alert('Error', 'Could not cancel'))
+              .catch((error: any) => {
+                console.log('cancelBooking: ', error)
+                Alert.alert('❌ Error', 'Could not cancel')
+              })
         }
       ],
       { cancelable: true }

@@ -86,7 +86,7 @@ const ScheduleScreen = () => {
       .unwrap()
       .then(() => {
         Alert.alert('Booked! ✅', 'You appointment is pending confirmation.')
-        router.push('/(tabs)/Bookings')
+        router.push('/(tabs)/ProtectedBookingsScreen')
       })
       .catch((err: any) => {
         console.log('makeBookingSlice Error: ❌', err)
