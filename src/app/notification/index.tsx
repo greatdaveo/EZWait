@@ -13,21 +13,54 @@ const Index = () => {
   }
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <>
-        <View style={styles.topBar}>
-          <TouchableOpacity onPress={handlePreviousStep} style={styles.iconCover}>
-            <Ionicons name="chevron-back-outline" size={28} color={appTheme.primary} />
-          </TouchableOpacity>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={handlePreviousStep} style={styles.iconCover}>
+          <Ionicons name="chevron-back-outline" size={28} color={appTheme.primary} />
+        </TouchableOpacity>
 
-          <View style={styles.titleCover}>
-            <Text style={styles.title}>Notifications</Text>
+        <View style={styles.titleCover}>
+          <Text style={styles.title}>Notifications</Text>
+        </View>
+      </View>
+
+      <View style={styles.appointmentDetailsCover}>
+        <View style={styles.detailsCover}>
+          <Ionicons name="calendar-outline" color={appTheme.primary} size={28} />
+
+          <View style={styles.customerDetails}>
+            <Text style={styles.customerName}>New Booking Requests</Text>
+            <Text style={styles.date}>You have a new appointment request!</Text>
           </View>
         </View>
 
-        <View>
-          <Text>Notification Screen</Text>
+        <TouchableOpacity style={styles.acceptBtn} disabled={true}>
+          <Text style={styles.btnText}>View</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.appointmentDetailsCover}>
+        <View style={styles.detailsCover}>
+          <View style={styles.notificationCover}>
+            <Ionicons name="notifications" size={30} color={appTheme.primary} />
+          </View>
+
+          <View style={styles.customerDetails}>
+            <Text style={styles.date}>Client Canceled Booking: Michael A. canceled their appointment for March 10.</Text>
+          </View>
         </View>
-      </>
+      </View>
+
+      <View style={styles.appointmentDetailsCover}>
+        <View style={styles.detailsCover}>
+          <View style={styles.notificationCover}>
+            <Ionicons name="person" size={30} color={appTheme.primary} />
+          </View>
+
+          <View style={styles.customerDetails}>
+            <Text style={styles.date}>Your profile has been successfully updated.</Text>
+          </View>
+        </View>
+      </View>
     </ScrollView>
   )
 }
@@ -35,10 +68,9 @@ const Index = () => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 50,
-    padding: 20,
+    paddingTop: 20,
     backgroundColor: '#FFFFFF',
     height: '100%'
-    // position: 'static'
   },
 
   topBar: {
@@ -69,9 +101,62 @@ const styles = StyleSheet.create({
     marginHorizontal: 50,
     textAlign: 'center'
     // marginBottom: 4
-  }
+  },
 
   // ::::::::::::::::::
+  appointmentDetailsCover: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 30,
+    gap: 5,
+    marginTop: 5,
+    padding: 30,
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#EBEBEB'
+  },
+
+  detailsCover: {
+    flexDirection: 'row',
+    gap: 20
+  },
+
+  customerDetails: {
+    gap: 15
+  },
+
+  customerName: {
+    fontWeight: 'bold',
+    fontSize: 16
+  },
+
+  date: {
+    fontWeight: 'medium',
+    fontSize: 16,
+    maxWidth: '90%',
+    color: '#757575'
+  },
+
+  acceptBtn: {
+    // marginLeft: 10
+  },
+
+  btnText: {
+    color: appTheme.primary,
+    fontWeight: 'bold',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: appTheme.primary,
+    padding: 10,
+    borderRadius: 30
+  },
+
+  notificationCover: {
+    backgroundColor: appTheme.semi,
+    borderRadius: '50%',
+    padding: 8
+  }
 })
 
 export default Index

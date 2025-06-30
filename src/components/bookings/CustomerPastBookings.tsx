@@ -47,6 +47,8 @@ export default function CustomerPastBookings() {
     .filter((booking: any) => moment(booking.start_time).isAfter(now))
     .sort((a: any, b: any) => moment(a.start_time).diff(b.start_time))
 
+  // console.log('bookings.data:', upcoming.stylist.name)
+
   const completed = bookings.data
     .filter((booking: any) => !moment(booking.start_time).isAfter(now))
     .sort((a: any, b: any) => moment(b.start_time).diff(a.start_time))
@@ -92,7 +94,7 @@ export default function CustomerPastBookings() {
                 <Ionicons name="calendar-outline" size={28} color={appTheme.themeBlack} />
 
                 <View style={styles.customerDetails}>
-                  <Text style={styles.customerName}>{booking.stylist?.name || booking.user?.name}</Text>
+                  <Text style={styles.customerName}>{booking.stylist?.name}</Text>
                   <Text style={styles.date}>{moment(booking.start_time).format('MMMM D, YYYY')}</Text>
                   <Text style={styles.time}>
                     🕒 {moment(booking.start_time).format('h:mm A')} – {moment(booking.end_time).format('h:mm A')}
