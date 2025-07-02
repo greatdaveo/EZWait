@@ -34,7 +34,20 @@
       "favicon": "./src/assets/images/icons/AppIcon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-font", "expo-asset"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/assets/images/icons/AppIcon.png",
+          "color": "#9747FF",
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": false
+        }
+      ]
+    ],
     "extra": {
       "router": {
         "origin": false
