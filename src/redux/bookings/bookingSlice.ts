@@ -33,6 +33,7 @@ export const getAllBookingsSlice = createAsyncThunk('bookings/view-bookings', as
   try {
     return await bookingService.getAllBookings()
   } catch (error: string | any) {
+    // console.log(error.toJSON())
     const message = error.response?.data?.message || error.message || error.toString()
     return thunkAPI.rejectWithValue(message)
   }
@@ -202,7 +203,7 @@ const bookingSlice = createSlice({
       .addCase(updateBookingStatusSlice.pending, (state) => {
         state.isLoading = true
       })
-      
+
       .addCase(updateBookingStatusSlice.fulfilled, (state, action) => {
         state.isLoading = false
         state.isSuccess = true

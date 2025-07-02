@@ -94,7 +94,7 @@ const CustomerHomeScreen = () => {
           </View>
 
           {(allStylists?.data || []).map((stylist: any, i: number) => {
-            console.log(stylist.profile_picture)
+            // console.log(stylist.profile_picture)
             return (
               <View style={styles.stylistCardContainer} key={i}>
                 <View style={styles.stylistCard}>

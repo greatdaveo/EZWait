@@ -9,7 +9,7 @@ console.log('AuthService: ', API_URL)
 // For registration
 const registerService = async (userData: UserData) => {
   const response = await axios.post(API_URL + '/register', userData, {
-    withCredentials: true
+    // withCredentials: true
   })
 
   return response.data
@@ -18,7 +18,7 @@ const registerService = async (userData: UserData) => {
 // For Login
 const loginService = async (userData: LoginData) => {
   const response = await axios.post(API_URL + '/login', userData, {
-    withCredentials: true
+    // withCredentials: true
   })
   // console.log('Login Data: ', response.data)
   const { data, token } = response.data

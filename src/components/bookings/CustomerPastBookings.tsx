@@ -16,6 +16,8 @@ export default function CustomerPastBookings() {
   const { isLoggedIn } = useSelector((s: RootState) => s.auth)
   const { isLoading, bookings } = useSelector((s: RootState) => s.bookings)
 
+  // console.log(bookings.stylist?.name)
+
   // To fetch all bookings for this user on mount
   useEffect(() => {
     if (isLoggedIn) {
@@ -67,7 +69,7 @@ export default function CustomerPastBookings() {
               .unwrap()
               .then(() => dispatch(getAllBookingsSlice()))
               .catch((error: any) => {
-                console.log('cancelBooking: ', error)
+                // console.log('cancelBooking: ', error)
                 Alert.alert('❌ Error', 'Could not cancel')
               })
         }
@@ -88,41 +90,45 @@ export default function CustomerPastBookings() {
             <Text style={styles.appointmentHeader}>Upcoming Appointments ------------------------------</Text>
           </View>
 
-          {upcoming.map((booking: any, i: number) => (
-            <View key={i} style={styles.appointmentDetailsCover}>
-              <View style={styles.detailsCover}>
-                <Ionicons name="calendar-outline" size={28} color={appTheme.themeBlack} />
+          {upcoming.map((booking: any, i: number) => {
+            // console.log('booking:------- ', booking)
 
-                <View style={styles.customerDetails}>
-                  <Text style={styles.customerName}>{booking.stylist?.name}</Text>
-                  <Text style={styles.date}>{moment(booking.start_time).format('MMMM D, YYYY')}</Text>
-                  <Text style={styles.time}>
-                    🕒 {moment(booking.start_time).format('h:mm A')} – {moment(booking.end_time).format('h:mm A')}
-                  </Text>
+            return (
+              <View key={i} style={styles.appointmentDetailsCover}>
+                <View style={styles.detailsCover}>
+                  <Ionicons name="calendar-outline" size={28} color={appTheme.themeBlack} />
+
+                  <View style={styles.customerDetails}>
+                    <Text style={styles.customerName}>{booking.stylist?.name}</Text>
+                    <Text style={styles.date}>{moment(booking.start_time).format('MMMM D, YYYY')}</Text>
+                    <Text style={styles.time}>
+                      🕒 {moment(booking.start_time).format('h:mm A')} – {moment(booking.end_time).format('h:mm A')}
+                    </Text>
+                  </View>
                 </View>
+
+                {booking.booking_status === 'pending' ? (
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity style={styles.editBtn} onPress={() => editBooking(booking.id)}>
+                      <Text style={styles.editText}>Edit</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.cancelBtn} onPress={() => cancelBooking(booking.id)}>
+                      <Text style={styles.cancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : booking.booking_status === 'cancelled' ? (
+                  <View style={styles.acceptBtn}>
+                    <Text style={styles.cancelText}>Cancelled</Text>
+                  </View>
+                ) : (
+                  <View style={styles.acceptBtn}>
+                    <Text style={styles.btnText}>Confirmed</Text>
+                  </View>
+                )}
               </View>
-
-              {booking.booking_status === 'pending' ? (
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                  <TouchableOpacity style={styles.editBtn} onPress={() => editBooking(booking.id)}>
-                    <Text style={styles.editText}>Edit</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity style={styles.cancelBtn} onPress={() => cancelBooking(booking.id)}>
-                    <Text style={styles.cancelText}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : booking.booking_status === 'cancelled' ? (
-                <View style={styles.acceptBtn}>
-                  <Text style={styles.cancelText}>Cancelled</Text>
-                </View>
-              ) : (
-                <View style={styles.acceptBtn}>
-                  <Text style={styles.btnText}>Confirmed</Text>
-                </View>
-              )}
-            </View>
-          ))}
+            )
+          })}
 
           {/* For Past Appointments */}
           <View style={styles.passAppointments}>
